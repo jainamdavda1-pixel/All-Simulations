@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Layout Rescue Mission</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-info">
+                <h1>UI Layout Rescue Mission</h1>
+                <p>Learn how to fix a broken screen layout using good screen design principles.</p>
+            </div>
+            <div class="header-progress-stats">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="header-stats">
+                    <span class="badge" id="level-indicator">Level 1 of 6</span>
+                    <span class="badge score-badge">XP: <span id="current-score">0</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="simulation-container">
+        <!-- Level 1: Identify Layout Mistakes -->
+        <section id="level-1" class="level-section active">
+            <h2>Level 1: Identify Layout Mistakes</h2>
+            <p class="scenario">Click on the areas that represent a badly designed layout mistake. There are 8 mistakes
+                to find!</p>
+
+            <div class="bad-mockup realistic-mockup" id="bad-mockup">
+                <!-- Sidebar -->
+                <div class="mockup-mistake realistic-sidebar" data-mistake="sidebar">
+                    <div class="sidebar-logo">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        LightningSaaS
+                    </div>
+                    <ul class="sidebar-nav">
+                        <li class="active"><svg width="20" height="20" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                </path>
+                            </svg> Dashboard</li>
+                        <li><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg> Team</li>
+                        <li><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                </path>
+                            </svg> Reports</li>
+                        <li><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg> Settings</li>
+                    </ul>
+                </div>
+
+                <!-- Header -->
+                <div class="mockup-mistake realistic-header" data-mistake="header">
+                    <span class="nav-links">Dashboard Overview &nbsp;&middot;&nbsp; 24 New Notifications
+                        &nbsp;&middot;&nbsp; Logged in as Admin</span>
+                </div>
+
+                <!-- Footer -->
+                <div class="mockup-mistake realistic-footer" data-mistake="footer">
+                    <span>Privacy Policy | Terms of Service | &copy; 2026 LightningSaaS Inc.</span>
+                </div>
+
+                <!-- Button -->
+                <button class="mockup-mistake realistic-btn" data-mistake="button">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg> Create New Project
+                </button>
+
+                <!-- Cards -->
+                <div class="mockup-mistake realistic-cards" data-mistake="spacing">
+                    <div class="card c1">
+                        <h2>Total Revenue</h2>
+                        <p>$24,592</p>
+                        <span class="trend up">↑ +14.5%</span>
+                    </div>
+                    <div class="card c2">
+                        <h2>Active Users</h2>
+                        <p>1,432</p>
+                        <span class="trend down">↓ -2.4%</span>
+                    </div>
+                    <div class="card c3">
+                        <h2>Conversion Rate</h2>
+                        <p>4.8%</p>
+                        <span class="trend up">↑ +1.1%</span>
+                    </div>
+                </div>
+
+                <!-- Hidden -->
+                <div class="mockup-mistake realistic-hidden" data-mistake="hidden">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                        </path>
+                    </svg> Payment processing is currently failing!
+                </div>
+
+                <!-- Search -->
+                <div class="mockup-mistake realistic-search" data-mistake="search">
+                    <svg width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" placeholder="Search customers..." disabled>
+                </div>
+
+                <!-- Hierarchy -->
+                <div class="mockup-mistake realistic-hierarchy" data-mistake="hierarchy">
+                    <span>Recent Customer Activity Log</span>
+                    <span>12:43 PM user signed up for premium plan</span>
+                    <span>11:15 AM user downgraded to free tier</span>
+                    <span>09:30 AM database backup completed</span>
+                </div>
+
+                <!-- Decoy -->
+                <div class="mockup-decoy realistic-decoy1">
+                    <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" class="avatar-img">
+                    <div class="profile-info">
+                        <strong>Sarah Jenkins</strong>
+                        <span>Senior Administrator</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mistake-feedback" id="mistake-feedback">Find the mistakes...</div>
+            <div class="found-counter">Mistakes found: <span id="mistakes-found">0</span> / 8</div>
+
+            <button class="primary-btn" id="next-btn-1" style="display: none;" onclick="goToNextLevel()">Next
+                Level</button>
+        </section>
+
+        <!-- Level 2: Fix the Broken Layout -->
+        <section id="level-2" class="level-section">
+            <h2>Level 2: Fix the Broken Layout</h2>
+            <p class="scenario">Drag the UI elements from the left panel and drop them into the correct zones on the
+                right canvas.</p>
+
+            <div class="builder-container">
+                <div class="elements-panel" id="elements-pool">
+                    <h3>UI Elements</h3>
+                    <div class="draggable-item" draggable="true" data-element="header">Header</div>
+                    <div class="draggable-item" draggable="true" data-element="sidebar">Sidebar</div>
+                    <div class="draggable-item" draggable="true" data-element="search">Search Bar</div>
+                    <div class="draggable-item" draggable="true" data-element="profile">Profile Icon</div>
+                    <div class="draggable-item" draggable="true" data-element="main">Main Content</div>
+                    <div class="draggable-item" draggable="true" data-element="progress">Progress Card</div>
+                    <div class="draggable-item" draggable="true" data-element="quiz">Quiz Card</div>
+                    <div class="draggable-item" draggable="true" data-element="leaderboard">Leaderboard Card</div>
+                    <div class="draggable-item" draggable="true" data-element="button">Primary Button</div>
+                    <div class="draggable-item" draggable="true" data-element="notification">Notification Panel</div>
+                    <div class="draggable-item" draggable="true" data-element="footer">Footer</div>
+                </div>
+
+                <div class="canvas-panel">
+                    <div class="canvas-zone drop-zone top-zone" data-zone="top">Top Zone</div>
+                    <div class="canvas-middle">
+                        <div class="canvas-zone drop-zone left-zone" data-zone="left">Left Zone</div>
+                        <div class="canvas-zone drop-zone center-zone" data-zone="center">Center Zone</div>
+                        <div class="canvas-zone drop-zone right-zone" data-zone="right">Right Zone</div>
+                    </div>
+                    <div class="canvas-zone drop-zone bottom-zone" data-zone="bottom">Bottom Zone</div>
+                </div>
+            </div>
+
+            <button class="check-btn" onclick="checkLayout()">Check Layout</button>
+            <div class="feedback" id="feedback-2"></div>
+            <button class="primary-btn" id="next-btn-2" style="display: none;" onclick="goToNextLevel()">Next
+                Level</button>
+        </section>
+
+        <!-- Level 3: Choose the Best Layout Pattern -->
+        <section id="level-3" class="level-section">
+            <h2>Level 3: Choose the Best Layout Pattern</h2>
+            <p class="scenario">Which layout pattern is best for a learning dashboard with modules, quizzes, progress,
+                leaderboard, and settings?</p>
+
+            <div class="layout-options">
+                <div class="layout-card" onclick="selectLayoutPattern('top', this)">
+                    <div class="mock-top"></div>
+                    <h3>Option A: Top navigation layout</h3>
+                </div>
+                <div class="layout-card" onclick="selectLayoutPattern('sidebar', this)">
+                    <div class="mock-sidebar"></div>
+                    <h3>Option B: Sidebar dashboard layout</h3>
+                </div>
+                <div class="layout-card" onclick="selectLayoutPattern('mixed', this)">
+                    <div class="mock-mixed"></div>
+                    <h3>Option C: Random mixed layout</h3>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback-3"></div>
+            <button class="primary-btn" id="next-btn-3" style="display: none;" onclick="goToNextLevel()">Next
+                Level</button>
+        </section>
+
+        <!-- Level 4: Responsive Layout Challenge -->
+        <section id="level-4" class="level-section">
+            <h2>Level 4: Responsive Layout Challenge</h2>
+            <p class="scenario">Choose the best arrangement rule for each device view.</p>
+
+            <div class="device-tabs">
+                <button class="device-tab active" onclick="showDeviceQuestion('desktop')">Desktop View</button>
+                <button class="device-tab" onclick="showDeviceQuestion('tablet')">Tablet View</button>
+                <button class="device-tab" onclick="showDeviceQuestion('mobile')">Mobile View</button>
+            </div>
+
+            <div id="q-desktop" class="device-question active">
+                <h3>What is the best layout rule for Desktop?</h3>
+                <div class="mcq-options">
+                    <label><input type="radio" name="desktop" value="wrong1"> Cards must be single column and sidebar
+                        hidden.</label>
+                    <label><input type="radio" name="desktop" value="correct"> Sidebar stays on the left, cards in
+                        multiple columns, header contains search/profile.</label>
+                    <label><input type="radio" name="desktop" value="wrong2"> Sidebar on top, main content
+                        hidden.</label>
+                </div>
+                <button class="mcq-btn" onclick="checkDeviceAnswer('desktop')">Submit</button>
+                <div class="mcq-feedback"></div>
+            </div>
+
+            <div id="q-tablet" class="device-question" style="display: none;">
+                <h3>What is the best layout rule for Tablet?</h3>
+                <div class="mcq-options">
+                    <label><input type="radio" name="tablet" value="correct"> Sidebar becomes collapsible, cards reduce
+                        to two columns, actions remain visible.</label>
+                    <label><input type="radio" name="tablet" value="wrong1"> Keep desktop view exactly the same but
+                        shrink text.</label>
+                    <label><input type="radio" name="tablet" value="wrong2"> Remove the sidebar entirely and delete the
+                        cards.</label>
+                </div>
+                <button class="mcq-btn" onclick="checkDeviceAnswer('tablet')">Submit</button>
+                <div class="mcq-feedback"></div>
+            </div>
+
+            <div id="q-mobile" class="device-question" style="display: none;">
+                <h3>What is the best layout rule for Mobile?</h3>
+                <div class="mcq-options">
+                    <label><input type="radio" name="mobile" value="wrong1"> Put the sidebar on the left and scroll
+                        horizontally.</label>
+                    <label><input type="radio" name="mobile" value="wrong2"> Hide the primary button to save
+                        space.</label>
+                    <label><input type="radio" name="mobile" value="correct"> Sidebar becomes hamburger menu, cards
+                        single column, primary button large and easy to tap.</label>
+                </div>
+                <button class="mcq-btn" onclick="checkDeviceAnswer('mobile')">Submit</button>
+                <div class="mcq-feedback"></div>
+            </div>
+
+            <div class="feedback" id="feedback-4"></div>
+            <button class="primary-btn" id="next-btn-4" style="display: none;" onclick="goToNextLevel()">Next
+                Level</button>
+        </section>
+
+        <!-- Level 5: Visual Hierarchy Challenge -->
+        <section id="level-5" class="level-section">
+            <h2>Level 5: Visual Hierarchy Challenge</h2>
+            <p class="scenario">Drag the style tokens onto the flat text lines to establish a proper visual priority.
+                Each line needs one token.</p>
+
+            <div class="hierarchy-builder">
+                <div class="style-tokens" id="tokens-pool">
+                    <div class="token-draggable" draggable="true" data-style="heading">Heading Style (H1)</div>
+                    <div class="token-draggable" draggable="true" data-style="subtitle">Subtitle Style (H2)</div>
+                    <div class="token-draggable" draggable="true" data-style="muted">Muted Text</div>
+                    <div class="token-draggable" draggable="true" data-style="highlight">Highlight Color</div>
+                </div>
+
+                <div class="flat-text-container">
+                    <div class="text-row drop-style" data-target="heading">Welcome to your Dashboard</div>
+                    <div class="text-row drop-style" data-target="subtitle">Here is a summary of your recent activities
+                    </div>
+                    <div class="text-row drop-style" data-target="muted">Last updated 2 mins ago</div>
+                    <div class="text-row drop-style" data-target="highlight">Action Required: Complete Profile</div>
+                </div>
+            </div>
+
+            <button class="check-btn" onclick="checkHierarchy()">Check Hierarchy</button>
+            <div class="feedback" id="feedback-5"></div>
+            <button class="primary-btn" id="next-btn-5" style="display: none;" onclick="goToNextLevel()">Next
+                Level</button>
+        </section>
+
+        <!-- Level 6: Form Alignment & Proximity -->
+        <section id="level-6" class="level-section">
+            <h2>Level 6: Alignment & Proximity Fixer</h2>
+            <p class="scenario">This form is a chaotic mess! Toggle the switches below to apply design principles and
+                snap the form into a clean state.</p>
+
+            <div class="form-fixer">
+                <div class="toggles">
+                    <label class="toggle-label"><input type="checkbox" id="toggle-proximity" onchange="updateFormFix()">
+                        Fix Proximity (Group related elements)</label>
+                    <label class="toggle-label"><input type="checkbox" id="toggle-alignment" onchange="updateFormFix()">
+                        Fix Alignment (Align left)</label>
+                    <label class="toggle-label"><input type="checkbox" id="toggle-whitespace"
+                            onchange="updateFormFix()"> Fix Whitespace (Add padding)</label>
+                </div>
+
+                <div class="bad-form" id="live-form">
+                    <div class="form-title">Registration</div>
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" disabled placeholder="e.g. John">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" disabled placeholder="e.g. Doe">
+                    </div>
+                    <button class="submit-btn">Submit</button>
+                </div>
+            </div>
+
+            <button class="check-btn" onclick="checkForm()">Check Form</button>
+            <div class="feedback" id="feedback-6"></div>
+            <button class="primary-btn" id="finish-btn" style="display: none;" onclick="showResultScreen()">Finish
+                Mission</button>
+        </section>
+
+        <!-- Final Result Screen -->
+        <section id="result-screen" class="level-section result-section">
+            <h2>Mission Completed!</h2>
+            <div class="result-card">
+                <h3>Total Score: <span id="final-score">0</span> / 100</h3>
+                <p>XP Earned: <span id="final-xp">0</span></p>
+                <div class="badge-display">
+                    <span id="final-badge-icon" class="large-icon">🏆</span>
+                    <h4 id="final-badge-title">Badge Name</h4>
+                </div>
+                <p id="final-feedback" class="personalized-feedback">Great job!</p>
+            </div>
+            <div class="result-actions">
+                <button class="primary-btn" onclick="location.reload()">Restart Simulation</button>
+                <button class="secondary-btn"
+                    onclick="alert('Review mode: You completed the layout challenges by applying good design principles!')">Review
+                    Feedback</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Design Lab — Human Characteristics in Design (Module 1.2)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* =========================================
+           ROOT & COLOR PALETTE (Red & White Theme)
+           ========================================= */
+        :root {
+            --bg: #fdfdfd;
+            --surface-bg: #f7f9fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e9eb;
+            --primary: #c1121f;
+            /* Vibrant Dark Crimson */
+            --primary-hover: #780000;
+            /* Deep Red Accent */
+            --primary-light: #fdf2f2;
+            /* Soft Red Highlight tint */
+            --text-dark: #1b1e22;
+            --text-muted: #5e6973;
+            --success: #2a9d8f;
+            /* Soft emerald green for success */
+            --success-light: #eef8f6;
+            --danger: #e63946;
+            /* Red for alerts/errors */
+            --danger-light: #fdf2f3;
+            --warning: #f4a261;
+            /* Warm orange for warnings/hints */
+            --warning-light: #fef6ee;
+            --r: 10px;
+            --shadow: 0 4px 20px rgba(193, 18, 31, 0.05);
+            --shadow-btn: 0 4px 12px rgba(193, 18, 31, 0.15);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        /* =========================================
+           HEADER & STATS BAR
+           ========================================= */
+        .topbar {
+            background: var(--card-bg);
+            border-bottom: 3px solid var(--primary);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .topbar-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .badge-role {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 99px;
+            border: 1px solid rgba(193, 18, 31, 0.2);
+        }
+
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat-pill {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-pill strong {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .stat-pill.success-pill strong {
+            color: var(--success);
+        }
+
+        /* =========================================
+           MAIN CONTAINER & LAYOUT
+           ========================================= */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+            flex: 1;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 900px) {
+            .container {
+                grid-template-columns: 3fr 1fr;
+            }
+        }
+
+        /* =========================================
+           GAME CONTROLS PANEL
+           ========================================= */
+        .workspace-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .notebook-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: fit-content;
+        }
+
+        .nb-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* =========================================
+           LEVEL HEADERS & PROGRESS
+           ========================================= */
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .level-title-area {
+            flex: 1;
+        }
+
+        .level-title-area h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .level-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .level-progress-bar-wrap {
+            width: 100%;
+            background: var(--border-color);
+            height: 6px;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .level-progress-fill {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* =========================================
+           BUTTON SYSTEM
+           ========================================= */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow-btn);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: #fff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--primary-light);
+        }
+
+        .btn-warning {
+            background: var(--warning-light);
+            border-color: var(--warning);
+            color: #d47a2a;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background: #fde8d4;
+        }
+
+        .btn-muted {
+            background: #fff;
+            border-color: var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .btn-muted:hover:not(:disabled) {
+            background: #f0f2f5;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* =========================================
+           FEEDBACK AND PANEL SYSTEM
+           ========================================= */
+        .fb-box {
+            display: none;
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+
+        .fb-box.correct {
+            display: block;
+            background-color: var(--success-light);
+            border-color: var(--success);
+            color: #1e5a52;
+        }
+
+        .fb-box.wrong {
+            display: block;
+            background-color: var(--danger-light);
+            border-color: var(--danger);
+            color: #8c202a;
+        }
+
+        .fb-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hint-box {
+            display: none;
+            background: var(--warning-light);
+            border: 1px solid var(--warning);
+            color: #7b4f2c;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+        }
+
+        /* =========================================
+           LEVEL-SPECIFIC INTERACTIVE UIs
+           ========================================= */
+
+        /* LEVEL 1: Visual Chaos Inspection */
+        .l1-chaos-device {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8fafc;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23c1121f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") 8 8, auto;
+        }
+
+        .l1-chaos-canvas {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            height: 380px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .l1-bug-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .l1-bug-item.found {
+            outline: 2px solid var(--success) !important;
+            background: rgba(42, 157, 143, 0.08) !important;
+            pointer-events: none;
+        }
+
+        /* Level 1 Correct Grid dashboard */
+        .l1-clean-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 16px;
+            height: 100%;
+            background: #f8fafc;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .l1-clean-item {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .l1-clean-item.header {
+            grid-column: 1 / -1;
+            font-size: 16px;
+            font-weight: 700;
+            border-left: 4px solid var(--primary);
+            background: #fff;
+        }
+
+        /* LEVEL 2: Cognitive Load Challenge */
+        .l2-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .l2-grid {
+                grid-template-columns: 1fr 2.5fr;
+            }
+        }
+
+        .l2-pool {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 480px;
+            overflow-y: auto;
+            align-content: flex-start;
+        }
+
+        .l2-chip {
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .l2-chip:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .l2-chip.dragging {
+            opacity: 0.4;
+        }
+
+        .l2-folders {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .l2-bin {
+            border: 2.5px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .l2-bin.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .l2-bin.correct-bin {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+        }
+
+        .l2-bin.wrong-bin {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+        }
+
+        .l2-bin-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+            border-bottom: 1.5px solid var(--border-color);
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .l2-bin-chip {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .l2-bin-chip.ok {
+            background: var(--success-light);
+            color: #1e5a52;
+            border-color: var(--success);
+        }
+
+        .l2-bin-chip.bad {
+            background: var(--danger-light);
+            color: #8c202a;
+            border-color: var(--danger);
+            cursor: pointer;
+        }
+
+        /* LEVEL 3: Human Response Chain */
+        .chain-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chain-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .chain-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .chain-item.dragging {
+            opacity: 0.4;
+        }
+
+        .chain-item.correct-position {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+        }
+
+        .chain-item.wrong-position {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+        }
+
+        .chain-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--surface-bg);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* LEVEL 4: Match Problem to Limitation */
+        .match-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 700px) {
+            .match-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* LEVEL 5: Final Human-Centered Redesign Mission */
+        .l5-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 900px) {
+            .l5-layout {
+                grid-template-columns: 1.3fr 1fr;
+            }
+        }
+
+        .portal-preview {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: #f1f5f9;
+            padding: 16px;
+            position: relative;
+        }
+
+        .portal-ui {
+            background: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            grid-template-rows: 50px 1fr;
+            height: 460px;
+            border: 1px solid #cbd5e1;
+            font-size: 11px;
+        }
+
+        .portal-header {
+            grid-column: 1 / -1;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .portal-sidebar {
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .portal-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .portal-main {
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8fafc;
+        }
+
+        .portal-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 14px;
+        }
+
+        /* Highlightable slots on Level 5 Mockup */
+        .l5-slot {
+            border: 2.5px dashed var(--border-color);
+            background: rgba(193, 18, 31, 0.01);
+            border-radius: 4px;
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .l5-slot:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .l5-slot.drag-over {
+            border-color: var(--primary) !important;
+            background: var(--primary-light) !important;
+        }
+
+        .l5-slot.resolved {
+            border: 2px solid var(--success) !important;
+            background: var(--success-light) !important;
+            pointer-events: none;
+        }
+
+        /* Fix cards deck */
+        .l5-fix-deck {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: fit-content;
+        }
+
+        .l5-fix-card {
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-left: 5px solid var(--primary);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .l5-fix-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary);
+        }
+
+        .l5-fix-card.dragging {
+            opacity: 0.4;
+        }
+
+        .l5-fix-card.used {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-left-color: #cbd5e1;
+        }
+
+        /* =========================================
+           FINAL REPORT / RESULT STYLES
+           ========================================= */
+        .results-card {
+            text-align: center;
+            padding: 40px 24px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .results-badge {
+            font-size: 64px;
+            margin-bottom: 8px;
+        }
+
+        .results-score-highlight {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+        }
+
+        .results-cell {
+            background: var(--surface-bg);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .results-cell span {
+            display: block;
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* =========================================
+           THEORY & OBSERVATION ACCORDIONS
+           ========================================= */
+        .theory-section {
+            border-top: 1px solid var(--border-color);
+            margin-top: 32px;
+            padding-top: 24px;
+        }
+
+        .theory-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theory-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .theory-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .theory-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .theory-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .theory-card p {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .obs-box {
+            background: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: 16px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            margin-top: 16px;
+            line-height: 1.6;
+        }
+
+        /* =========================================
+           UTILITIES / TOAST / ANIMATIONS
+           ========================================= */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.t-ok {
+            background: var(--success-light);
+            color: #1e5a52;
+            border: 1px solid var(--success);
+        }
+
+        .toast.t-err {
+            background: var(--danger-light);
+            color: #8c202a;
+            border: 1px solid var(--danger);
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-6px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(6px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================================
+         HEADER & STATS BAR
+         ========================================= -->
+    <header class="topbar">
+        <div class="topbar-container">
+            <div class="brand">
+                🔬 UX <span>Design Lab</span>
+                <span class="badge-role">Design Analyst</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-pill">
+                    Level: <strong id="ui-level-num">1 / 5</strong>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================
+         MAIN CONTENT CONTAINER
+         ========================================= -->
+    <div class="container" id="game-container">
+
+        <!-- WORKSPACE (Left Side) -->
+        <main class="workspace-card" id="main-workspace">
+
+            <!-- LEVEL HEADER -->
+            <div class="level-header">
+                <div class="level-title-area">
+                    <h2 id="level-title">Visual Chaos Inspection</h2>
+                    <div class="level-subtitle" id="level-desc">Test the bad visual hierarchy. Click on the 5 visual
+                        problems.</div>
+                </div>
+                <div class="level-progress-bar-wrap">
+                    <div class="level-progress-fill" id="level-progress"></div>
+                </div>
+            </div>
+
+            <!-- LEVEL INTERACTIVE DISPLAY ZONE -->
+            <div id="interactive-zone" class="fade-in">
+                <!-- Dynamically populated by JS -->
+            </div>
+
+            <!-- DYNAMIC FEEDBACK BOX -->
+            <div class="fb-box" id="feedback-panel">
+                <div class="fb-title" id="feedback-title">Correct!</div>
+                <div id="feedback-body">Excellent HCD insight!</div>
+            </div>
+
+        </main>
+
+        <!-- INSPECTOR NOTEBOOK / ACTIONS (Right Side) -->
+        <aside class="notebook-card" id="sidebar-notebook">
+            <div class="nb-title">📋 Analyst Tools</div>
+
+            <div class="btn-row" style="flex-direction: column; width: 100%; gap: 12px;">
+                <button class="btn btn-primary" id="btn-check" style="width: 100%;">Check Answer</button>
+                <button class="btn btn-warning" id="btn-hint" style="width: 100%;">🔍 Reveal Hint</button>
+                <button class="btn btn-outline" id="btn-next" style="width: 100%; display: none;">Next Level →</button>
+                <button class="btn btn-muted" id="btn-reset" style="width: 100%;">↺ Reset Level</button>
+            </div>
+
+            <!-- HINT DISPLAY ZONE -->
+            <div class="hint-box" id="hint-display">
+                <!-- Hint text -->
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- =========================================
+         RESULTS CONTAINER (Shows only at the end)
+         ========================================= -->
+    <div class="container" style="display:none;" id="results-container">
+        <main class="workspace-card results-card" style="grid-column: 1 / -1;">
+            <div class="results-badge" id="res-badge">🏆</div>
+            <h2 id="res-title">Human-Centered UX Expert</h2>
+            <p id="res-subtitle">You have demonstrated expert HCD analyst skills!</p>
+
+            <div class="results-grid">
+                <div class="results-cell" style="text-align: center;">
+                    Redesigns Solved
+                    <span id="res-bugs">18 / 18</span>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="restartGame()">↺ Restart Course Challenge</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- =========================================
+         THEORY, OBSERVATION, CONCLUSION
+         ========================================= -->
+    <div class="container" id="theory-container">
+        <section class="theory-section" style="grid-column: 1 / -1;">
+            <div class="theory-header">📚 Human Heuristics Notebook</div>
+
+            <div class="theory-grid">
+                <div class="theory-card">
+                    <h4>Why People Struggle with Computers</h4>
+                    <p>
+                        <strong>1. Non-obvious layout design:</strong> Hidden features that fail standard discovery.
+                        <br><strong>2. Fine distinctions:</strong> Using tiny differences in icons or labels that are
+                        hard to spot.
+                        <br><strong>3. Problem-solving strategy mismatch:</strong> Systems demanding complex technical
+                        concepts from normal users.
+                        <br><strong>4. Design inconsistency:</strong> Changing structures across pages, forcing
+                        continuous relearning.
+                    </p>
+                </div>
+                <div class="theory-card">
+                    <h4>Cognitive Limits & Memory Load</h4>
+                    <p>
+                        • <strong>Short-term memory limits:</strong> Working memory holds only 7±2 chunks of information
+                        at once (Miller's Law).
+                        <br>• <strong>Mental models:</strong> Users construct expectations based on prior experience.
+                        Breaches trigger confusion.
+                        <br>• <strong>Psychological responses:</strong> Confusion scales to annoyance, escalates to
+                        frustration, peaks as panic/stress, and results in boredom/abandonment.
+                        <br>• <strong>Physical/behavioural responses:</strong> Users physically abandon the task or use
+                        only a tiny subset of features.
+                    </p>
+                </div>
+            </div>
+
+            <!-- OBSERVATION PANEL -->
+            <div class="obs-box" id="observation-panel">
+                <strong>Analyst's Observation:</strong> Complete challenges to generate HCD insights. When interfaces
+                overload memory, use inconsistent patterns, or hide important actions, users become confused,
+                frustrated, and may abandon the system.
+            </div>
+
+            <!-- CONCLUSION PANEL -->
+            <div class="theory-card" style="margin-top: 16px;">
+                <h4>Analyst's Conclusion</h4>
+                <p>
+                    Good design respects human limitations by reducing memory load, using consistent patterns, showing
+                    clear feedback, and organizing information in a way users can easily understand.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- TOAST ALERT -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ============================================================
+         GAME ENGINE (JavaScript)
+         ============================================================ -->
+    <script>
+        /* ============================================================
+           DATA: LEVEL CONFIGURATIONS
+           ============================================================ */
+        const GAME = {
+            currentLevel: 1,
+            hintUsed: false,
+            // Track state within levels
+            state: {
+                l1_found: [], // visual bug IDs found
+                l2_assignments: {}, // cardId -> binId
+                l2_selected_card: null, // click match state
+                l3_order: ['r1', 'r2', 'r3', 'r4', 'r5'], // reaction IDs current order
+                l4_matches: {}, // targetZoneId -> problemId
+                l4_selected_chip: null, // click match state
+                l5_fixed: [], // resolved HCD keys
+                l5_selected_card: null // click-fix active selection
+            }
+        };
+
+        const LEVEL_DEFS = {
+            1: {
+                title: "Level 1: Visual Chaos Inspection",
+                desc: "Analyze the chaotic dashboard. Click on 5 distinct visual hierarchy and formatting bugs.",
+                hint: "Find mixed overlapping fonts, staggered off-grid alignments, identical font weights with no title contrast, absolute overlapping info card boxes, and a wall of identical pale warnings."
+            },
+            2: {
+                title: "Level 2: Cognitive Load Challenge",
+                desc: "Reduce cognitive load! Sort the 16 ungrouped dashboard options into the 6 logical HCD categories.",
+                hint: "Personal info goes to Profile. Timetables go to Academics. Hall tickets go to Exams. Receipts and scholarships go to Fees. Library details go to Resources. Help forms go to Support."
+            },
+            3: {
+                title: "Level 3: Human Response Chain",
+                desc: "Sort the user reactions in the correct order of psychological escalation (from mildest to most severe).",
+                hint: "Escalation begins when expectations mismatch (Confusion), grows to annoyance, scales into deep frustration, spikes as panic under stakes, and results in abandonment."
+            },
+            4: {
+                title: "Level 4: Match Problem to Human Limitation",
+                desc: "Match the interface design errors on the left to their corresponding human limitations on the right.",
+                hint: "Ungrouped actions map to memory. Tiny differences in icons maps to fine distinctions. Inability to undo actions maps to fear of error."
+            },
+            5: {
+                title: "Level 5: Final Human-Centered Redesign Mission",
+                desc: "Redesign the Student Portal case study. Drag the 8 HCD Fix Cards onto their matching highlighted portal issues to watch the layout transform.",
+                hint: "Match 'Reduce options' to the list overload, 'Add groups' to ungrouped sections, 'Labels to icons' to sidebar abstract shapes, 'Consistent buttons' to styled buttons, and 'Move higher' to class registration hidden below text."
+            }
+        };
+
+        // Level 1 bugs
+        const L1_BUGS = {
+            v1: { id: "v1", label: "Mixed fonts", explain: "Mixing three distinct font families (Times, Courier, cursive) looks messy and breaks design cohesion, slowing down reading speeds." },
+            v2: { id: "v2", label: "Poor layout alignment", explain: "Offset, staggered input boxes are off-grid. Grids speed up visual parsing because they align with standard scanning patterns." },
+            v3: { id: "v3", label: "No visual hierarchy", explain: "Setting headers and body texts to the same size/weight forces the user to scan every line to find basic items." },
+            v4: { id: "v4", label: "Random info placement", explain: "Absolute layout elements overlapping titles cover important system data. Always structure cards cleanly." },
+            v5: { id: "v5", label: "Information layout flood", explain: "Displaying 6 identical alert boxes with pale styling triggers warning fatigue. Group notifications or filter them by priority." }
+        };
+
+        // Level 2 folders & actions
+        const L2_CARDS = [
+            { id: "c1", text: "ID Card", bin: "b1" },
+            { id: "c2", text: "Personal Details", bin: "b1" },
+            { id: "c3", text: "Attendance", bin: "b2" },
+            { id: "c4", text: "Timetable", bin: "b2" },
+            { id: "c5", text: "Course Notes", bin: "b2" },
+            { id: "c6", text: "Assignment Upload", bin: "b2" },
+            { id: "c7", text: "Exam Form", bin: "b3" },
+            { id: "c8", text: "Exam Results", bin: "b3" },
+            { id: "c9", text: "Hall Ticket", bin: "b3" },
+            { id: "c10", text: "Pay Fees", bin: "b4" },
+            { id: "c11", text: "Fee Receipt", bin: "b4" },
+            { id: "c12", text: "Scholarship", bin: "b4" },
+            { id: "c13", text: "Library Books", bin: "b5" },
+            { id: "c14", text: "Downloads", bin: "b5" },
+            { id: "c15", text: "Help Desk", bin: "b6" },
+            { id: "c16", text: "Complaint Form", bin: "b6" }
+        ];
+
+        const L2_BINS = [
+            { id: "b1", title: "Profile", icon: "👤" },
+            { id: "b2", title: "Academics", icon: "📚" },
+            { id: "b3", title: "Exams", icon: "📝" },
+            { id: "b4", title: "Fees", icon: "💳" },
+            { id: "b5", title: "Resources", icon: "📁" },
+            { id: "b6", title: "Support", icon: "🛠️" }
+        ];
+
+        // Level 3 order stages
+        const L3_REACTIONS_ORDER = [
+            "Confusion",
+            "Annoyance",
+            "Frustration",
+            "Panic / Stress",
+            "Boredom / Abandonment"
+        ];
+
+        const L3_REACTIONS_DEFS = {
+            r1: { id: "r1", text: "Confusion" },
+            r2: { id: "r2", text: "Annoyance" },
+            r3: { id: "r3", text: "Frustration" },
+            r4: { id: "r4", text: "Panic / Stress" },
+            r5: { id: "r5", text: "Boredom / Abandonment" }
+        };
+
+        // Level 4 matching data
+        const L4_PROBLEMS = [
+            { id: "p1", text: "28 ungrouped menu items", correctZone: "z1" },
+            { id: "p2", text: "Different button style on every page", correctZone: "z2" },
+            { id: "p3", text: "Tiny difference between icons", correctZone: "z3" },
+            { id: "p4", text: "User cannot undo wrong action", correctZone: "z4" },
+            { id: "p5", text: "Slow loading after every click", correctZone: "z5" },
+            { id: "p6", text: "User uses only basic features", correctZone: "z6" }
+        ];
+
+        const L4_ZONES = [
+            { id: "z1", title: "Short-term memory overload" },
+            { id: "z2", title: "Inconsistency / relearning" },
+            { id: "z3", title: "Fine distinctions hard to spot" },
+            { id: "z4", title: "Panic / fear of error" },
+            { id: "z5", title: "Frustration / boredom" },
+            { id: "z6", title: "Partial feature use" }
+        ];
+
+        // Level 5 portal redesign
+        const L5_PROBLEMS = {
+            s1: { id: "s1", name: "Too many options shown together", desc: "Portal lists 20 links on the homepage.", fixId: "f1", label: "Reduce unnecessary options" },
+            s2: { id: "s2", name: "No grouping", desc: "Course links are scattered in a raw unordered sequence.", fixId: "f2", label: "Add clear groups" },
+            s3: { id: "s3", name: "Similar-looking icons", desc: "All menu actions share the same empty box icon.", fixId: "f3", label: "Add labels to icons" },
+            s4: { id: "s4", name: "Inconsistent buttons", desc: "Actions mix text links, large borders, and buttons.", fixId: "f4", label: "Use consistent buttons" },
+            s5: { id: "s5", name: "Poor visual hierarchy", desc: "Important details use tiny fonts; footer texts use large fonts.", fixId: "f5", label: "Improve visual hierarchy" },
+            s6: { id: "s6", name: "No clear feedback after action", desc: "Submitting details refreshes page silently.", fixId: "f6", label: "Add success feedback" },
+            s7: { id: "s7", name: "Error message creates panic", desc: "Banner screams: SYSTEM ERROR LOCK CODE 0x981.", fixId: "f7", label: "Show friendly error message" },
+            s8: { id: "s8", name: "Important task hidden below unnecessary content", desc: "Registration button is pushed to the bottom behind a massive disclaimer.", fixId: "f8", label: "Move important task higher" }
+        };
+
+        const L5_FIX_DECK = [
+            { id: "f1", label: "Reduce unnecessary options" },
+            { id: "f2", label: "Add clear groups" },
+            { id: "f3", label: "Add labels to icons" },
+            { id: "f4", label: "Use consistent buttons" },
+            { id: "f5", label: "Improve visual hierarchy" },
+            { id: "f6", label: "Add success feedback" },
+            { id: "f7", label: "Show friendly error message" },
+            { id: "f8", label: "Move important task higher" }
+        ];
+
+        /* ============================================================
+           ENGINE BOOT
+           ============================================================ */
+        const S2_STATE_KEY = 'ux_design_lab_s2_state';
+        let draggedElement = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadGameState();
+            initLevel(GAME.currentLevel);
+            setupGlobalEvents();
+        });
+
+        function setupGlobalEvents() {
+            document.getElementById('btn-check').addEventListener('click', checkLevelAnswer);
+            document.getElementById('btn-hint').addEventListener('click', requestHint);
+            document.getElementById('btn-next').addEventListener('click', nextLevel);
+            document.getElementById('btn-reset').addEventListener('click', resetLevel);
+        }
+
+        function saveGameState() {
+            localStorage.setItem(S2_STATE_KEY, JSON.stringify({
+                currentLevel: GAME.currentLevel,
+                state: GAME.state
+            }));
+        }
+
+        function loadGameState() {
+            const saved = localStorage.getItem(S2_STATE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    GAME.currentLevel = parsed.currentLevel ?? 1;
+                    GAME.state = parsed.state ?? GAME.state;
+                } catch (e) {
+                    console.error("Error loading state:", e);
+                }
+            }
+        }
+
+        function restartGame() {
+            localStorage.removeItem(S2_STATE_KEY);
+            GAME.currentLevel = 1;
+            GAME.state = {
+                l1_found: [],
+                l2_assignments: {},
+                l2_selected_card: null,
+                l3_order: ['r1', 'r2', 'r3', 'r4', 'r5'],
+                l4_matches: {},
+                l4_selected_chip: null,
+                l5_fixed: [],
+                l5_selected_card: null
+            };
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('main-workspace').style.display = 'flex';
+            document.getElementById('sidebar-notebook').style.display = 'flex';
+            document.getElementById('theory-container').style.display = 'block';
+            initLevel(1);
+        }
+
+        function initLevel(lvlNum) {
+            GAME.currentLevel = lvlNum;
+            GAME.hintUsed = false;
+
+            document.getElementById('ui-level-num').textContent = `${lvlNum} / 5`;
+            document.getElementById('level-title').textContent = LEVEL_DEFS[lvlNum].title;
+            document.getElementById('level-desc').innerHTML = LEVEL_DEFS[lvlNum].desc;
+            document.getElementById('hint-display').style.display = 'none';
+            document.getElementById('feedback-panel').className = 'fb-box';
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('btn-next').style.display = 'none';
+
+            // Active/inactive check answer
+            if (lvlNum === 1 || lvlNum === 5) {
+                document.getElementById('btn-check').disabled = true;
+            } else {
+                document.getElementById('btn-check').disabled = false;
+            }
+
+            const zone = document.getElementById('interactive-zone');
+            zone.innerHTML = '';
+            zone.className = "fade-in";
+
+            if (lvlNum === 1) {
+                renderLevel1(zone);
+                updateLevelProgress((GAME.state.l1_found.length / 5) * 100);
+            } else if (lvlNum === 2) {
+                renderLevel2(zone);
+                const assignedCount = Object.keys(GAME.state.l2_assignments).length;
+                updateLevelProgress((assignedCount / 16) * 100);
+            } else if (lvlNum === 3) {
+                // Shuffle reaction chain order only if starting new
+                if (GAME.state.l3_order.join(',') === 'r1,r2,r3,r4,r5') {
+                    GAME.state.l3_order.sort(() => Math.random() - 0.5);
+                }
+                renderLevel3(zone);
+                updateLevelProgress(0);
+            } else if (lvlNum === 4) {
+                renderLevel4(zone);
+                const matchCount = Object.keys(GAME.state.l4_matches).length;
+                updateLevelProgress((matchCount / 6) * 100);
+            } else if (lvlNum === 5) {
+                renderLevel5(zone);
+                updateLevelProgress((GAME.state.l5_fixed.length / 8) * 100);
+            }
+
+            updateObservation();
+            saveGameState();
+        }
+
+        function updateLevelProgress(pct) {
+            document.getElementById('level-progress').style.width = pct + '%';
+        }
+
+        function toast(msg, type = 't-ok') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + type;
+            setTimeout(() => { t.classList.remove('show'); }, 2500);
+        }
+
+        function requestHint() {
+            if (GAME.hintUsed) {
+                toast("Hint already retrieved!", "t-err");
+                return;
+            }
+            GAME.hintUsed = true;
+            const display = document.getElementById('hint-display');
+            display.textContent = LEVEL_DEFS[GAME.currentLevel].hint;
+            display.style.display = 'block';
+            toast("Hint revealed.", "t-ok");
+            saveGameState();
+        }
+
+        function resetLevel() {
+            toast("Level reset.", "t-ok");
+            if (GAME.currentLevel === 1) GAME.state.l1_found = [];
+            else if (GAME.currentLevel === 2) {
+                GAME.state.l2_assignments = {};
+                GAME.state.l2_selected_card = null;
+            }
+            else if (GAME.currentLevel === 3) GAME.state.l3_order = ['r1', 'r2', 'r3', 'r4', 'r5'].sort(() => Math.random() - 0.5);
+            else if (GAME.currentLevel === 4) {
+                GAME.state.l4_matches = {};
+                GAME.state.l4_selected_chip = null;
+            }
+            else if (GAME.currentLevel === 5) {
+                GAME.state.l5_fixed = [];
+                GAME.state.l5_selected_card = null;
+            }
+            initLevel(GAME.currentLevel);
+        }
+
+        function nextLevel() {
+            if (GAME.currentLevel < 5) {
+                initLevel(GAME.currentLevel + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function completeLevel() {
+            toast("Level Complete!", "t-ok");
+
+            const nextBtn = document.getElementById('btn-next');
+            nextBtn.style.display = 'block';
+            nextBtn.scrollIntoView({ behavior: 'smooth' });
+
+            if (GAME.currentLevel === 5) {
+                nextBtn.textContent = "See HCD Analyst Evaluation Report →";
+            } else {
+                nextBtn.textContent = `Proceed to Level ${GAME.currentLevel + 1} →`;
+            }
+
+            document.getElementById('btn-check').disabled = true;
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 1: Visual Chaos Inspection
+           ============================================================ */
+        function renderLevel1(container) {
+            const isFinished = GAME.state.l1_found.length === 5;
+
+            const wrap = document.createElement('div');
+            wrap.className = 'l1-chaos-device';
+
+            if (isFinished) {
+                // Show clean visual hierarchy version immediately if already complete
+                wrap.innerHTML = `
+                    <div class="l1-clean-grid">
+                        <div class="l1-clean-item header">📋 Unified Student Dashboard</div>
+                        <div class="l1-clean-item"><strong>Personal Profile</strong><p style="color:#5e6973; margin-top:4px;">Verify registration details before midnight.</p></div>
+                        <div class="l1-clean-item"><strong>Course Enrollment</strong><p style="color:#5e6973; margin-top:4px;">Grouped and aligned to active academic term.</p></div>
+                        <div class="l1-clean-item"><strong>Finance & Fees</strong><p style="color:#5e6973; margin-top:4px;">No overload. Summarized financial updates.</p></div>
+                        <div class="l1-clean-item"><strong>System Status</strong><p style="color:#5e6973; margin-top:4px;">All services functioning at optimal speeds.</p></div>
+                    </div>
+                `;
+                container.appendChild(wrap);
+                return;
+            }
+
+            // Create messy overlapping layout
+            wrap.innerHTML = `
+                <div class="l1-chaos-canvas" id="l1-canvas">
+                    <!-- v1: Mixed Fonts -->
+                    <div class="l1-bug-item" id="l1-v1" data-bug="v1" style="position: absolute; top: 12px; left: 16px; font-family: 'Times New Roman'; font-size: 19px; font-weight: bold; cursor: pointer;">
+                        Term Enrollments (Times)
+                    </div>
+                    <div style="position: absolute; top: 40px; left: 16px; font-family: 'Courier New'; font-size: 11px; color: #555;">
+                        Term ID: 2026-A (Courier)
+                    </div>
+                    <div style="position: absolute; top: 58px; left: 16px; font-family: cursive; font-size: 14px; color: #9c27b0;">
+                        Grade details available below (Cursive)
+                    </div>
+
+                    <!-- v2: Poor alignment -->
+                    <div class="l1-bug-item" id="l1-v2" data-bug="v2" style="position: absolute; top: 96px; left: 35px; border: 1.5px solid #d9d9d9; padding: 4px 8px; width: 140px; cursor: pointer;">
+                        Name: John
+                    </div>
+                    <div style="position: absolute; top: 130px; left: 8px; border: 1.5px solid #d9d9d9; padding: 4px 8px; width: 155px;">
+                        Username: john_doe
+                    </div>
+
+                    <!-- v3: No Visual Hierarchy -->
+                    <div class="l1-bug-item" id="l1-v3" data-bug="v3" style="position: absolute; top: 180px; left: 16px; font-size: 12px; font-weight: 400; color: #000; cursor: pointer;">
+                        PAY FINANCE BILL NOW
+                    </div>
+                    <div style="position: absolute; top: 200px; left: 16px; font-size: 12px; font-weight: 400; color: #000;">
+                        Select details to proceed to bill payment.
+                    </div>
+
+                    <!-- v4: Random absolute cards placement overlay -->
+                    <div class="l1-bug-item" id="l1-v4" data-bug="v4" style="position: absolute; top: 80px; right: 16px; width: 140px; height: 110px; background: #fff8f8; border: 2px solid var(--primary); padding: 8px; font-size: 11px; z-index: 10; cursor: pointer; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                        <strong>System Notice Card</strong>
+                        <p style="margin-top:4px; font-size:9px;">This absolute box overflows the navigation links beneath it!</p>
+                    </div>
+
+                    <!-- v5: Equal alert box overload flood -->
+                    <div class="l1-bug-item" id="l1-v5" data-bug="v5" style="position: absolute; bottom: 10px; left: 16px; right: 16px; height: 95px; border: 1px solid #fed7aa; background: #fffbeb; padding: 8px; display: flex; flex-wrap: wrap; gap: 4px; overflow: hidden; cursor: pointer;">
+                        <span style="background:#ffedd5; padding:2px 6px; font-size:8px; border-radius:3px;">⚠️ alert 1</span>
+                        <span style="background:#ffedd5; padding:2px 6px; font-size:8px; border-radius:3px;">⚠️ alert 2</span>
+                        <span style="background:#ffedd5; padding:2px 6px; font-size:8px; border-radius:3px;">⚠️ alert 3</span>
+                        <span style="background:#ffedd5; padding:2px 6px; font-size:8px; border-radius:3px;">⚠️ alert 4</span>
+                        <span style="background:#ffedd5; padding:2px 6px; font-size:8px; border-radius:3px;">⚠️ alert 5</span>
+                        <span style="background:#ffedd5; padding:2px 6px; font-size:8px; border-radius:3px;">⚠️ alert 6</span>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(wrap);
+
+            // Click events directly on bugs
+            wrap.querySelectorAll('.l1-bug-item').forEach(el => {
+                const bugKey = el.getAttribute('data-bug');
+                if (GAME.state.l1_found.includes(bugKey)) {
+                    el.classList.add('found');
+                }
+
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    onL1BugClick(el, bugKey);
+                });
+            });
+
+            // Miss clicks
+            wrap.querySelector('#l1-canvas').addEventListener('click', (e) => {
+                if (e.target.closest('.l1-bug-item')) return;
+
+                e.stopPropagation();
+                showLevelFeedback(false, "Symmetrical Element!", "This element satisfies aligned grid guidelines. Target the mixed fonts, overlapping boxes, staggered inputs, or alert floods.");
+                toast("Wrong spot!", "t-err");
+
+                wrap.classList.add('shake');
+                setTimeout(() => wrap.classList.remove('shake'), 500);
+                saveGameState();
+            });
+        }
+
+        function onL1BugClick(element, bugKey) {
+            if (GAME.state.l1_found.includes(bugKey)) return;
+
+            GAME.state.l1_found.push(bugKey);
+            element.classList.add('found');
+
+            const bug = L1_BUGS[bugKey];
+            showLevelFeedback(true, `Correct: ${bug.label}!`, bug.explain);
+            toast("HCD Bug Spotted!", "t-ok");
+
+            const progressPct = (GAME.state.l1_found.length / 5) * 100;
+            updateLevelProgress(progressPct);
+
+            if (GAME.state.l1_found.length === 5) {
+                // Animate showing resolved dashboard layout
+                setTimeout(() => {
+                    const z = document.getElementById('interactive-zone');
+                    z.innerHTML = '';
+                    renderLevel1(z);
+                    completeLevel();
+                }, 2000);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 2: Cognitive Load Challenge
+           ============================================================ */
+        function renderLevel2(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'l2-grid';
+
+            // Left: Ungrouped Pool
+            const pool = document.createElement('div');
+            pool.className = 'l2-pool';
+            pool.innerHTML = `<h5 style="width:100%; font-size:11px; color:var(--text-muted); text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; margin-bottom:8px;">Ungrouped Options</h5>`;
+
+            // Filter out cards that are already assigned
+            const assignedIds = Object.keys(GAME.state.l2_assignments);
+            const unassignedCards = L2_CARDS.filter(c => !assignedIds.includes(c.id));
+
+            unassignedCards.forEach(card => {
+                const chip = document.createElement('div');
+                chip.className = 'l2-chip';
+                chip.draggable = true;
+                chip.id = card.id;
+                chip.textContent = card.text;
+
+                // HTML5 Drag Events
+                chip.addEventListener('dragstart', (e) => {
+                    draggedElement = chip;
+                    chip.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', chip.id);
+                });
+                chip.addEventListener('dragend', () => {
+                    chip.classList.remove('dragging');
+                });
+
+                // Tap match fallback
+                chip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    pool.querySelectorAll('.l2-chip').forEach(c => c.style.borderColor = '');
+                    chip.style.borderColor = 'var(--primary)';
+                    GAME.state.l2_selected_card = chip.id;
+                    toast("Option selected. Tap a Folder below to sort.", "t-ok");
+                });
+
+                pool.appendChild(chip);
+            });
+
+            // Right: Bins
+            const rightContainer = document.createElement('div');
+            rightContainer.className = 'l2-folders';
+
+            L2_BINS.forEach(bin => {
+                const binEl = document.createElement('div');
+                binEl.className = 'l2-bin';
+                binEl.id = bin.id;
+                binEl.innerHTML = `<span class="l2-bin-title">${bin.icon} ${bin.title}</span>`;
+
+                // HTML5 Drop Events
+                binEl.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    binEl.classList.add('drag-over');
+                });
+                binEl.addEventListener('dragleave', () => {
+                    binEl.classList.remove('drag-over');
+                });
+                binEl.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    binEl.classList.remove('drag-over');
+                    const cardId = e.dataTransfer.getData('text/plain');
+                    if (cardId) {
+                        assignCardToBin(cardId, bin.id);
+                    }
+                });
+
+                // Mobile Click fallback match
+                binEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l2_selected_card) {
+                        assignCardToBin(GAME.state.l2_selected_card, bin.id);
+                        GAME.state.l2_selected_card = null;
+                    }
+                });
+
+                // Append any cards placed inside this bin
+                for (const cardId in GAME.state.l2_assignments) {
+                    if (GAME.state.l2_assignments[cardId] === bin.id) {
+                        const card = L2_CARDS.find(c => c.id === cardId);
+                        if (card) {
+                            const subChip = document.createElement('div');
+                            subChip.className = 'l2-bin-chip';
+                            subChip.textContent = card.text;
+
+                            // If they clicked Check Answer and it failed, highlight bad ones so they can remove them
+                            if (binEl.classList.contains('wrong-bin')) {
+                                if (card.bin === bin.id) {
+                                    subChip.classList.add('ok');
+                                } else {
+                                    subChip.classList.add('bad');
+                                    subChip.innerHTML += ` <span style="font-size:10px;">❌</span>`;
+
+                                    // Click to return to pool
+                                    subChip.addEventListener('click', (e) => {
+                                        e.stopPropagation();
+                                        delete GAME.state.l2_assignments[cardId];
+                                        toast(`Returned "${card.text}" to pool.`, "t-ok");
+                                        const z = document.getElementById('interactive-zone');
+                                        z.innerHTML = '';
+                                        renderLevel2(z);
+                                        saveGameState();
+                                    });
+                                }
+                            }
+
+                            binEl.appendChild(subChip);
+                        }
+                    }
+                }
+
+                rightContainer.appendChild(binEl);
+            });
+
+            wrap.appendChild(pool);
+            wrap.appendChild(rightContainer);
+            container.appendChild(wrap);
+        }
+
+        function assignCardToBin(cardId, binId) {
+            GAME.state.l2_assignments[cardId] = binId;
+            toast("Card categorized!", "t-ok");
+
+            const z = document.getElementById('interactive-zone');
+            z.innerHTML = '';
+            renderLevel2(z);
+
+            const count = Object.keys(GAME.state.l2_assignments).length;
+            updateLevelProgress((count / 16) * 100);
+            saveGameState();
+        }
+
+        function checkLevel2Sorting() {
+            const count = Object.keys(GAME.state.l2_assignments).length;
+            if (count < 16) {
+                showLevelFeedback(false, "Unfinished Grouping", "Please categorize all 16 items into the folders before validation.");
+                toast("Place all cards!", "t-err");
+                return;
+            }
+
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            L2_BINS.forEach(bin => {
+                const binEl = document.getElementById(bin.id);
+                binEl.classList.remove('correct-bin', 'wrong-bin');
+
+                // Check cards in this bin
+                let binHasError = false;
+                let cardsPlaced = 0;
+
+                for (const cardId in GAME.state.l2_assignments) {
+                    if (GAME.state.l2_assignments[cardId] === bin.id) {
+                        cardsPlaced++;
+                        const card = L2_CARDS.find(c => c.id === cardId);
+                        if (card && card.bin === bin.id) {
+                            correctCount++;
+                        } else {
+                            binHasError = true;
+                            wrongCount++;
+                        }
+                    }
+                }
+
+                if (binHasError || cardsPlaced === 0) {
+                    binEl.classList.add('wrong-bin');
+                } else {
+                    binEl.classList.add('correct-bin');
+                }
+            });
+
+            if (wrongCount === 0) {
+                showLevelFeedback(true, "Cognitive Load Reduced!", "Superb sorting! Grouping information reduces working memory load (respecting Miller's Law) and facilitates scanning.");
+                completeLevel();
+            } else {
+                showLevelFeedback(false, "Grouping Mistakes!", `You correctly grouped ${correctCount} out of 16 options. Red folders contain errors. Tap the red cards to return them to the unassigned deck.`);
+                toast("Incorrect placements!", "t-err");
+
+                // Re-render level to apply sub-chip highlights
+                const z = document.getElementById('interactive-zone');
+                z.innerHTML = '';
+                renderLevel2(z);
+
+                const wrap = document.querySelector('.l2-grid');
+                wrap.classList.add('shake');
+                setTimeout(() => wrap.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 3: Human Response Chain
+           ============================================================ */
+        function renderLevel3(container) {
+            const list = document.createElement('div');
+            list.className = 'chain-list';
+
+            GAME.state.l3_order.forEach((rId, idx) => {
+                const r = L3_REACTIONS_DEFS[rId];
+                const item = document.createElement('div');
+                item.className = 'chain-item';
+                item.draggable = true;
+                item.id = r.id;
+
+                item.innerHTML = `
+                    <span class="sev-handle">⠿</span>
+                    <span class="chain-num">${idx + 1}</span>
+                    <span class="sev-text">${r.text}</span>
+                    <div class="sev-order-controls">
+                        <button class="btn-order-arrow arrow-up">▲</button>
+                        <button class="btn-order-arrow arrow-down">▼</button>
+                    </div>
+                `;
+
+                // HTML5 Drag Events
+                item.addEventListener('dragstart', (e) => {
+                    draggedElement = item;
+                    item.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', item.id);
+                });
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (draggedElement && draggedElement !== item) {
+                        const children = [...list.children];
+                        const srcIdx = children.indexOf(draggedElement);
+                        const tgtIdx = children.indexOf(item);
+                        if (srcIdx < tgtIdx) {
+                            list.insertBefore(draggedElement, item.nextSibling);
+                        } else {
+                            list.insertBefore(draggedElement, item);
+                        }
+                        recalculateL3Order(list);
+                    }
+                });
+
+                // Arrow click handlers
+                item.querySelector('.arrow-up').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const prev = item.previousElementSibling;
+                    if (prev) {
+                        list.insertBefore(item, prev);
+                        recalculateL3Order(list);
+                    }
+                });
+                item.querySelector('.arrow-down').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const next = item.nextElementSibling;
+                    if (next) {
+                        list.insertBefore(next, item);
+                        recalculateL3Order(list);
+                    }
+                });
+
+                list.appendChild(item);
+            });
+
+            container.appendChild(list);
+        }
+
+        function recalculateL3Order(list) {
+            GAME.state.l3_order = [...list.children].map(item => item.id);
+            [...list.children].forEach((c, idx) => {
+                c.querySelector('.chain-num').textContent = idx + 1;
+            });
+            saveGameState();
+        }
+
+        function checkLevel3Order() {
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            GAME.state.l3_order.forEach((rId, idx) => {
+                const r = L3_REACTIONS_DEFS[rId];
+                const expectedText = L3_REACTIONS_ORDER[idx];
+                const itemEl = document.getElementById(rId);
+
+                itemEl.classList.remove('correct-position', 'wrong-position');
+
+                if (r.text === expectedText) {
+                    itemEl.classList.add('correct-position');
+                    correctCount++;
+                } else {
+                    itemEl.classList.add('wrong-position');
+                    wrongCount++;
+                }
+            });
+
+            if (correctCount === 5) {
+                showLevelFeedback(true, "Perfect Escalation Sequence!", `
+                    Confusion starts when the interface does not match the user’s mental model.<br>
+                    Annoyance sets in as inconsistency and minor friction slow down progress.<br>
+                    Frustration increases when the user gets stuck and cannot recover.<br>
+                    Panic happens under pressure (fear of data loss/error).<br>
+                    Boredom or abandonment occurs when the user gives up entirely.
+                `);
+                updateLevelProgress(100);
+                completeLevel();
+            } else {
+                showLevelFeedback(false, "Escalation Mismatch!", `You placed ${correctCount} / 5 reactions in their correct order. Rearrange the items highlighted in red.`);
+                toast("Incorrect chain order!", "t-err");
+
+                const list = document.querySelector('.chain-list');
+                list.classList.add('shake');
+                setTimeout(() => list.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 4: Match Problem to Limitation
+           ============================================================ */
+        function renderLevel4(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'match-container';
+
+            const colProblems = document.createElement('div');
+            colProblems.className = 'match-column';
+            colProblems.innerHTML = `<h4 style="font-size: 14px; font-weight:700; color:var(--text-dark); margin-bottom:8px;">Interface Problems</h4>`;
+
+            const matchedProblems = Object.values(GAME.state.l4_matches);
+            const remainingProblems = L4_PROBLEMS.filter(p => !matchedProblems.includes(p.id));
+
+            remainingProblems.forEach(prob => {
+                const chip = document.createElement('div');
+                chip.className = 'match-problem-chip';
+                chip.draggable = true;
+                chip.id = prob.id;
+                chip.textContent = prob.text;
+
+                chip.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', chip.id);
+                    chip.classList.add('dragging');
+                });
+                chip.addEventListener('dragend', () => {
+                    chip.classList.remove('dragging');
+                });
+
+                chip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    colProblems.querySelectorAll('.match-problem-chip').forEach(c => c.style.borderColor = '');
+                    chip.style.borderColor = 'var(--primary)';
+                    GAME.state.l4_selected_chip = chip.id;
+                    toast("Selected! Now tap a Limitation Zone on the right.", "t-ok");
+                });
+
+                colProblems.appendChild(chip);
+            });
+
+            const colZones = document.createElement('div');
+            colZones.className = 'match-column';
+            colZones.innerHTML = `<h4 style="font-size: 14px; font-weight:700; color:var(--text-dark); margin-bottom:8px;">Human Limitations</h4>`;
+
+            L4_ZONES.forEach(zone => {
+                const zoneBox = document.createElement('div');
+                zoneBox.className = 'match-zone';
+                zoneBox.id = zone.id;
+                zoneBox.innerHTML = `<span class="match-zone-title">${zone.title}</span>`;
+
+                zoneBox.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zoneBox.classList.add('drag-over');
+                });
+                zoneBox.addEventListener('dragleave', () => {
+                    zoneBox.classList.remove('drag-over');
+                });
+                zoneBox.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zoneBox.classList.remove('drag-over');
+                    const problemId = e.dataTransfer.getData('text/plain');
+                    if (problemId) {
+                        applyL4Match(problemId, zone.id, zoneBox);
+                    }
+                });
+
+                zoneBox.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l4_selected_chip) {
+                        applyL4Match(GAME.state.l4_selected_chip, zone.id, zoneBox);
+                        GAME.state.l4_selected_chip = null;
+                    }
+                });
+
+                const matchedId = GAME.state.l4_matches[zone.id];
+                if (matchedId) {
+                    const prob = L4_PROBLEMS.find(p => p.id === matchedId);
+                    if (prob) {
+                        const chip = document.createElement('div');
+                        chip.className = 'match-problem-chip';
+                        chip.style.margin = '4px 0 0 0';
+                        chip.style.width = '100%';
+                        chip.textContent = prob.text;
+                        zoneBox.appendChild(chip);
+                    }
+                }
+
+                colZones.appendChild(zoneBox);
+            });
+
+            wrap.appendChild(colProblems);
+            wrap.appendChild(colZones);
+            container.appendChild(wrap);
+        }
+
+        function applyL4Match(problemId, zoneId, zoneElement) {
+            for (const key in GAME.state.l4_matches) {
+                if (GAME.state.l4_matches[key] === problemId) {
+                    delete GAME.state.l4_matches[key];
+                }
+            }
+            GAME.state.l4_matches[zoneId] = problemId;
+            toast("Problem matched successfully!", "t-ok");
+
+            const z = document.getElementById('interactive-zone');
+            z.innerHTML = '';
+            renderLevel4(z);
+
+            const count = Object.keys(GAME.state.l4_matches).length;
+            updateLevelProgress((count / 6) * 100);
+            saveGameState();
+        }
+
+        function checkLevel4Match() {
+            const matchCount = Object.keys(GAME.state.l4_matches).length;
+            if (matchCount < 6) {
+                showLevelFeedback(false, "Unfinished Matches", "Please associate all 6 items before checking.");
+                toast("Please match all items!", "t-err");
+                return;
+            }
+
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            L4_ZONES.forEach(zone => {
+                const zoneElement = document.getElementById(zone.id);
+                const matchedId = GAME.state.l4_matches[zone.id];
+                zoneElement.classList.remove('correct-zone', 'wrong-zone');
+
+                const prob = L4_PROBLEMS.find(p => p.id === matchedId);
+                if (prob && prob.correctZone === zone.id) {
+                    zoneElement.classList.add('correct-zone');
+                    correctCount++;
+                } else {
+                    zoneElement.classList.add('wrong-zone');
+                    wrongCount++;
+                }
+            });
+
+            if (wrongCount === 0) {
+                showLevelFeedback(true, "Limitation Matches Complete!", "Fantastic! Designs must accommodate human limitations, such as working memory, fine motor/visual distinction, and panic behaviors.");
+                completeLevel();
+            } else {
+                showLevelFeedback(false, "Mismatched Limitations!", `You correctly matched ${correctCount} out of 6 items. Red zones are incorrect. Rearrange and check again.`);
+                toast("Incorrect matching!", "t-err");
+
+                const wrap = document.querySelector('.match-container');
+                wrap.classList.add('shake');
+                setTimeout(() => wrap.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 5: Final Human-Centered Redesign Mission
+           ============================================================ */
+        function renderLevel5(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'l5-layout';
+
+            // Visual updates on mockup slots depending on what is resolved
+            const f1Active = GAME.state.l5_fixed.includes('s1');
+            const f2Active = GAME.state.l5_fixed.includes('s2');
+            const f3Active = GAME.state.l5_fixed.includes('s3');
+            const f4Active = GAME.state.l5_fixed.includes('s4');
+            const f5Active = GAME.state.l5_fixed.includes('s5');
+            const f6Active = GAME.state.l5_fixed.includes('s6');
+            const f7Active = GAME.state.l5_fixed.includes('s7');
+            const f8Active = GAME.state.l5_fixed.includes('s8');
+
+            const s1HTML = f1Active ? '<span style="color:var(--success); font-weight:700;">✓ Excess options removed</span>' : 'Options: [Home, Profile, Academics, Mail, Grades, Portal Info, Finance, FAQ, Attendance, Syllabus, Campus Life, Books, Clubs, Events, Sports, Alerts, Directory, Log, Settings, Admin]';
+            const s2HTML = f2Active ? '<span style="color:var(--success); font-weight:700;">✓ Dynamic academic categories grouped</span>' : 'Courses: Intro CS, Statistics, Systems, Calculus, Literature, Chemistry, Physics, Biology (unordered flat stream)';
+            const s3HTML = f3Active ? '👤 Profile | 📚 Academics | 💳 Finance' : '⬡ | ⬡ | ⬡ (Identical sidebar icons)';
+            const s4HTML = f4Active ? '<button class="btn btn-primary" style="font-size:10px; padding:4px 8px;">Submit</button> <button class="btn btn-primary" style="font-size:10px; padding:4px 8px;">Cancel</button>' : '<a href="#">Submit Link</a> | <button style="border: 2px double red;">Cancel Btn</button>';
+            const s5HTML = f5Active ? '<h2 style="font-size:15px; font-weight:700; color:var(--primary);">Active Enrolments</h2><span style="font-size:10px; color:#555;">Details below</span>' : '<span style="font-size:8px;">Active Enrolments</span><h2 style="font-size:18px; font-weight:700; color:#555;">Details below</h2>';
+            const s6HTML = f6Active ? '<div style="background:var(--success-light); border:1px solid var(--success); color:#1e5a52; padding:4px; font-size:10px;">✓ Preferences saved successfully!</div>' : 'Save Details (silent click action)';
+            const s7HTML = f7Active ? '<div style="color:var(--success); font-weight:700;">✓ Email is invalid. Please use address format containing @.</div>' : '<div style="color:var(--danger); font-family:\'JetBrains Mono\'">CRITICAL ACCESS ERROR: CODE 0x921 ACCOUNT LOCK THREAT!</div>';
+
+            let s8HTML = '';
+            if (f8Active) {
+                s8HTML = `
+                    <div style="background:var(--primary); color:#fff; text-align:center; padding:10px; font-weight:700; border-radius:4px; margin-bottom:8px;">
+                        🎯 PRIMARY TASK: CLICK TO REGISTER FOR CLASSES
+                    </div>
+                `;
+            }
+
+            // Student Portal visual rendering
+            wrap.innerHTML = `
+                <div class="portal-preview" id="l5-portal-redesign">
+                    <!-- If Q8 is fixed, the Class Registration CTA is rendered at the top of the main viewport! -->
+                    ${s8HTML}
+
+                    <div class="portal-ui">
+                        <div class="portal-header">
+                            <strong style="color:var(--primary); font-size:12px;">🏫 Redesign Center</strong>
+                            
+                            <!-- s7: Error banner -->
+                            <div class="l5-slot ${f7Active ? 'resolved' : ''}" id="slot-s7" data-slot="s7" style="flex:1; max-width:240px; font-size:9px;">
+                                ${s7HTML}
+                            </div>
+                        </div>
+
+                        <!-- s3: Sidebar icons labels -->
+                        <div class="portal-sidebar l5-slot ${f3Active ? 'resolved' : ''}" id="slot-s3" data-slot="s3" style="font-size:9.5px; gap:8px;">
+                            ${s3HTML}
+                        </div>
+
+                        <div class="portal-main">
+                            <!-- s1: Unnecessary options -->
+                            <div class="l5-slot ${f1Active ? 'resolved' : ''}" id="slot-s1" data-slot="s1" style="font-size:9.5px;">
+                                ${s1HTML}
+                            </div>
+
+                            <!-- s5: Visual Hierarchy -->
+                            <div class="l5-slot ${f5Active ? 'resolved' : ''}" id="slot-s5" data-slot="s5">
+                                ${s5HTML}
+                            </div>
+
+                            <!-- s2: Groups -->
+                            <div class="l5-slot ${f2Active ? 'resolved' : ''}" id="slot-s2" data-slot="s2">
+                                ${s2HTML}
+                            </div>
+
+                            <!-- s4: Buttons consistency -->
+                            <div class="l5-slot ${f4Active ? 'resolved' : ''}" id="slot-s4" data-slot="s4" style="text-align:center;">
+                                ${s4HTML}
+                            </div>
+
+                            <!-- s6: Silent save action feedback -->
+                            <div class="l5-slot ${f6Active ? 'resolved' : ''}" id="slot-s6" data-slot="s6" style="text-align:center; font-weight:600; cursor:pointer;">
+                                ${s6HTML}
+                            </div>
+
+                            <!-- s8: Hidden main registration CTA below visual disclaimers -->
+                            ${!f8Active ? `
+                                <div class="l5-slot" id="slot-s8" data-slot="s8" style="background:#fee2e2; border-color:#fca5a5;">
+                                    <div style="font-size:9px; color:#7f1d1d; margin-bottom:8px; line-height:1.3;">
+                                        ⚠️ Welcome Disclaimers: By scrolling here, you acknowledge reading standard guidelines, cookies, rules, finance agreements...
+                                    </div>
+                                    <div style="background:#ef4444; color:#fff; text-align:center; padding:8px; font-weight:700; border-radius:4px;">
+                                        CLICK TO REGISTER FOR CLASSES
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="l5-fix-deck" id="l5-deck">
+                    <h5 style="font-size:11px; text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; color:var(--text-muted);">HCD Fix Cards</h5>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        ${L5_FIX_DECK.map(fix => {
+                const isUsed = GAME.state.l5_fixed.some(key => L5_PROBLEMS[key].fixId === fix.id);
+                return `
+                                <div class="l5-fix-card ${isUsed ? 'used' : ''}" draggable="${!isUsed}" id="${fix.id}" data-fix="${fix.id}">
+                                    ${fix.label}
+                                </div>
+                            `;
+            }).join('')}
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(wrap);
+
+            // HTML5 Drag Events for Deck
+            wrap.querySelectorAll('.l5-fix-card:not(.used)').forEach(card => {
+                card.addEventListener('dragstart', (e) => {
+                    draggedElement = card;
+                    card.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', card.id);
+                });
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+
+                // Mobile click-to-match fallback
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    wrap.querySelectorAll('.l5-fix-card').forEach(c => c.style.borderColor = '');
+                    card.style.borderColor = 'var(--primary)';
+                    GAME.state.l5_selected_card = card.id;
+                    toast("Fix card selected. Tap a highlighted slot in the mockup.", "t-ok");
+                });
+            });
+
+            // HTML5 Drag Events for Mockup slots
+            wrap.querySelectorAll('.l5-slot:not(.resolved)').forEach(slot => {
+                const slotKey = slot.getAttribute('data-slot');
+
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    const fixId = e.dataTransfer.getData('text/plain');
+                    if (fixId) {
+                        applyL5Fix(slotKey, fixId, slot);
+                    }
+                });
+
+                // Mobile Tap Match
+                slot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l5_selected_card) {
+                        applyL5Fix(slotKey, GAME.state.l5_selected_card, slot);
+                        GAME.state.l5_selected_card = null;
+                    } else {
+                        // Describe the issue if they clicked without a card selected
+                        const prob = L5_PROBLEMS[slotKey];
+                        toast(`Selected slot: ${prob.name}. Find HCD card to apply.`, "t-warn");
+                    }
+                });
+            });
+
+            wrap.querySelector('#l5-portal-redesign').addEventListener('click', (e) => {
+                if (e.target.closest('.l5-slot')) return;
+
+                e.stopPropagation();
+                showLevelFeedback(false, "Symmetrical Element!", "This mockup area is designed properly. Drag HCD cards directly onto the dotted border slots.");
+                toast("Wrong spot!", "t-err");
+
+                const p = wrap.querySelector('#l5-portal-redesign');
+                p.classList.add('shake');
+                setTimeout(() => p.classList.remove('shake'), 500);
+                saveGameState();
+            });
+        }
+
+        function applyL5Fix(slotKey, fixId, slotElement) {
+            const prob = L5_PROBLEMS[slotKey];
+            const isCorrect = (prob.fixId === fixId);
+
+            if (isCorrect) {
+                GAME.state.l5_fixed.push(slotKey);
+                showLevelFeedback(true, `Redesign Applied!`, `Correctly matched fix to: ${prob.name}.`);
+                toast("Redesign Correct!", "t-ok");
+
+                // Redraw Level 5 UI
+                const z = document.getElementById('interactive-zone');
+                z.innerHTML = '';
+                renderLevel5(z);
+
+                const progressPct = (GAME.state.l5_fixed.length / 8) * 100;
+                updateLevelProgress(progressPct);
+
+                if (GAME.state.l5_fixed.length === 8) {
+                    completeLevel();
+                }
+            } else {
+                showLevelFeedback(false, "Suboptimal Redesign Fix!", `This HCD Fix doesn't address the core limitation: "${prob.desc}".`);
+                toast("Incorrect fix!", "t-err");
+
+                const mockup = document.getElementById('l5-portal-redesign');
+                mockup.classList.add('shake');
+                setTimeout(() => mockup.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL VALIDATION & CONTROL ROUTING
+           ============================================================ */
+        function checkLevelAnswer() {
+            if (GAME.currentLevel === 2) {
+                checkLevel2Sorting();
+            } else if (GAME.currentLevel === 3) {
+                checkLevel3Order();
+            } else if (GAME.currentLevel === 4) {
+                checkLevel4Match();
+            }
+        }
+
+        function showLevelFeedback(success, title, msg) {
+            const panel = document.getElementById('feedback-panel');
+            panel.style.display = 'block';
+            panel.className = 'fb-box ' + (success ? 'correct' : 'wrong');
+            document.getElementById('feedback-title').textContent = (success ? '✅ ' : '❌ ') + title;
+            document.getElementById('feedback-body').innerHTML = msg;
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function updateObservation() {
+            const obsEl = document.getElementById('observation-panel');
+            let insight = "";
+
+            if (GAME.currentLevel === 1) {
+                insight = "<strong>Analyst's Insight:</strong> Design inconsistency and mixed typography exhaust users psychologically, scale cognitive load, and can trigger system abandonment.";
+            } else if (GAME.currentLevel === 2) {
+                insight = "<strong>Analyst's Insight:</strong> Human working memory cannot process massive ungrouped lists. Categorizing features into chunks respects cognitive boundaries.";
+            } else if (GAME.currentLevel === 3) {
+                insight = "<strong>Analyst's Insight:</strong> User escalation is progressive. Small errors trigger confusion, which scales into annoyance and frustration, finally leading to stress and closure.";
+            } else if (GAME.currentLevel === 4) {
+                insight = "<strong>Analyst's Insight:</strong> System parameters must respect limitations. Slow feedback causes boredom; inability to undo triggers error panic.";
+            } else if (GAME.currentLevel === 5) {
+                insight = "<strong>Analyst's Insight:</strong> An optimal student portal places critical CTAs on top, groups menus, uses unique icons, provides success state feedback, and shows friendly errors.";
+            }
+
+            obsEl.innerHTML = insight;
+        }
+
+        function completeLevel() {
+            toast("Level Complete!", "t-ok");
+
+            const nextBtn = document.getElementById('btn-next');
+            nextBtn.style.display = 'block';
+            nextBtn.scrollIntoView({ behavior: 'smooth' });
+
+            if (GAME.currentLevel === 5) {
+                nextBtn.textContent = "See HCD Analyst Evaluation Report →";
+            } else {
+                nextBtn.textContent = `Proceed to Level ${GAME.currentLevel + 1} →`;
+            }
+        }
+
+        function showResults() {
+            document.getElementById('main-workspace').style.display = 'none';
+            document.getElementById('sidebar-notebook').style.display = 'none';
+            document.getElementById('theory-container').style.display = 'none';
+
+            const resContainer = document.getElementById('results-container');
+            resContainer.style.display = 'block';
+
+            const badgeTitle = "Human-Centered UX Expert";
+            const badgeIcon = "🏆";
+            const badgeDesc = "Excellent! You completed all HCD review levels and verified interface accommodations for human constraints.";
+
+            document.getElementById('res-badge').textContent = badgeIcon;
+            document.getElementById('res-title').textContent = badgeTitle;
+            document.getElementById('res-subtitle').textContent = badgeDesc;
+
+            resContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>

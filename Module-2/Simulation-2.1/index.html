@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Information Architecture & Application Structure Simulation</title>
+
+    <!-- Typography from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Premium Red and White Theme Styling */
+        :root {
+            --primary: #c41e3a;
+            /* Crimson Red */
+            --primary-hover: #a7162d;
+            /* Darker Crimson */
+            --primary-light: #fff5f5;
+            /* Soft light-red background tint */
+            --primary-glow: rgba(196, 30, 58, 0.1);
+            --bg: #fafafa;
+            /* Clean off-white background */
+            --card-bg: #ffffff;
+            /* Pure white for cards */
+            --text: #2c3e50;
+            /* Charcoal text for readability */
+            --text-muted: #7f8c8d;
+            /* Muted grey for subtext */
+            --border: #e0e0e0;
+            /* Soft light-grey borders */
+            --border-red: rgba(196, 30, 58, 0.2);
+            --success: #27ae60;
+            /* Forest green for correct answers */
+            --success-light: #e8f5e9;
+            /* Soft green background tint */
+            --danger: #c0392b;
+            /* Bright red for errors */
+            --danger-light: #fdedec;
+            /* Soft red background tint */
+            --radius: 12px;
+            --radius-sm: 8px;
+            --font-main: 'Outfit', sans-serif;
+            --font-code: 'Space Grotesk', sans-serif;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 8px 24px rgba(196, 30, 58, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        /* Header styling */
+        header.app-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header.app-header h1 {
+            font-family: var(--font-code);
+            font-weight: 700;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hud-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hud-stat {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-code);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reset-game-btn {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-game-btn:hover {
+            background: white;
+            color: var(--primary);
+            border-color: white;
+        }
+
+        /* Main layout */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left panel for theory and observations */
+        .info-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-card h3 {
+            font-family: var(--font-code);
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 6px;
+        }
+
+        .theory-item {
+            margin-bottom: 12px;
+        }
+
+        .theory-item strong {
+            display: block;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .theory-item p {
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .observation-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--text);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .conclusion-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Right panel (Simulation workspace) */
+        .workspace-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Progression Bar & Steps */
+        .progress-bar-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .level-indicator {
+            font-family: var(--font-code);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .step-tracker {
+            display: flex;
+            gap: 8px;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background-color: var(--primary);
+            transform: scale(1.2);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .step-dot.completed {
+            background-color: var(--success);
+        }
+
+        /* Game workspace card */
+        .workspace-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 480px;
+        }
+
+        .workspace-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .workspace-header h2 {
+            font-family: var(--font-code);
+            font-size: 18px;
+            color: var(--text);
+        }
+
+        .workspace-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Button Bar */
+        .control-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .action-group-left {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            font-family: var(--font-main);
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-primary:disabled {
+            background-color: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #f1f2f6;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e4e7eb;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Drag and Drop Card Styles */
+        .unsorted-deck {
+            background-color: #fcfcfc;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            transition: border-color 0.2s;
+        }
+
+        .deck-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        .page-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: grab;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .page-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary);
+        }
+
+        .page-card:active {
+            cursor: grabbing;
+        }
+
+        .page-card.selected {
+            border: 2px solid var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        /* Grid for Folders */
+        .folders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .folder-container {
+            background-color: var(--card-bg);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .folder-container.dragover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .folder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .folder-count {
+            font-size: 11px;
+            background-color: var(--primary-light);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .folder-contents {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1;
+            align-content: flex-start;
+            min-height: 80px;
+        }
+
+        .folder-placeholder {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin: auto;
+            pointer-events: none;
+        }
+
+        /* Answer Highlights */
+        .page-card.correct {
+            border-color: var(--success);
+            background-color: var(--success-light);
+            color: #1b5e20;
+        }
+
+        .page-card.wrong {
+            border-color: var(--danger);
+            background-color: var(--danger-light);
+            color: #7b1fa2;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
+
+        /* Level 2: Better Category Selection styles */
+        .selection-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .selection-question-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            background-color: #fafafa;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .question-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        .question-target-page {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text);
+            margin: 12px 0;
+            font-family: var(--font-code);
+        }
+
+        .category-choices-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 500px) {
+            .category-choices-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .choice-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-family: var(--font-main);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .choice-btn.correct {
+            background-color: var(--success-light) !important;
+            border-color: var(--success) !important;
+            color: #1b5e20 !important;
+        }
+
+        .choice-btn.wrong {
+            background-color: var(--danger-light) !important;
+            border-color: var(--danger) !important;
+            color: var(--danger) !important;
+        }
+
+        .choice-feedback-box {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            line-height: 1.4;
+            text-align: left;
+            display: none;
+        }
+
+        /* Level 3: Menu Slots Styles */
+        .menu-builder-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .menu-slots-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+            background-color: #fafafa;
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: var(--radius);
+        }
+
+        .menu-slot {
+            background-color: var(--card-bg);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            text-align: center;
+            gap: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .menu-slot.dragover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .menu-slot-number {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            font-family: var(--font-code);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .menu-slot-placeholder {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .menu-slot.correct {
+            border-color: var(--success);
+            background-color: var(--success-light);
+        }
+
+        .menu-slot.wrong {
+            border-color: var(--danger);
+            background-color: var(--danger-light);
+            animation: shake 0.3s ease;
+        }
+
+        /* Level 4: Fix Bad Sitemap layout */
+        .audit-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .audit-sitemap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            background-color: #fafafa;
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: var(--radius);
+        }
+
+        .audit-folder {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .audit-folder-header {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .audit-contents {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .page-card.misplaced {
+            border-color: var(--danger);
+            background-color: var(--danger-light);
+            border-style: dashed;
+        }
+
+        /* Feedback Alert Banner */
+        .feedback-banner {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .feedback-banner.success {
+            background-color: var(--success-light);
+            color: #1b5e20;
+            border: 1px solid rgba(39, 174, 96, 0.2);
+            display: flex;
+        }
+
+        .feedback-banner.danger {
+            background-color: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid rgba(192, 57, 43, 0.2);
+            display: flex;
+        }
+
+        .feedback-banner.info {
+            background-color: #e8f4fd;
+            color: #0b69a3;
+            border: 1px solid rgba(11, 105, 163, 0.2);
+            display: flex;
+        }
+
+        /* Final Result Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .result-card {
+            background-color: var(--card-bg);
+            border: 4px double var(--primary);
+            border-radius: var(--radius);
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.85);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .result-title {
+            font-family: var(--font-code);
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .badge-earned {
+            display: inline-block;
+            margin: 16px 0;
+            padding: 10px 20px;
+            background-color: var(--primary-light);
+            border: 2px dashed var(--primary);
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .results-table {
+            width: 100%;
+            margin: 16px 0;
+            border-collapse: collapse;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .results-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .results-table td {
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .results-summary {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        /* Help UI Click info */
+        .click-info-tip {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+            text-align: right;
+            margin-top: 4px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Section with HUD -->
+    <header class="app-header">
+        <h1>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"
+                style="margin-right: 4px;">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+            </svg>
+            Information Architecture Virtual Lab
+        </h1>
+        <div class="hud-controls">
+            <div class="hud-stat" id="hudProgress">Level: 1 of 5</div>
+            <div class="hud-stat" id="hudScore">Score: ⭐ 0</div>
+            <button class="reset-game-btn" onclick="confirmResetAll()">Reset All</button>
+        </div>
+    </header>
+
+    <!-- Two-Column Layout -->
+    <div class="app-layout">
+
+        <!-- Left Panel: Educational Info & Observation -->
+        <aside class="info-sidebar">
+
+            <!-- Theory Section -->
+            <section class="sidebar-card">
+                <h3>Theory Refresher</h3>
+
+                <div class="theory-item">
+                    <strong>Information Architecture (IA)</strong>
+                    <p>The practice of deciding how to arrange the parts of something to be understandable. It centers
+                        on structure, navigation, and labeling.</p>
+                </div>
+
+                <div class="theory-item">
+                    <strong>Organization</strong>
+                    <p>Grouping related content cards logically (e.g., placing Pay Fees and Fee Receipts together under
+                        finance categories) to mirror real student behaviors.</p>
+                </div>
+
+                <div class="theory-item">
+                    <strong>Labeling</strong>
+                    <p>Creating clear and simple category names so that users instantly recognize what they contain
+                        without reading helper details.</p>
+                </div>
+
+                <div class="theory-item">
+                    <strong>Navigation</strong>
+                    <p>The physical path users traverse to discover content. A predictable layout minimizes clicks and
+                        path backtracking.</p>
+                </div>
+
+                <div class="theory-item">
+                    <strong>Search & Clear Grouping</strong>
+                    <p>Predictable folder groups facilitate quick visual searches, reducing the student's cognitive load
+                        and preventing user frustration.</p>
+                </div>
+            </section>
+
+            <!-- Observations Section -->
+            <section class="sidebar-card">
+                <h3>Observations</h3>
+                <div class="observation-box" id="observationText">
+                    Group pages and menus logically to help users build a correct mental model. Run an answer check to
+                    see live analysis.
+                </div>
+            </section>
+
+            <!-- Conclusion Section -->
+            <section class="sidebar-card">
+                <h3>Conclusion</h3>
+                <p class="conclusion-text">
+                    A clear application structure improves usability by making pages predictable, organized, and easy to
+                    access.
+                </p>
+            </section>
+
+        </aside>
+
+        <!-- Right Panel: Simulation Space -->
+        <main class="workspace-container">
+
+            <!-- Step Tracker Bar -->
+            <div class="progress-bar-card">
+                <span class="level-indicator" id="levelNameIndicator">Level 1: Basic Page Sorting</span>
+                <div class="step-tracker" id="stepTrackerDots">
+                    <div class="step-dot active"></div>
+                    <div class="step-dot"></div>
+                    <div class="step-dot"></div>
+                    <div class="step-dot"></div>
+                    <div class="step-dot"></div>
+                </div>
+            </div>
+
+            <!-- Main Workspace Card -->
+            <div class="workspace-card">
+
+                <!-- Level Details Header -->
+                <div class="workspace-header">
+                    <h2 id="levelTitle">Level 1: Basic Page Sorting</h2>
+                    <p id="levelInstruction">Drag the pages into the correct sections.</p>
+                </div>
+
+                <!-- Feedback Alert Banner -->
+                <div class="feedback-banner" id="levelFeedback"></div>
+
+                <!-- Active Interactive Simulation Area -->
+                <div id="simulationArea" style="display: flex; flex-direction: column; gap: 20px; flex: 1;">
+                    <!-- Dynamically populated by level configs -->
+                </div>
+
+                <!-- Controls/Actions -->
+                <footer class="control-actions">
+                    <div class="action-group-left">
+                        <button class="btn btn-secondary" onclick="resetCurrentLevel()">Reset Level</button>
+                        <button class="btn btn-outline" onclick="triggerHint()">Hint</button>
+                    </div>
+                    <div class="action-group-right">
+                        <button class="btn btn-primary" id="checkAnswerBtn" onclick="checkActiveAnswer()">Check
+                            Answer</button>
+                        <button class="btn btn-primary" id="nextLevelBtn" onclick="goToNextLevel()"
+                            style="display: none;">Next Level</button>
+                    </div>
+                </footer>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Final Certificate / Results Modal -->
+    <div class="modal-overlay" id="resultsModal">
+        <div class="result-card">
+            <div class="result-title">Simulation Complete!</div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Information Architecture Virtual Lab
+                Scorecard</p>
+
+            <div class="badge-earned" id="earnedBadge">Badge: IA Master</div>
+
+            <table class="results-table">
+                <tr>
+                    <th>Total Score</th>
+                    <td id="finalScore" style="color: var(--primary); font-size: 16px;">⭐ 0</td>
+                </tr>
+                <tr>
+                    <th>Correct Answers</th>
+                    <td id="finalCorrect" style="color: var(--success);">0</td>
+                </tr>
+                <tr>
+                    <th>Mistakes Made</th>
+                    <td id="finalMistakes" style="color: var(--danger);">0</td>
+                </tr>
+            </table>
+
+            <p class="results-summary" id="finalSummary">
+                A clear application structure improves usability by making pages predictable, organized, and easy to
+                access.
+            </p>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="restartLab()">Restart Virtual Lab</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATABASE: Simplified 5-Level Configuration ---
+        const levelConfigs = [
+            {
+                number: 1,
+                title: "Level 1: Basic Page Sorting",
+                instruction: "Drag portal pages into their correct sections. (Or click a page to select it, then click a section folder to place it).",
+                type: "sorting",
+                sections: ["Academic", "Profile", "Fees", "Support"],
+                pages: [
+                    { id: "timetable", name: "Timetable", category: "Academic" },
+                    { id: "exam_results", name: "Exam Results", category: "Academic" },
+                    { id: "personal_details", name: "Personal Details", category: "Profile" },
+                    { id: "fee_receipt", name: "Fee Receipt", category: "Fees" },
+                    { id: "pay_fees", name: "Pay Fees", category: "Fees" },
+                    { id: "help_desk", name: "Help Desk", category: "Support" }
+                ],
+                hints: [
+                    "Hint: Timetable and Exam Results represent courses/grades, belonging under Academic.",
+                    "Hint: Personal Details is information identifying the student, fitting under Profile.",
+                    "Hint: Fee Receipt and Pay Fees involve financial checkout actions (Fees).",
+                    "Hint: Help Desk provides technical service ticketing and assists users (Support)."
+                ],
+                learningNote: "Basic page grouping forms the foundation of content hierarchy. Mutual exclusivity ensures users don't guess where a page is stored."
+            },
+            {
+                number: 2,
+                title: "Level 2: Better Category Selection",
+                instruction: "Review each portal page and choose the single best category.",
+                type: "selection",
+                questions: [
+                    {
+                        page: "Attendance",
+                        options: ["Academic", "Profile", "Resources", "Exams", "Fees"],
+                        answer: "Academic",
+                        explanation: "Attendance tracks student lecture attendance, which is an Academic progress metric."
+                    },
+                    {
+                        page: "ID Card",
+                        options: ["Academic", "Profile", "Resources", "Exams", "Fees"],
+                        answer: "Profile",
+                        explanation: "An ID Card displays personal identity details, belonging in the user's Profile."
+                    },
+                    {
+                        page: "Course Notes",
+                        options: ["Academic", "Profile", "Resources", "Exams", "Fees"],
+                        answer: "Resources",
+                        explanation: "Course notes are study materials and reference guides, categorized as Resources."
+                    },
+                    {
+                        page: "Exam Form",
+                        options: ["Academic", "Profile", "Resources", "Exams", "Fees"],
+                        answer: "Exams",
+                        explanation: "Exam Forms are used to register for examinations, placed under Exams."
+                    },
+                    {
+                        page: "Scholarship Form",
+                        options: ["Academic", "Profile", "Resources", "Exams", "Fees"],
+                        answer: "Fees",
+                        explanation: "Scholarship Forms manage tuition funding and balances, classified under Fees."
+                    }
+                ],
+                hints: [
+                    "Hint: Attendance is part of academic tracking.",
+                    "Hint: ID Card carries student identification (Profile).",
+                    "Hint: Course notes are lecture references (Resources).",
+                    "Hint: Exam Form registers you to sit in a hall (Exams).",
+                    "Hint: Scholarship Form handles tuition finance (Fees)."
+                ],
+                learningNote: "Better Category Selection focuses on defining clear categories for jargon-heavy labels to optimize search efficiency."
+            },
+            {
+                number: 3,
+                title: "Level 3: Menu Order Builder",
+                instruction: "Usability principles show that high-frequency items go first, while support settings go last. Drag items into a logical linear order from Slot 1 (leftmost) to Slot 7 (rightmost). (Or click an item then click a slot).",
+                type: "menu",
+                items: ["Dashboard", "Profile", "Academics", "Exams", "Fees", "Resources", "Support"],
+                correctOrder: ["Dashboard", "Profile", "Academics", "Exams", "Fees", "Resources", "Support"],
+                hints: [
+                    "Hint: Dashboard is always the first central landing page (Slot 1).",
+                    "Hint: Profile defines the logged-in student (Slot 2).",
+                    "Hint: Core university actions come next: Academics (Slot 3), Exams (Slot 4), Fees (Slot 5).",
+                    "Hint: Supplemental Resources (Slot 6) and Help Support (Slot 7) go towards the end."
+                ],
+                learningNote: "Primary navigation orders leverage the Serial Position Effect—users remember the first and last links in a list best."
+            },
+            {
+                number: 4,
+                title: "Level 4: Fix Wrong Structure",
+                instruction: "This Student Portal structure has some wrongly nested pages. Drag pages into their correct folders.",
+                type: "audit",
+                sections: ["Profile", "Exams", "Fees", "Resources", "Support"],
+                initialPlacements: {
+                    "Fee Receipt": "Resources",     /* should go under Fees */
+                    "Help Desk": "Exams",           /* should go under Support */
+                    "Exam Results": "Profile",       /* should go under Exams */
+                    "Personal Details": "Fees",      /* should go under Profile */
+                    "Notes": "Support"              /* should go under Resources */
+                },
+                correctPlacements: {
+                    "Fee Receipt": "Fees",
+                    "Help Desk": "Support",
+                    "Exam Results": "Exams",
+                    "Personal Details": "Profile",
+                    "Notes": "Resources"
+                },
+                hints: [
+                    "Hint: Fee Receipt handles billing details and goes to Fees.",
+                    "Hint: Help Desk handles technical service queries and belongs in Support.",
+                    "Hint: Exam Results lists testing accomplishments, belonging under Exams.",
+                    "Hint: Personal Details stores your profile contact information.",
+                    "Hint: Notes represent academic study material (Resources)."
+                ],
+                learningNote: "Fixing wrong structures reduces cognitive load. Users expect billing under Fees and helper guides under Support."
+            },
+            {
+                number: 5,
+                title: "Level 5: Final Student Portal Structure",
+                instruction: "Construct the complete Information Architecture by dragging all 10 pages into their correct folders.",
+                type: "final",
+                sections: ["Dashboard", "Profile", "Academics", "Exams", "Fees", "Support"],
+                pages: [
+                    { id: "personal_details", name: "Personal Details", category: "Profile" },
+                    { id: "id_card", name: "ID Card", category: "Profile" },
+                    { id: "timetable", name: "Timetable", category: "Academics" },
+                    { id: "attendance", name: "Attendance", category: "Academics" },
+                    { id: "exam_form", name: "Exam Form", category: "Exams" },
+                    { id: "exam_results", name: "Exam Results", category: "Exams" },
+                    { id: "pay_fees", name: "Pay Fees", category: "Fees" },
+                    { id: "fee_receipt", name: "Fee Receipt", category: "Fees" },
+                    { id: "help_desk", name: "Help Desk", category: "Support" },
+                    { id: "complaint_form", name: "Complaint Form", category: "Support" }
+                ],
+                hints: [
+                    "Hint: Timetable and Attendance belong to Academics. ID Card belongs to Profile.",
+                    "Hint: Pay Fees and Fee Receipt belong to Fees.",
+                    "Hint: Exam Form and Exam Results go to Exams.",
+                    "Hint: Help Desk and Complaint Form go to Support.",
+                    "Hint: Dashboard remains a top-level empty landing directory."
+                ],
+                learningNote: "Completing a balanced sitemap validates horizontal category coverage and clean vertical item classification."
+            }
+        ];
+
+        // --- GAME ENGINE STATE ---
+        let state = {
+            score: 0,
+            currentLevelIdx: 0,
+            correctCount: 0,
+            mistakesCount: 0,
+            hintsUsedThisLevel: 0,
+
+            // Temporary placements tracker: pageId -> targetSection
+            placements: {},
+
+            // Select / Tap selection tracker (beginner touch controls fallback)
+            selectedElementId: null,
+
+            // Level 2 (Selection) Specific Sub-state
+            level2QuestionIdx: 0,
+            level2Answers: [] // tracks results of level 2 selections
+        };
+
+        // --- INITIALIZATION ---
+        window.onload = function () {
+            initGame();
+        };
+
+        function initGame() {
+            state.score = 0;
+            state.currentLevelIdx = 0;
+            state.correctCount = 0;
+            state.mistakesCount = 0;
+            state.hintsUsedThisLevel = 0;
+            state.placements = {};
+            state.selectedElementId = null;
+            state.level2QuestionIdx = 0;
+            state.level2Answers = [];
+
+            updateHUD();
+            loadLevel(0);
+        }
+
+        function confirmResetAll() {
+            if (confirm("Are you sure you want to reset the entire simulation? Your score will start from 0.")) {
+                initGame();
+            }
+        }
+
+        function updateHUD() {
+            document.getElementById("hudScore").innerText = `Score: ⭐ ${state.score}`;
+            document.getElementById("hudProgress").innerText = `Level: ${state.currentLevelIdx + 1} of 5`;
+        }
+
+        // --- STEP PROGRESS INDICATOR UI ---
+        function updateProgressSteps() {
+            const dotsContainer = document.getElementById("stepTrackerDots");
+            dotsContainer.innerHTML = "";
+            for (let i = 0; i < levelConfigs.length; i++) {
+                const dot = document.createElement("div");
+                dot.className = "step-dot";
+                if (i === state.currentLevelIdx) {
+                    dot.classList.add("active");
+                } else if (i < state.currentLevelIdx) {
+                    dot.classList.add("completed");
+                }
+                dotsContainer.appendChild(dot);
+            }
+            document.getElementById("levelNameIndicator").innerText = levelConfigs[state.currentLevelIdx].title;
+        }
+
+        // --- LEVEL LOAD CONTROLLER ---
+        function loadLevel(idx) {
+            state.currentLevelIdx = idx;
+            state.hintsUsedThisLevel = 0;
+            state.selectedElementId = null;
+            state.placements = {};
+
+            const config = levelConfigs[idx];
+
+            // Update Texts
+            document.getElementById("levelTitle").innerText = config.title;
+            document.getElementById("levelInstruction").innerText = config.instruction;
+            document.getElementById("observationText").innerText = "Group pages and menus logically to help users build a correct mental model. Run an answer check to see live analysis.";
+
+            // Update Step Tracker
+            updateProgressSteps();
+            updateHUD();
+
+            // UI reset
+            document.getElementById("nextLevelBtn").style.display = "none";
+            document.getElementById("checkAnswerBtn").style.display = "block";
+            document.getElementById("checkAnswerBtn").disabled = false;
+
+            const feedback = document.getElementById("levelFeedback");
+            feedback.style.display = "none";
+            feedback.className = "feedback-banner";
+
+            // Render Active Game Content
+            const container = document.getElementById("simulationArea");
+            container.innerHTML = "";
+
+            if (config.type === "sorting" || config.type === "final") {
+                renderSortingWorkspace(config, container);
+            } else if (config.type === "selection") {
+                state.level2QuestionIdx = 0;
+                state.level2Answers = [];
+                document.getElementById("checkAnswerBtn").style.display = "none"; // Checks are instant button triggers in Level 2
+                renderSelectionWorkspace(config, container);
+            } else if (config.type === "menu") {
+                renderMenuWorkspace(config, container);
+            } else if (config.type === "audit") {
+                renderAuditWorkspace(config, container);
+            }
+        }
+
+        // --- LEVEL 1 & 5: SORTING WORKSPACES ---
+        function renderSortingWorkspace(config, container) {
+            // 1. Create Deck
+            const deck = document.createElement("div");
+            deck.className = "unsorted-deck";
+            deck.id = "unsortedDeck";
+            deck.ondragover = handleDragOver;
+            deck.ondrop = handleDeckDrop;
+
+            const deckTitle = document.createElement("div");
+            deckTitle.className = "deck-label";
+            deckTitle.innerText = "Unsorted Pages Deck (Drag cards or click to place)";
+            deck.appendChild(deckTitle);
+
+            config.pages.forEach(page => {
+                const card = createPageCard(page.id, page.name);
+                deck.appendChild(card);
+            });
+
+            container.appendChild(deck);
+
+            // 2. Create Folders Grid
+            const grid = document.createElement("div");
+            grid.className = "folders-grid";
+
+            config.sections.forEach(secName => {
+                const folder = document.createElement("div");
+                folder.className = "folder-container";
+                folder.setAttribute("data-section", secName);
+                folder.ondragover = handleDragOver;
+                folder.ondragleave = handleDragLeave;
+                folder.ondrop = handleFolderDrop;
+                folder.onclick = function () { handleFolderClick(secName); };
+
+                folder.innerHTML = `
+          <div class="folder-header">
+            <span>📁 ${secName}</span>
+            <span class="folder-count" id="count-${secName}">0</span>
+          </div>
+          <div class="folder-contents" id="contents-${secName}">
+            <div class="folder-placeholder">Drop cards here...</div>
+          </div>
+        `;
+                grid.appendChild(folder);
+            });
+
+            container.appendChild(grid);
+        }
+
+        // --- LEVEL 2: SELECTION WORKSPACE ---
+        function renderSelectionWorkspace(config, container) {
+            container.innerHTML = ""; // reset
+
+            if (state.level2QuestionIdx >= config.questions.length) {
+                // Finished selection questions!
+                const banner = document.getElementById("levelFeedback");
+                banner.className = "feedback-banner success";
+                banner.innerText = "All category choices completed! Click Next Level to proceed.";
+                banner.style.display = "flex";
+
+                document.getElementById("nextLevelBtn").style.display = "block";
+                document.getElementById("observationText").innerText = "When related pages are grouped correctly, users can find information faster and with less confusion.";
+                return;
+            }
+
+            const q = config.questions[state.level2QuestionIdx];
+
+            const selectionLayout = document.createElement("div");
+            selectionLayout.className = "selection-layout";
+
+            const qCard = document.createElement("div");
+            qCard.className = "selection-question-card";
+
+            qCard.innerHTML = `
+        <div class="question-badge">PAGE ${state.level2QuestionIdx + 1} OF ${config.questions.length}</div>
+        <div class="question-target-page">📄 ${q.page}</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Choose the most intuitive category structure:</div>
+        <div class="category-choices-grid" id="choicesGrid"></div>
+        <div class="choice-feedback-box" id="choiceFeedback"></div>
+        <button class="btn btn-primary" id="selectionNextBtn" style="margin-top: 16px; display: none;" onclick="advanceLevel2Question()">Next Page</button>
+      `;
+
+            selectionLayout.appendChild(qCard);
+            container.appendChild(selectionLayout);
+
+            const grid = document.getElementById("choicesGrid");
+            q.options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "choice-btn";
+                btn.innerText = opt;
+                btn.onclick = function () { submitSelectionChoice(opt, btn, q); };
+                grid.appendChild(btn);
+            });
+        }
+
+        function submitSelectionChoice(selectedOpt, btnEl, questionObj) {
+            const buttons = document.querySelectorAll(".choice-btn");
+            buttons.forEach(btn => btn.disabled = true); // Lock options
+
+            const feedback = document.getElementById("choiceFeedback");
+            feedback.style.display = "block";
+
+            const isCorrect = (selectedOpt === questionObj.answer);
+
+            if (isCorrect) {
+                btnEl.classList.add("correct");
+                feedback.style.backgroundColor = "var(--success-light)";
+                feedback.style.color = "#1b5e20";
+                feedback.innerHTML = `<strong>Correct! +10 Points</strong><br>${questionObj.explanation}`;
+                adjustScore(10);
+                state.correctCount++;
+                document.getElementById("observationText").innerText = `Correctly grouped: ${questionObj.page} fits perfectly under ${questionObj.answer}.`;
+            } else {
+                btnEl.classList.add("wrong");
+                feedback.style.backgroundColor = "var(--danger-light)";
+                feedback.style.color = "var(--danger)";
+                feedback.innerHTML = `<strong>Incorrect! -5 Points</strong><br>${questionObj.explanation}`;
+                adjustScore(-5);
+                state.mistakesCount++;
+                document.getElementById("observationText").innerText = `Oops! Misplacing ${questionObj.page} increases student path searching steps.`;
+
+                // Highlight correct button in green
+                buttons.forEach(btn => {
+                    if (btn.innerText === questionObj.answer) {
+                        btn.classList.add("correct");
+                    }
+                });
+            }
+
+            document.getElementById("selectionNextBtn").style.display = "inline-block";
+        }
+
+        function advanceLevel2Question() {
+            state.level2QuestionIdx++;
+            const config = levelConfigs[state.currentLevelIdx];
+            const container = document.getElementById("simulationArea");
+            renderSelectionWorkspace(config, container);
+        }
+
+        // --- LEVEL 3: MENU WORKSPACE ---
+        function renderMenuWorkspace(config, container) {
+            // 1. Items Deck
+            const deck = document.createElement("div");
+            deck.className = "unsorted-deck";
+            deck.id = "unsortedDeck";
+            deck.ondragover = handleDragOver;
+            deck.ondrop = handleDeckDrop;
+
+            const deckTitle = document.createElement("div");
+            deckTitle.className = "deck-label";
+            deckTitle.innerText = "Available Navigation Cards";
+            deck.appendChild(deckTitle);
+
+            config.items.forEach(item => {
+                const card = createPageCard(item, item);
+                deck.appendChild(card);
+            });
+
+            container.appendChild(deck);
+
+            // 2. Linear Slots row
+            const slotsContainer = document.createElement("div");
+            slotsContainer.className = "menu-slots-container";
+
+            for (let i = 0; i < config.items.length; i++) {
+                const slot = document.createElement("div");
+                slot.className = "menu-slot";
+                slot.setAttribute("data-slot", i);
+                slot.ondragover = handleDragOver;
+                slot.ondragleave = handleDragLeave;
+                slot.ondrop = handleSlotDrop;
+                slot.onclick = function () { handleSlotClick(i); };
+
+                slot.innerHTML = `
+          <span class="menu-slot-number">${i + 1}</span>
+          <span class="menu-slot-placeholder">Slot ${i + 1}</span>
+        `;
+                slotsContainer.appendChild(slot);
+            }
+
+            container.appendChild(slotsContainer);
+        }
+
+        // --- LEVEL 4: AUDIT WORKSPACE (FIX WRONG STRUCTURE) ---
+        function renderAuditWorkspace(config, container) {
+            // Load sitemaps with pages pre-filled incorrectly
+            const grid = document.createElement("div");
+            grid.className = "audit-sitemap-grid";
+
+            // Initialize state placements if empty
+            if (Object.keys(state.placements).length === 0) {
+                Object.assign(state.placements, config.initialPlacements);
+            }
+
+            config.sections.forEach(secName => {
+                const folder = document.createElement("div");
+                folder.className = "audit-folder";
+                folder.setAttribute("data-section", secName);
+                folder.ondragover = handleDragOver;
+                folder.ondragleave = handleDragLeave;
+                folder.ondrop = handleFolderDrop;
+                folder.onclick = function () { handleFolderClick(secName); };
+
+                const fHeader = document.createElement("div");
+                fHeader.className = "audit-folder-header";
+                fHeader.innerText = `📂 ${secName}`;
+                folder.appendChild(fHeader);
+
+                const fContents = document.createElement("div");
+                fContents.className = "audit-contents";
+                fContents.id = `contents-${secName}`;
+
+                folder.appendChild(fContents);
+                grid.appendChild(folder);
+            });
+
+            container.appendChild(grid);
+            rebuildAuditPlacements();
+        }
+
+        function rebuildAuditPlacements() {
+            const config = levelConfigs[state.currentLevelIdx];
+
+            // Clear all audit folder structures
+            config.sections.forEach(secName => {
+                const container = document.getElementById(`contents-${secName}`);
+                container.innerHTML = "";
+            });
+
+            // Distribute pages
+            for (const pageName in state.placements) {
+                const section = state.placements[pageName];
+                const container = document.getElementById(`contents-${section}`);
+
+                if (container) {
+                    const card = createPageCard(pageName, pageName);
+
+                    // Determine if it is currently misplaced to color it
+                    const correctSec = config.correctPlacements[pageName];
+                    if (section !== correctSec) {
+                        card.classList.add("misplaced");
+                    }
+                    container.appendChild(card);
+                }
+            }
+
+            // Check if folder contains placeholder
+            config.sections.forEach(secName => {
+                const folderCont = document.getElementById(`contents-${secName}`);
+                if (folderCont.children.length === 0) {
+                    const placeholder = document.createElement("div");
+                    placeholder.className = "folder-placeholder";
+                    placeholder.innerText = "Empty Folder";
+                    folderCont.appendChild(placeholder);
+                }
+            });
+        }
+
+        // --- DRAGGABLE COMPONENT BUILDER ---
+        function createPageCard(id, name) {
+            const card = document.createElement("div");
+            card.className = "page-card";
+            card.id = `page-${id}`;
+            card.setAttribute("data-id", id);
+            card.draggable = true;
+
+            // HTML5 Drag Events
+            card.ondragstart = function (e) {
+                e.dataTransfer.setData("text/plain", id);
+                card.classList.add("selected");
+                state.selectedElementId = id;
+                e.stopPropagation();
+            };
+
+            card.ondragend = function (e) {
+                card.classList.remove("selected");
+            };
+
+            // Click select support for mobile/desktop touch accessibility
+            card.onclick = function (e) {
+                e.stopPropagation();
+
+                // Remove previous selected
+                document.querySelectorAll(".page-card").forEach(el => el.classList.remove("selected"));
+
+                if (state.selectedElementId === id) {
+                    state.selectedElementId = null;
+                } else {
+                    state.selectedElementId = id;
+                    card.classList.add("selected");
+                }
+            };
+
+            card.innerHTML = `☰ ${name}`;
+            return card;
+        }
+
+        // --- DRAG & DROP UTILITIES ---
+        function handleDragOver(e) {
+            e.preventDefault();
+            const target = e.currentTarget;
+            if (target.classList.contains("folder-container") || target.classList.contains("menu-slot") || target.classList.contains("audit-folder")) {
+                target.classList.add("dragover");
+            }
+        }
+
+        function handleDragLeave(e) {
+            const target = e.currentTarget;
+            target.classList.remove("dragover");
+        }
+
+        // Drop back into the Deck
+        function handleDeckDrop(e) {
+            e.preventDefault();
+            const pageId = e.dataTransfer.getData("text/plain") || state.selectedElementId;
+            if (!pageId) return;
+
+            const card = document.getElementById(`page-${pageId}`);
+            if (card) {
+                const deck = document.getElementById("unsortedDeck");
+                deck.appendChild(card);
+                delete state.placements[pageId];
+            }
+
+            state.selectedElementId = null;
+            document.querySelectorAll(".page-card").forEach(el => el.classList.remove("selected"));
+
+            const config = levelConfigs[state.currentLevelIdx];
+            if (config.type === "sorting" || config.type === "final") {
+                updateFolderCounts();
+            }
+        }
+
+        // Drop into Category Folder (Level 1, 4, 5)
+        function handleFolderDrop(e) {
+            e.preventDefault();
+            const folder = e.currentTarget;
+            folder.classList.remove("dragover");
+
+            const pageId = e.dataTransfer.getData("text/plain") || state.selectedElementId;
+            if (!pageId) return;
+
+            placeItemInFolder(pageId, folder);
+        }
+
+        function handleFolderClick(sectionName) {
+            if (!state.selectedElementId) return;
+            const folderEl = document.querySelector(`[data-section="${sectionName}"]`);
+            if (folderEl) {
+                placeItemInFolder(state.selectedElementId, folderEl);
+            }
+        }
+
+        function placeItemInFolder(pageId, folderEl) {
+            const sectionName = folderEl.getAttribute("data-section");
+            const contents = folderEl.querySelector(".folder-contents") || folderEl.querySelector(".audit-contents");
+            const card = document.getElementById(`page-${pageId}`);
+
+            if (card && contents) {
+                // Remove empty placeholders
+                const placeholder = contents.querySelector(".folder-placeholder");
+                if (placeholder) placeholder.remove();
+
+                contents.appendChild(card);
+                state.placements[pageId] = sectionName;
+            }
+
+            // Cleanup selections
+            state.selectedElementId = null;
+            document.querySelectorAll(".page-card").forEach(el => el.classList.remove("selected"));
+
+            const config = levelConfigs[state.currentLevelIdx];
+            if (config.type === "sorting" || config.type === "final") {
+                updateFolderCounts();
+            } else if (config.type === "audit") {
+                rebuildAuditPlacements();
+            }
+        }
+
+        // Drop into Menu Slot (Level 3)
+        function handleSlotDrop(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove("dragover");
+
+            const pageId = e.dataTransfer.getData("text/plain") || state.selectedElementId;
+            if (!pageId) return;
+
+            placeItemInSlot(pageId, slot);
+        }
+
+        function handleSlotClick(slotIdx) {
+            if (!state.selectedElementId) return;
+            const slotEl = document.querySelector(`[data-slot="${slotIdx}"]`);
+            if (slotEl) {
+                placeItemInSlot(state.selectedElementId, slotEl);
+            }
+        }
+
+        function placeItemInSlot(pageId, slotEl) {
+            const slotIdx = slotEl.getAttribute("data-slot");
+            const card = document.getElementById(`page-${pageId}`);
+
+            // If slot already has an item, return that item to the deck
+            const existingCard = slotEl.querySelector(".page-card");
+            if (existingCard) {
+                const deck = document.getElementById("unsortedDeck");
+                deck.appendChild(existingCard);
+                const oldId = existingCard.getAttribute("data-id");
+                delete state.placements[oldId];
+            }
+
+            // Append new card
+            if (card) {
+                // Clear placeholder text
+                const placeholder = slotEl.querySelector(".menu-slot-placeholder");
+                if (placeholder) placeholder.style.display = "none";
+
+                slotEl.appendChild(card);
+                state.placements[pageId] = parseInt(slotIdx);
+            }
+
+            state.selectedElementId = null;
+            document.querySelectorAll(".page-card").forEach(el => el.classList.remove("selected"));
+            updateMenuPlaceholderStates();
+        }
+
+        // Helper to refresh counters on folders
+        function updateFolderCounts() {
+            const config = levelConfigs[state.currentLevelIdx];
+            config.sections.forEach(sec => {
+                const contents = document.getElementById(`contents-${sec}`);
+                const countSpan = document.getElementById(`count-${sec}`);
+
+                let count = 0;
+                if (contents) {
+                    // Exclude placeholders
+                    const cards = contents.querySelectorAll(".page-card");
+                    count = cards.length;
+
+                    // Put placeholder if empty
+                    if (count === 0 && !contents.querySelector(".folder-placeholder")) {
+                        contents.innerHTML = `<div class="folder-placeholder">Drop cards here...</div>`;
+                    }
+                }
+                if (countSpan) {
+                    countSpan.innerText = count;
+                }
+            });
+        }
+
+        function updateMenuPlaceholderStates() {
+            const slots = document.querySelectorAll(".menu-slot");
+            slots.forEach(slot => {
+                const hasCard = slot.querySelector(".page-card");
+                const placeholder = slot.querySelector(".menu-slot-placeholder");
+                if (placeholder) {
+                    placeholder.style.display = hasCard ? "none" : "block";
+                }
+            });
+        }
+
+        // --- GAME ENGINE LOGIC & SCORING ---
+        function adjustScore(points) {
+            state.score += points;
+            if (state.score < 0) state.score = 0;
+            updateHUD();
+        }
+
+        // --- HINT BUTTON ACTION ---
+        function triggerHint() {
+            const config = levelConfigs[state.currentLevelIdx];
+            const hintIdx = Math.min(state.hintsUsedThisLevel, config.hints.length - 1);
+
+            const banner = document.getElementById("levelFeedback");
+            banner.className = "feedback-banner info";
+            banner.innerText = config.hints[hintIdx];
+            banner.style.display = "flex";
+
+            // Deduct 2 points for using a hint
+            adjustScore(-2);
+            state.hintsUsedThisLevel++;
+        }
+
+        // --- RESET LEVEL BUTTON ACTION ---
+        function resetCurrentLevel() {
+            // Re-load the same level to discard placements
+            loadLevel(state.currentLevelIdx);
+        }
+
+        // --- NEXT LEVEL CLICK ---
+        function goToNextLevel() {
+            const nextIdx = state.currentLevelIdx + 1;
+            if (nextIdx < levelConfigs.length) {
+                loadLevel(nextIdx);
+            } else {
+                showResultsScreen();
+            }
+        }
+
+        // --- ANSWER VERIFICATION CHECKER ---
+        function checkActiveAnswer() {
+            const config = levelConfigs[state.currentLevelIdx];
+            const feedback = document.getElementById("levelFeedback");
+            feedback.style.display = "none";
+
+            if (config.type === "sorting") {
+                checkSortingLevel(config, feedback);
+            } else if (config.type === "menu") {
+                checkMenuLevel(config, feedback);
+            } else if (config.type === "audit") {
+                checkAuditLevel(config, feedback);
+            } else if (config.type === "final") {
+                checkFinalLevel(config, feedback);
+            }
+        }
+
+        // Validate Level 1 basic sorting
+        function checkSortingLevel(config, feedback) {
+            // Check if all pages are placed
+            const placedKeys = Object.keys(state.placements);
+            if (placedKeys.length < config.pages.length) {
+                feedback.className = "feedback-banner danger";
+                feedback.innerText = "Please place all page cards into categories before checking!";
+                feedback.style.display = "flex";
+                return;
+            }
+
+            let allCorrect = true;
+            config.pages.forEach(p => {
+                const card = document.getElementById(`page-${p.id}`);
+                const currentSec = state.placements[p.id];
+
+                if (currentSec === p.category) {
+                    if (card) {
+                        card.classList.add("correct");
+                        card.classList.remove("wrong");
+                        card.draggable = false; // Lock correct cards
+                    }
+                } else {
+                    allCorrect = false;
+                    if (card) {
+                        card.classList.add("wrong");
+                        // Return to deck
+                        setTimeout(() => {
+                            const deck = document.getElementById("unsortedDeck");
+                            deck.appendChild(card);
+                            card.classList.remove("wrong");
+                            delete state.placements[p.id];
+                            updateFolderCounts();
+                        }, 1000);
+                    }
+                }
+            });
+
+            if (allCorrect) {
+                feedback.className = "feedback-banner success";
+                feedback.innerText = "Perfect! You grouped all pages correctly. Click Next Level.";
+                feedback.style.display = "flex";
+                adjustScore(10);
+                state.correctCount++;
+                document.getElementById("observationText").innerText = "When related pages are grouped correctly, users can find information faster and with less confusion.";
+
+                document.getElementById("nextLevelBtn").style.display = "block";
+                document.getElementById("checkAnswerBtn").style.display = "none";
+            } else {
+                feedback.className = "feedback-banner danger";
+                feedback.innerText = "Some pages were incorrectly categorized and returned to the deck. -5 Points.";
+                feedback.style.display = "flex";
+                adjustScore(-5);
+                state.mistakesCount++;
+                document.getElementById("observationText").innerText = "Oops! Misplaced pages forces the user to search randomly, increasing cognitive friction.";
+            }
+        }
+
+        // Validate Level 3 menu builder order
+        function checkMenuLevel(config, feedback) {
+            const placedKeys = Object.keys(state.placements);
+            if (placedKeys.length < config.items.length) {
+                feedback.className = "feedback-banner danger";
+                feedback.innerText = "Please place all menu items into slots before checking!";
+                feedback.style.display = "flex";
+                return;
+            }
+
+            // Construct placed array
+            const userOrder = new Array(config.items.length);
+            for (const itemName in state.placements) {
+                const slotIdx = state.placements[itemName];
+                userOrder[slotIdx] = itemName;
+            }
+
+            let allCorrect = true;
+            for (let i = 0; i < config.correctOrder.length; i++) {
+                const slotEl = document.querySelector(`[data-slot="${i}"]`);
+                const isMatch = (userOrder[i] === config.correctOrder[i]);
+
+                if (slotEl) {
+                    if (isMatch) {
+                        slotEl.classList.add("correct");
+                        slotEl.classList.remove("wrong");
+                        const card = slotEl.querySelector(".page-card");
+                        if (card) card.draggable = false;
+                    } else {
+                        allCorrect = false;
+                        slotEl.classList.add("wrong");
+                        // return card to deck
+                        setTimeout(() => {
+                            const card = slotEl.querySelector(".page-card");
+                            if (card) {
+                                const deck = document.getElementById("unsortedDeck");
+                                deck.appendChild(card);
+                                const pageId = card.getAttribute("data-id");
+                                delete state.placements[pageId];
+                                updateMenuPlaceholderStates();
+                            }
+                            slotEl.classList.remove("wrong");
+                        }, 1000);
+                    }
+                }
+            }
+
+            if (allCorrect) {
+                feedback.className = "feedback-banner success";
+                feedback.innerText = "Excellent! The menu hierarchy matches expected usability. Click Next Level.";
+                feedback.style.display = "flex";
+                adjustScore(10);
+                state.correctCount++;
+                document.getElementById("observationText").innerText = "A central landing page (Dashboard) belongs first. Configuration settings and profile adjustments sit correctly at the end.";
+
+                document.getElementById("nextLevelBtn").style.display = "block";
+                document.getElementById("checkAnswerBtn").style.display = "none";
+            } else {
+                feedback.className = "feedback-banner danger";
+                feedback.innerText = "Some items are ordered incorrectly. Bouncing wrong nodes back to deck. -5 Points.";
+                feedback.style.display = "flex";
+                adjustScore(-5);
+                state.mistakesCount++;
+                document.getElementById("observationText").innerText = "Organizing menus randomly confuses users who look for primary actions on the left and admin tools on the right.";
+            }
+        }
+
+        // Validate Level 4 fix wrong sitemap structure
+        function checkAuditLevel(config, feedback) {
+            let allCorrect = true;
+
+            for (const pageName in state.correctPlacements) {
+                const currentSec = state.placements[pageName];
+                const correctSec = config.correctPlacements[pageName];
+
+                if (currentSec !== correctSec) {
+                    allCorrect = false;
+                }
+            }
+
+            if (allCorrect) {
+                feedback.className = "feedback-banner success";
+                feedback.innerText = "Structure resolved successfully! No misplaced elements. Click Next Level.";
+                feedback.style.display = "flex";
+                adjustScore(10);
+                state.correctCount++;
+                document.getElementById("observationText").innerText = "Excellent. Auditing deeply nested links and moving them to their predictable folders speeds up task completion.";
+
+                // Lock all audit drag actions
+                document.querySelectorAll(".page-card").forEach(card => card.draggable = false);
+
+                document.getElementById("nextLevelBtn").style.display = "block";
+                document.getElementById("checkAnswerBtn").style.display = "none";
+            } else {
+                feedback.className = "feedback-banner danger";
+                feedback.innerText = "Sitemap still contains some misplaced elements highlighted in dashed borders. -5 Points.";
+                feedback.style.display = "flex";
+                adjustScore(-5);
+                state.mistakesCount++;
+                document.getElementById("observationText").innerText = "Warning: Misaligned structure blocks student workflows. Move receipts to Fees and help desk links to Support.";
+            }
+
+            rebuildAuditPlacements();
+        }
+
+        // Validate Level 5 complete sitemap
+        function checkFinalLevel(config, feedback) {
+            const placedKeys = Object.keys(state.placements);
+            if (placedKeys.length < config.pages.length) {
+                feedback.className = "feedback-banner danger";
+                feedback.innerText = "Please place all page cards into categories before checking!";
+                feedback.style.display = "flex";
+                return;
+            }
+
+            let allCorrect = true;
+            config.pages.forEach(p => {
+                const card = document.getElementById(`page-${p.id}`);
+                const currentSec = state.placements[p.id];
+
+                if (currentSec === p.category) {
+                    if (card) {
+                        card.classList.add("correct");
+                        card.classList.remove("wrong");
+                        card.draggable = false;
+                    }
+                } else {
+                    allCorrect = false;
+                    if (card) {
+                        card.classList.add("wrong");
+                        // Return to deck
+                        setTimeout(() => {
+                            const deck = document.getElementById("unsortedDeck");
+                            deck.appendChild(card);
+                            card.classList.remove("wrong");
+                            delete state.placements[p.id];
+                            updateFolderCounts();
+                        }, 1000);
+                    }
+                }
+            });
+
+            if (allCorrect) {
+                feedback.className = "feedback-banner success";
+                feedback.innerText = "Brilliant! You built the final sitemap structure. Click Finish!";
+                feedback.style.display = "flex";
+                adjustScore(10);
+                state.correctCount++;
+                document.getElementById("observationText").innerText = "Final Observation: A clear application structure improves usability by making pages predictable, organized, and easy to access.";
+
+                document.getElementById("nextLevelBtn").innerText = "View Final Score";
+                document.getElementById("nextLevelBtn").style.display = "block";
+                document.getElementById("checkAnswerBtn").style.display = "none";
+            } else {
+                feedback.className = "feedback-banner danger";
+                feedback.innerText = "Some final portal placements were incorrect. Cards returned to deck. -5 Points.";
+                feedback.style.display = "flex";
+                adjustScore(-5);
+                state.mistakesCount++;
+                document.getElementById("observationText").innerText = "Incorrect grouping leads to student portal abandonment.";
+            }
+        }
+
+        // --- GAME COMPLETE SCORECARD ---
+        function showResultsScreen() {
+            // Calculate final badge
+            const totalPossibleScore = 90; // (10 points per level/question * 9 triggers)
+            // Level 1 check (10), Level 2 choices (5 * 10 = 50), Level 3 check (10), Level 4 check (10), Level 5 check (10) = 90 points base.
+
+            let badge = "Beginner Planner";
+            if (state.score >= 80) {
+                badge = "IA Master 🏆";
+            } else if (state.score >= 60) {
+                badge = "Smart Organizer 🧠";
+            }
+
+            document.getElementById("earnedBadge").innerText = `Badge Earned: ${badge}`;
+            document.getElementById("finalScore").innerText = `⭐ ${state.score}`;
+            document.getElementById("finalCorrect").innerText = state.correctCount;
+            document.getElementById("finalMistakes").innerText = state.mistakesCount;
+
+            let summary = "";
+            if (state.score >= 80) {
+                summary = "Outstanding work! You demonstrated an expert grasp of information categorization, sequential labeling hierarchies, portal sitemap auditing, and structured page routing.";
+            } else if (state.score >= 60) {
+                summary = "Well done! You successfully organized the student portals, aligned labels, and corrected misplaced navigation nodes.";
+            } else {
+                summary = "Good attempt! Review the structure guidelines and try again to improve your score and organize pages with less user cognitive delay.";
+            }
+            document.getElementById("finalSummary").innerText = summary;
+
+            document.getElementById("resultsModal").classList.add("open");
+        }
+
+        function closeModal() {
+            document.getElementById("resultsModal").classList.remove("open");
+        }
+
+        function restartLab() {
+            closeModal();
+            initGame();
+        }
+    </script>
+</body>
+
+</html>

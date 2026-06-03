@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Content Ordering Challenge</title>
+    <!-- Use Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-text">
+                <h1>Smart Content Ordering Challenge</h1>
+                <p>Learn how to arrange list content based on priority, sequence, and user needs.</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat-badge">
+                    <span class="stat-label">Level</span>
+                    <span class="stat-value" id="current-level-display">1 / 5</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-label">Total XP</span>
+                    <span class="stat-value" id="total-xp-display">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </header>
+
+    <main class="simulation-area">
+
+        <!-- LEVEL 1: Arrange by Learning Journey -->
+        <section class="level-section active" id="level-1">
+            <div class="level-header">
+                <h2>Level 1: Arrange by Learning Journey</h2>
+                <div class="level-actions">
+                    <button class="hint-btn" onclick="useHint(1)">💡 Hint (-10 pts)</button>
+                </div>
+            </div>
+            <div class="card">
+                <p class="scenario"><strong>Scenario:</strong> Arrange the following items to create an optimal learning
+                    journey for a student. Drag and drop to reorder.</p>
+                <ul class="sortable-list" id="list-level-1">
+                    <li class="sortable-item" draggable="true" data-id="score">View Final Score</li>
+                    <li class="sortable-item" draggable="true" data-id="flashcards">Practice Flashcards</li>
+                    <li class="sortable-item" draggable="true" data-id="video">Watch Video Lecture</li>
+                    <li class="sortable-item" draggable="true" data-id="quiz">Attempt Quiz</li>
+                    <li class="sortable-item" draggable="true" data-id="notes">Read Notes</li>
+                </ul>
+                <div class="controls">
+                    <button class="primary-btn" onclick="checkLevel1()">Check Answer</button>
+                </div>
+                <div class="feedback-box" id="feedback-1" style="display: none;"></div>
+                <button class="next-level-btn" id="next-btn-1" style="display: none;" onclick="goToNextLevel(2)">Next
+                    Level ➡️</button>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: Arrange by Urgency -->
+        <section class="level-section" id="level-2">
+            <div class="level-header">
+                <h2>Level 2: Arrange by Urgency</h2>
+                <div class="level-actions">
+                    <button class="hint-btn" onclick="useHint(2)">💡 Hint (-10 pts)</button>
+                </div>
+            </div>
+            <div class="card">
+                <p class="scenario"><strong>Scenario:</strong> A student opens the dashboard before starting study.
+                    Arrange the notifications according to urgency. (Top = Most Urgent)</p>
+                <ul class="sortable-list" id="list-level-2">
+                    <li class="sortable-item" draggable="true" data-id="badge">New badge unlocked</li>
+                    <li class="sortable-item" draggable="true" data-id="assignment">Assignment due tomorrow</li>
+                    <li class="sortable-item" draggable="true" data-id="quiz">Quiz deadline in 1 hour</li>
+                    <li class="sortable-item" draggable="true" data-id="report">Weekly performance report</li>
+                    <li class="sortable-item" draggable="true" data-id="profile">Profile update suggestion</li>
+                </ul>
+                <div class="controls">
+                    <button class="primary-btn" onclick="checkLevel2()">Check Answer</button>
+                </div>
+                <div class="feedback-box" id="feedback-2" style="display: none;"></div>
+                <button class="next-level-btn" id="next-btn-2" style="display: none;" onclick="goToNextLevel(3)">Next
+                    Level ➡️</button>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: Arrange by User Goal -->
+        <section class="level-section" id="level-3">
+            <div class="level-header">
+                <h2>Level 3: Arrange by User Goal</h2>
+                <div class="level-actions">
+                    <button class="hint-btn" onclick="useHint(3)">💡 Hint (-10 pts)</button>
+                </div>
+            </div>
+            <div class="card">
+                <p class="scenario"><strong>Scenario:</strong> A student has completed 80% of a module and has a quiz
+                    deadline in 30 minutes. Arrange the dashboard items to support this immediate goal.</p>
+                <ul class="sortable-list" id="list-level-3">
+                    <li class="sortable-item" draggable="true" data-id="leaderboard">Leaderboard</li>
+                    <li class="sortable-item" draggable="true" data-id="resume">Resume Quiz</li>
+                    <li class="sortable-item" draggable="true" data-id="notes">Study Notes</li>
+                    <li class="sortable-item" draggable="true" data-id="results">Past Results</li>
+                    <li class="sortable-item" draggable="true" data-id="settings">Profile Settings</li>
+                    <li class="sortable-item" draggable="true" data-id="announcement">Important Announcement</li>
+                </ul>
+                <div class="controls">
+                    <button class="primary-btn" onclick="checkLevel3()">Check Answer</button>
+                </div>
+                <div class="feedback-box" id="feedback-3" style="display: none;"></div>
+                <button class="next-level-btn" id="next-btn-3" style="display: none;" onclick="goToNextLevel(4)">Next
+                    Level ➡️</button>
+            </div>
+        </section>
+
+        <!-- LEVEL 4: Group Mixed Content -->
+        <section class="level-section" id="level-4">
+            <div class="level-header">
+                <h2>Level 4: Group Mixed Content</h2>
+                <div class="level-actions">
+                    <button class="hint-btn" onclick="useHint(4)">💡 Hint (-10 pts)</button>
+                </div>
+            </div>
+            <div class="card">
+                <p class="scenario"><strong>Scenario:</strong> Organize the messy list of items from a student dashboard
+                    into their logical visual categories. Drag and drop items into their correct boxes.</p>
+
+                <div class="grouping-challenge">
+                    <div class="pool-container">
+                        <h3>Draggable Dashboard Items</h3>
+                        <div class="item-pool" id="item-pool">
+                            <div class="draggable-pill" draggable="true" data-group="learning" id="item-5">Watch Lecture
+                                4 Video</div>
+                            <div class="draggable-pill" draggable="true" data-group="urgent" id="item-1">Weekly Quiz
+                                (due in 2 hours)</div>
+                            <div class="draggable-pill" draggable="true" data-group="general" id="item-10">Update
+                                Account Email</div>
+                            <div class="draggable-pill" draggable="true" data-group="learning" id="item-8">Download
+                                Syllabus PDF</div>
+                            <div class="draggable-pill" draggable="true" data-group="urgent" id="item-2">Submit Final
+                                Project (due tonight)</div>
+                            <div class="draggable-pill" draggable="true" data-group="general" id="item-9">Join Class
+                                Discord Server</div>
+                            <div class="draggable-pill" draggable="true" data-group="learning" id="item-7">Practice Quiz
+                                (ungraded)</div>
+                            <div class="draggable-pill" draggable="true" data-group="urgent" id="item-3">Attend Live Q&A
+                                Session (starts in 15m)</div>
+                            <div class="draggable-pill" draggable="true" data-group="general" id="item-12">View Course
+                                Hall of Fame</div>
+                            <div class="draggable-pill" draggable="true" data-group="learning" id="item-6">Read Chapter
+                                3 Study Guide</div>
+                            <div class="draggable-pill" draggable="true" data-group="general" id="item-11">Submit Tech
+                                Support Ticket</div>
+                            <div class="draggable-pill" draggable="true" data-group="urgent" id="item-4">Peer Assessment
+                                (due in 4 hours)</div>
+                        </div>
+                    </div>
+
+                    <div class="category-boxes">
+                        <div class="category-box" data-target="urgent">
+                            <h3>🚨 Urgent Tasks</h3>
+                            <div class="drop-zone" id="zone-urgent"></div>
+                        </div>
+                        <div class="category-box" data-target="learning">
+                            <h3>📚 Learning Resources</h3>
+                            <div class="drop-zone" id="zone-learning"></div>
+                        </div>
+                        <div class="category-box" data-target="general">
+                            <h3>⚙️ General Dashboard</h3>
+                            <div class="drop-zone" id="zone-general"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="primary-btn" onclick="checkLevel4()">Check Grouping</button>
+                </div>
+                <div class="feedback-box" id="feedback-4" style="display: none;"></div>
+                <button class="next-level-btn" id="next-btn-4" style="display: none;" onclick="goToNextLevel(5)">Next
+                    Level ➡️</button>
+            </div>
+        </section>
+
+        <!-- LEVEL 5: Bad List vs Good List -->
+        <section class="level-section" id="level-5">
+            <div class="level-header">
+                <h2>Level 5: Bad List vs Good List</h2>
+            </div>
+            <div class="card">
+                <p class="scenario"><strong>Scenario:</strong> Analyze the two design styles. While both are modern and
+                    clean, one has severe usability and cognitive load flaws in list structure. Choose the superior
+                    design.</p>
+
+                <div class="comparison-container">
+                    <div class="list-preview bad-list" onclick="selectDesign('bad')">
+                        <h3>Design A (Alphabetical & Verbose)</h3>
+                        <div class="design-a-content">
+                            <div class="list-item-card">
+                                <p class="item-text"><strong>Assignment 3:</strong> Please upload your completed project
+                                    in PDF format by 11:59 PM today for grading.</p>
+                            </div>
+                            <div class="list-item-card">
+                                <p class="item-text"><strong>Chapter 4 Reading:</strong> Review pages 45 to 80 of the
+                                    textbook to prepare for tomorrow's seminar.</p>
+                            </div>
+                            <div class="list-item-card">
+                                <p class="item-text"><strong>Final Quiz:</strong> Test your knowledge on all topics
+                                    covered in this module before the exam period next week.</p>
+                            </div>
+                            <div class="list-item-card">
+                                <p class="item-text"><strong>Optional Feedback Survey:</strong> Let us know your
+                                    thoughts on the course structure whenever you have spare time.</p>
+                            </div>
+                            <div class="list-item-card">
+                                <p class="item-text"><strong>Watch Lecture Video:</strong> A 45-minute recording
+                                    explaining list design principles in depth is now available.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-preview good-list" onclick="selectDesign('good')">
+                        <h3>Design B (Prioritized & Scannable)</h3>
+                        <div class="design-b-content">
+                            <div class="list-group-header">🚨 Urgent Tasks</div>
+                            <div class="list-item-card urgent">
+                                <div class="item-main">
+                                    <span class="item-title">Submit Assignment 3</span>
+                                    <span class="badge red">Due Today</span>
+                                </div>
+                            </div>
+                            <div class="list-item-card urgent">
+                                <div class="item-main">
+                                    <span class="item-title">Attempt Final Quiz</span>
+                                    <span class="badge yellow">Due 2 Days</span>
+                                </div>
+                            </div>
+
+                            <div class="list-group-header">📚 Learning Resources</div>
+                            <div class="list-item-card">
+                                <div class="item-main">
+                                    <span class="item-title">Watch Lecture Video</span>
+                                    <span class="badge gray">45 min</span>
+                                </div>
+                            </div>
+                            <div class="list-item-card">
+                                <div class="item-main">
+                                    <span class="item-title">Read Chapter 4 Textbook</span>
+                                    <span class="badge gray">Pages 45-80</span>
+                                </div>
+                            </div>
+                            <div class="list-item-card">
+                                <div class="item-main">
+                                    <span class="item-title">Fill Out Feedback Survey</span>
+                                    <span class="badge green">Optional</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mcq-section" style="display: none; margin-top: 2rem;">
+                    <h3>Correct! Design B is much better. By grouping by priority, using concise action verbs, and
+                        adding visual status indicators, it significantly reduces scanning interaction cost. Now, solve
+                        these 3 advanced dashboard design scenarios:</h3>
+
+                    <div class="mcq-question" id="mcq-1">
+                        <p><strong>Scenario 1: The Scanner's Paradox</strong><br>A student is browsing a list of 15
+                            dashboard events on a mobile screen, looking for a specific topic (e.g., "Careers"). Which
+                            list pattern optimizes their retrieval time and reduces visual interaction cost?</p>
+                        <button class="mcq-btn" onclick="checkMCQ(1, true)">A. Group events by high-level categories
+                            (e.g., Careers, Academics, Social) using clear headers, and truncate details to 5
+                            words.</button>
+                        <button class="mcq-btn" onclick="checkMCQ(1, false)">B. Sort events chronologically, displaying
+                            complete descriptions with a bold date badge.</button>
+                        <button class="mcq-btn" onclick="checkMCQ(1, false)">C. Show a flat, alphabetical list of all
+                            events with high-contrast icons for each event type.</button>
+                        <div class="mcq-feedback" id="mcq-feedback-1"></div>
+                    </div>
+
+                    <div class="mcq-question" id="mcq-2" style="display: none;">
+                        <p><strong>Scenario 2: Alert Overload & Banner Blindness</strong><br>Your student portal
+                            displays a list of 8 action items. To ensure they aren't missed, the developer places a
+                            high-visibility, pulsing red "CRITICAL ALERT" badge on 4 of them. What is the primary
+                            usability risk of this design?</p>
+                        <button class="mcq-btn" onclick="checkMCQ(2, false)">A. It will slow down page rendering and
+                            increase mobile CPU utilization.</button>
+                        <button class="mcq-btn" onclick="checkMCQ(2, false)">B. It violates WCAG contrast requirements
+                            by displaying too much red text on a light background.</button>
+                        <button class="mcq-btn" onclick="checkMCQ(2, true)">C. It triggers 'badge fatigue' and 'banner
+                            blindness', diluting the visual weight of real emergencies and causing students to overlook
+                            critical deadlines.</button>
+                        <div class="mcq-feedback" id="mcq-feedback-2"></div>
+                    </div>
+
+                    <div class="mcq-question" id="mcq-3" style="display: none;">
+                        <p><strong>Scenario 3: Accessing Massive List Archives</strong><br>A student wants to find a
+                            specific homework feedback comment from last semester out of their history of 120 completed
+                            assignments. Which layout and search pattern should be implemented?</p>
+                        <button class="mcq-btn" onclick="checkMCQ(3, false)">A. Display a single, continuous infinite
+                            scroll list sorted by final grade so the student can scroll through all items
+                            quickly.</button>
+                        <button class="mcq-btn" onclick="checkMCQ(3, true)">B. Categorize the list by Course/Semester in
+                            collapsible accordion panels, paired with an active keyword search bar.</button>
+                        <button class="mcq-btn" onclick="checkMCQ(3, false)">C. Paginate the list alphabetically into 12
+                            pages of 10 items each, removing headers to maximize vertical space.</button>
+                        <div class="mcq-feedback" id="mcq-feedback-3"></div>
+                    </div>
+                </div>
+
+                <div class="feedback-box" id="feedback-5" style="display: none;"></div>
+                <button class="next-level-btn" id="next-btn-5" style="display: none;"
+                    onclick="showResultScreen()">Finish Simulation 🏆</button>
+            </div>
+        </section>
+
+        <!-- Final Result Screen -->
+        <section class="level-section" id="result-screen">
+            <div class="card result-card">
+                <h2>Simulation Complete!</h2>
+                <div class="final-score-display">
+                    <div class="badge-icon" id="final-badge-icon">🏅</div>
+                    <h3 id="final-badge-title">Badge Title</h3>
+                    <div class="score-details">
+                        <p>Score: <strong id="final-score">0</strong> / 100</p>
+                        <p>XP Earned: <strong id="final-total-xp">0</strong> XP</p>
+                    </div>
+                </div>
+                <p id="final-feedback-text" class="final-feedback">Personalized feedback will appear here.</p>
+                <div class="result-actions">
+                    <button class="secondary-btn" onclick="location.reload()">Restart Simulation</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Vanilla JS Logic -->
+    <script src="script.js"></script>
+</body>
+
+</html>

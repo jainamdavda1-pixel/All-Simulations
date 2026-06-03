@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Usability Inspector — Common Usability Problems</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* =========================================
+           ROOT & COLOR PALETTE (Red & White Theme)
+           ========================================= */
+        :root {
+            --bg: #fdfdfd;
+            --surface-bg: #f7f9fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e9eb;
+            --primary: #c1121f;
+            /* Vibrant Dark Crimson */
+            --primary-hover: #780000;
+            /* Deep Red Accent */
+            --primary-light: #fdf2f2;
+            /* Soft Red Highlight tint */
+            --text-dark: #1b1e22;
+            --text-muted: #5e6973;
+            --success: #2a9d8f;
+            /* Soft emerald green for success */
+            --success-light: #eef8f6;
+            --danger: #e63946;
+            /* Red for alerts/errors */
+            --danger-light: #fdf2f3;
+            --warning: #f4a261;
+            /* Warm orange for warnings/hints */
+            --warning-light: #fef6ee;
+            --r: 10px;
+            --shadow: 0 4px 20px rgba(193, 18, 31, 0.05);
+            --shadow-btn: 0 4px 12px rgba(193, 18, 31, 0.15);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        /* =========================================
+           HEADER & STATS BAR
+           ========================================= */
+        .topbar {
+            background: var(--card-bg);
+            border-bottom: 3px solid var(--primary);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .topbar-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .badge-role {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 99px;
+            border: 1px solid rgba(193, 18, 31, 0.2);
+        }
+
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat-pill {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-pill strong {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .stat-pill.success-pill strong {
+            color: var(--success);
+        }
+
+        /* =========================================
+           MAIN CONTAINER & LAYOUT
+           ========================================= */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+            flex: 1;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 900px) {
+            .container {
+                grid-template-columns: 3fr 1fr;
+            }
+        }
+
+        /* =========================================
+           GAME CONTROLS PANEL
+           ========================================= */
+        .workspace-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .notebook-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: fit-content;
+        }
+
+        .nb-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* =========================================
+           LEVEL HEADERS & PROGRESS
+           ========================================= */
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .level-title-area {
+            flex: 1;
+        }
+
+        .level-title-area h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .level-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .level-progress-bar-wrap {
+            width: 100%;
+            background: var(--border-color);
+            height: 6px;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .level-progress-fill {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* =========================================
+           BUTTON SYSTEM
+           ========================================= */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow-btn);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: #fff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--primary-light);
+        }
+
+        .btn-warning {
+            background: var(--warning-light);
+            border-color: var(--warning);
+            color: #d47a2a;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background: #fde8d4;
+        }
+
+        .btn-muted {
+            background: #fff;
+            border-color: var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .btn-muted:hover:not(:disabled) {
+            background: #f0f2f5;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* =========================================
+           FEEDBACK AND PANEL SYSTEM
+           ========================================= */
+        .fb-box {
+            display: none;
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+
+        .fb-box.correct {
+            display: block;
+            background-color: var(--success-light);
+            border-color: var(--success);
+            color: #1e5a52;
+        }
+
+        .fb-box.wrong {
+            display: block;
+            background-color: var(--danger-light);
+            border-color: var(--danger);
+            color: #8c202a;
+        }
+
+        .fb-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hint-box {
+            display: none;
+            background: var(--warning-light);
+            border: 1px solid var(--warning);
+            color: #7b4f2c;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+        }
+
+        /* =========================================
+           LEVEL-SPECIFIC INTERACTIVE UIs
+           ========================================= */
+
+        /* LEVEL 1: Spot the Usability Bugs */
+        .mock-device {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8fafc;
+            padding: 24px;
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23c1121f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") 8 8, auto;
+        }
+
+        .mock-form-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .l1-bug {
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+
+        /* Hover styles applied to elements inside L1 to make it challenging */
+        .mock-form-card .form-group-interactive:hover {
+            background: rgba(193, 18, 31, 0.02);
+        }
+
+        .l1-bug.found-correct {
+            outline: 3px solid var(--success) !important;
+            background-color: rgba(42, 157, 143, 0.08) !important;
+            pointer-events: none;
+            position: relative;
+        }
+
+        /* Styling the Level 1 Form Issues directly */
+        .l1-header-btn {
+            background: #d90429;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 900;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+        }
+
+        .l1-label-unclear {
+            font-size: 6px;
+            /* Too small */
+            color: #b0b5bb;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .l1-pwd-rules {
+            font-size: 10px;
+            color: #555;
+            padding: 8px;
+            background: #fffbeb;
+            border: 1px solid #fed7aa;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .l1-input-email {
+            width: 100%;
+            padding: 8px;
+            font-size: 13px;
+            border: 3px double var(--primary);
+            /* Inconsistent */
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .l1-input-phone {
+            width: 100%;
+            padding: 8px;
+            font-size: 13px;
+            border: 1px dashed var(--success);
+            /* Inconsistent */
+            border-radius: 0px;
+            outline: none;
+        }
+
+        .l1-btn-submit {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            color: #aaa;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 12px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .l1-generic-field {
+            width: 100%;
+            padding: 8px;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        /* LEVEL 2: Drag and Drop Matching */
+        .match-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 700px) {
+            .match-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .match-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .match-problem-chip {
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: grab;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .match-problem-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary);
+        }
+
+        .match-problem-chip.dragging {
+            opacity: 0.4;
+        }
+
+        .match-zone {
+            background: var(--surface-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .match-zone-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .match-zone.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .match-zone.correct-zone {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+        }
+
+        .match-zone.wrong-zone {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+        }
+
+        /* LEVEL 3: Fix the Interface */
+        .l3-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .l3-container {
+                grid-template-columns: 1.2fr 1fr;
+            }
+        }
+
+        .l3-device-mock {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .l3-wizard {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .l3-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .l3-opt-btn {
+            background: #fff;
+            border: 2px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .l3-opt-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .l3-opt-letter {
+            width: 24px;
+            height: 24px;
+            background: var(--surface-bg);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .l3-opt-btn.correct-choice {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #1e5a52;
+        }
+
+        .l3-opt-btn.correct-choice .l3-opt-letter {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .l3-opt-btn.wrong-choice {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            color: #8c202a;
+        }
+
+        .l3-opt-btn.wrong-choice .l3-opt-letter {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* LEVEL 4: Arrange Usability Severity */
+        .severity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .severity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .severity-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .severity-item.dragging {
+            opacity: 0.4;
+        }
+
+        .severity-item.correct-position {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+        }
+
+        .severity-item.wrong-position {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+        }
+
+        .sev-handle {
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .sev-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--surface-bg);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sev-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            margin-right: 6px;
+        }
+
+        .sev-badge.critical {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .sev-badge.major {
+            background: #ffedd5;
+            color: #f97316;
+        }
+
+        .sev-badge.moderate {
+            background: #fef9c3;
+            color: #ca8a04;
+        }
+
+        .sev-badge.minor {
+            background: #ecfdf5;
+            color: #10b981;
+        }
+
+        .sev-badge.cosmetic {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .sev-text {
+            font-size: 13px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .sev-order-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .btn-order-arrow {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-order-arrow:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* LEVEL 5: Final UX Inspection Portal Dashboard */
+        .l5-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 850px) {
+            .l5-grid-layout {
+                grid-template-columns: 1.3fr 1fr;
+            }
+        }
+
+        .portal-preview {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: #f1f5f9;
+            padding: 16px;
+            position: relative;
+        }
+
+        .portal-ui {
+            background: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            grid-template-rows: 50px 1fr;
+            height: 440px;
+            border: 1px solid #cbd5e1;
+            font-size: 11px;
+        }
+
+        .portal-header {
+            grid-column: 1 / -1;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            gap: 10px;
+        }
+
+        .portal-sidebar {
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .portal-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .portal-main {
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8fafc;
+        }
+
+        .portal-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 14px;
+        }
+
+        .portal-alert {
+            background: #ffe4e6;
+            color: #fda4af;
+            border: 1px solid #fecdd3;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 10px;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .portal-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 6px;
+        }
+
+        .portal-table th,
+        .portal-table td {
+            border: 1px solid #e2e8f0;
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        .portal-table th {
+            background: #f1f5f9;
+        }
+
+        /* Level 5 Inspector Panel */
+        .portal-inspector-console {
+            background: var(--surface-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            height: fit-content;
+        }
+
+        .inspector-console-header {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* LEVEL 5 Click Targets */
+        .l5-bug {
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+
+        .l5-bug:hover {
+            outline: 2px dashed var(--warning) !important;
+            outline-offset: 1px;
+        }
+
+        .l5-bug.fixed {
+            outline: 2px solid var(--success) !important;
+            background: rgba(42, 157, 143, 0.08) !important;
+        }
+
+        /* CSS Inspector Highlight */
+        .inspector-highlight {
+            outline: 2px dashed #2563eb !important;
+            outline-offset: 1px;
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        /* =========================================
+           FINAL REPORT / RESULT STYLES
+           ========================================= */
+        .results-card {
+            text-align: center;
+            padding: 40px 24px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .results-badge {
+            font-size: 64px;
+            margin-bottom: 8px;
+        }
+
+        .results-score-highlight {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+        }
+
+        .results-cell {
+            background: var(--surface-bg);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .results-cell span {
+            display: block;
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* =========================================
+           THEORY & OBSERVATION ACCORDIONS
+           ========================================= */
+        .theory-section {
+            border-top: 1px solid var(--border-color);
+            margin-top: 32px;
+            padding-top: 24px;
+        }
+
+        .theory-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theory-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .theory-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .theory-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .theory-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .theory-card p {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .obs-box {
+            background: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: 16px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            margin-top: 16px;
+            line-height: 1.6;
+        }
+
+        /* =========================================
+           UTILITIES / TOAST / ANIMATIONS
+           ========================================= */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.t-ok {
+            background: var(--success-light);
+            color: #1e5a52;
+            border: 1px solid var(--success);
+        }
+
+        .toast.t-err {
+            background: var(--danger-light);
+            color: #8c202a;
+            border: 1px solid var(--danger);
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-6px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(6px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================================
+         HEADER & STATS BAR
+         ========================================= -->
+    <header class="topbar">
+        <div class="topbar-container">
+            <div class="brand">
+                🔬 UX <span>Design Lab</span>
+                <span class="badge-role">Usability Inspector</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-pill">
+                    Level: <strong id="ui-level-num">1 / 5</strong>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================
+         MAIN CONTENT CONTAINER
+         ========================================= -->
+    <div class="container" id="game-container">
+
+        <!-- WORKSPACE (Left Side) -->
+        <main class="workspace-card" id="main-workspace">
+
+            <!-- LEVEL HEADER -->
+            <div class="level-header">
+                <div class="level-title-area">
+                    <h2 id="level-title">Spot the Usability Bugs</h2>
+                    <div class="level-subtitle" id="level-desc">Test the bad registration form and click on all 5
+                        usability issues.</div>
+                </div>
+                <div class="level-progress-bar-wrap">
+                    <div class="level-progress-fill" id="level-progress"></div>
+                </div>
+            </div>
+
+            <!-- LEVEL INTERACTIVE DISPLAY ZONE -->
+            <div id="interactive-zone" class="fade-in">
+                <!-- Dynamically populated by JS -->
+            </div>
+
+            <!-- DYNAMIC FEEDBACK BOX -->
+            <div class="fb-box" id="feedback-panel">
+                <div class="fb-title" id="feedback-title">Correct!</div>
+                <div id="feedback-body">Excellent work finding that bug.</div>
+            </div>
+
+        </main>
+
+        <!-- INSPECTOR NOTEBOOK / ACTIONS (Right Side) -->
+        <aside class="notebook-card" id="sidebar-notebook">
+            <div class="nb-title">📋 Inspector Tools</div>
+
+            <div class="btn-row" style="flex-direction: column; width: 100%; gap: 12px;">
+                <button class="btn btn-primary" id="btn-check" style="width: 100%;">Check Answer</button>
+                <button class="btn btn-warning" id="btn-hint" style="width: 100%;">🔍 Reveal Hint</button>
+                <button class="btn btn-outline" id="btn-next" style="width: 100%; display: none;">Next Level →</button>
+                <button class="btn btn-muted" id="btn-reset" style="width: 100%;">↺ Reset Level</button>
+            </div>
+
+            <!-- HINT DISPLAY ZONE -->
+            <div class="hint-box" id="hint-display">
+                <!-- Hint text -->
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- =========================================
+         RESULTS CONTAINER (Shows only at the end)
+         ========================================= -->
+    <div class="container" style="display:none;" id="results-container">
+        <main class="workspace-card results-card" style="grid-column: 1 / -1;">
+            <div class="results-badge" id="res-badge">🏆</div>
+            <h2 id="res-title">UX Usability Expert</h2>
+            <p id="res-subtitle">You have demonstrated expert usability inspector skills!</p>
+
+            <div class="results-grid">
+                <div class="results-cell" style="text-align: center;">
+                    Bugs Fixed
+                    <span id="res-bugs">18 / 18</span>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="restartGame()">↺ Restart Course Challenge</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- =========================================
+         THEORY, OBSERVATION, CONCLUSION
+         ========================================= -->
+    <div class="container" id="theory-container">
+        <section class="theory-section" style="grid-column: 1 / -1;">
+            <div class="theory-header">📚 Usability Guidelines Notebook</div>
+
+            <div class="theory-grid">
+                <div class="theory-card">
+                    <h4>Jakob Nielsen’s Usability Aspects</h4>
+                    <p>
+                        Usability is defined by 5 core aspects:
+                        <br><strong>1. Ease of learning:</strong> How easy is it for users to accomplish basic tasks the
+                        first time they encounter the design?
+                        <br><strong>2. Efficiency of use:</strong> Once users have learned the design, how quickly can
+                        they perform tasks?
+                        <br><strong>3. Memorability:</strong> When users return to the design after a period of non-use,
+                        how easily can they reestablish proficiency?
+                        <br><strong>4. Errors:</strong> How many errors do users make, how severe are these errors, and
+                        how easily can they recover?
+                        <br><strong>5. Subjective satisfaction:</strong> How pleasant is it to use the design?
+                    </p>
+                </div>
+                <div class="theory-card">
+                    <h4>Common Usability Failures</h4>
+                    <p>
+                        Most modern interface issues fall into distinct categories:
+                        <br>• <strong>Information Overload:</strong> Failing to chunk related info (exceeding Miller's
+                        Law of 7±2 items).
+                        <br>• <strong>Inconsistent Styles:</strong> Random borders, typography, or layouts force users
+                        to constantly relearn patterns.
+                        <br>• <strong>Vague Controls:</strong> Text like "Click Here" or "maybe submit?" forces recall
+                        instead of simple recognition.
+                        <br>• <strong>Lack of Feedback:</strong> Not showing confirmation alerts or state changes,
+                        leaving users guessing.
+                    </p>
+                </div>
+            </div>
+
+            <!-- OBSERVATION PANEL -->
+            <div class="obs-box" id="observation-panel">
+                <strong>Inspector's Observation:</strong> Complete challenges to generate usability insights. Most
+                serious usability issues are the ones that stop users from completing their task.
+            </div>
+
+            <!-- CONCLUSION PANEL -->
+            <div class="theory-card" style="margin-top: 16px;">
+                <h4>Inspector's Conclusion</h4>
+                <p>
+                    Identifying and fixing common usability problems systematically increases user satisfaction, reduces
+                    operational errors, and shortens the learning curve. A true Usability Inspector focuses on error
+                    prevention, visual consistency, and clear feedback to bridge the gap between user mental models and
+                    system states.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- TOAST ALERT -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ============================================================
+         GAME ENGINE (JavaScript)
+         ============================================================ -->
+    <script>
+        /* ============================================================
+           DATA: LEVEL CONFIGURATIONS
+           ============================================================ */
+        const GAME = {
+            currentLevel: 1,
+            hintUsed: false,
+            // Track state within levels
+            state: {
+                l1_found: [], // bug ids found
+                l2_matches: {}, // targetZoneId -> problemId
+                l2_selected_chip: null, // click match state
+                l3_current: 0, // current question index
+                l3_answers: [], // answer index selected
+                l4_order: ['p1', 'p2', 'p3', 'p4', 'p5'], // current shuffled IDs
+                l5_fixed: [], // bug ids resolved
+                l5_selected_bug: null // inspector active highlight
+            }
+        };
+
+        const LEVEL_DEFS = {
+            1: {
+                title: "Level 1: Spot the Usability Bugs",
+                desc: "Inspect the buggy registration form below. Click on the 5 usability problems to log them.",
+                hint: "Find screaming all-caps headers, a tiny/unclear input label, a giant box of complex password constraints, inconsistent input field borders, and a vague secondary action button."
+            },
+            2: {
+                title: "Level 2: Match Problem With Usability Principle",
+                desc: "Drag usability problems from the left and drop them into the correct principle zones on the right.",
+                hint: "Efficiency maps to speed/loads. Error prevention maps to mistakes. Consistency maps to styling. Ease of learning maps to information findability."
+            },
+            3: {
+                title: "Level 3: Fix the Interface",
+                desc: "Review the bad login mockup. Choose the best design fix for each highlighted usability problem to see the screen transform.",
+                hint: "Persistent labels above fields prevent forgetting. Miller's Law advises grouping related inputs. Friendly errors help users recover."
+            },
+            4: {
+                title: "Level 4: Arrange Usability Severity",
+                desc: "Sort the usability problems from MOST serious (top) to LEAST serious (bottom) based on their impact on task completion.",
+                hint: "Severity is judged by blocker impact: items preventing task completion go on top; cosmetic dislikes go at the bottom."
+            },
+            5: {
+                title: "Level 5: Final UX Inspection Challenge",
+                desc: "Test the Student Dashboard Portal mockup. Click the 8 usability violations to inspect them, choose correct fixes, and visually redesign the dashboard.",
+                hint: "Find abstract navigation symbols, a pale warning text, a dense course table containing 25 items, hidden actions, silent saves, and arbitrary delays."
+            }
+        };
+
+        // Level 1 bug list
+        const L1_BUGS = {
+            bh1: { id: "bh1", label: "Panic shout CTA", explain: "The all-caps screamed header ('REGISTER NOW!!!!!') causes user anxiety. Professional buttons use standard uppercase/title case." },
+            bh2: { id: "bh2", label: "Unclear microscopic label", explain: "The field label 'n' is illegible (6px) and ambiguous. Use persistent, clear labels like 'Full Name'." },
+            bh3: { id: "bh3", label: "Excessive password rules", explain: "Demanding 32+ characters and multiple obscure constraints triggers cognitive fatigue and high form abandonment." },
+            bh4: { id: "bh4", label: "Inconsistent input styling", explain: "Double red borders mixed with dashed green borders look broken. UI elements must follow consistent styles." },
+            bh5: { id: "bh5", label: "Vague button text", explain: "The label 'maybe submit?' creates system mistrust. Action buttons must clearly indicate the intent." }
+        };
+
+        // Level 2 matching data
+        const L2_PROBLEMS = [
+            { id: "p1", text: "User cannot find important information", correctZone: "z1" },
+            { id: "p2", text: "User gets stuck after clicking a button", correctZone: "z2" },
+            { id: "p3", text: "Page takes too long to load", correctZone: "z3" },
+            { id: "p4", text: "User makes frequent mistakes", correctZone: "z4" },
+            { id: "p5", text: "Interface looks confusing every time", correctZone: "z5" }
+        ];
+
+        const L2_ZONES = [
+            { id: "z1", title: "Ease of Learning / Findability" },
+            { id: "z2", title: "Feedback & Navigation Clarity" },
+            { id: "z3", title: "Efficiency of Use" },
+            { id: "z4", title: "Error Prevention" },
+            { id: "z5", title: "Memorability & Consistency" }
+        ];
+
+        // Level 3 wizard questions
+        const L3_QUESTIONS = [
+            {
+                problem: "Issue 1: The primary action button says 'Click Here'.",
+                options: [
+                    "Keep it as 'Click Here' to save design effort.",
+                    "Rename it to 'Login to Account' so the action is explicit and clear.",
+                    "Remove the button and auto-submit on character length."
+                ],
+                correct: 1,
+                explain: "Rename vague button: Action buttons should define what action they perform, bridging the user's expectation."
+            },
+            {
+                problem: "Issue 2: The email input field has no text label, only a placeholder.",
+                options: [
+                    "Leave it blank to keep the interface highly minimalist.",
+                    "Add a persistent text label 'Email Address' above the input field.",
+                    "Place a large icon in the middle of the box that hides when typing."
+                ],
+                correct: 1,
+                explain: "Add clear labels: Disappearing placeholders force users to recall what field they are typing into, raising errors."
+            },
+            {
+                problem: "Issue 3: All inputs (email, password, security code, billing, shipping) are stacked together.",
+                options: [
+                    "Leave them stacked to prevent scroll clicks.",
+                    "Group related fields into sections ('Account Credentials' and 'User Info') with clear headers.",
+                    "Spread them across 6 separate popups."
+                ],
+                correct: 1,
+                explain: "Group related fields: Chunking inputs into clear groups decreases cognitive strain and facilitates scanning."
+            },
+            {
+                problem: "Issue 4: Form error message shows 'Error Code: AUTH_0x8291'.",
+                options: [
+                    "Keep it as is; it is helpful for system database logs.",
+                    "Change it to 'Login failed. Please verify your credentials and try again.'",
+                    "Do not show any text, just highlight the field border pink."
+                ],
+                correct: 1,
+                explain: "Add helpful error message: Error messages should avoid system codes, explaining clearly what failed and how to recover."
+            },
+            {
+                problem: "Issue 5: Important warning text is colored very light gray on a white background.",
+                options: [
+                    "Keep it light gray to match modern aesthetics.",
+                    "Increase font size to 32px but keep the color.",
+                    "Change the text color to high-contrast dark charcoal gray (#4b5563)."
+                ],
+                correct: 2,
+                explain: "Improve contrast/readability: Ensure typography satisfies WCAG accessibility ratios so text remains readable under various lighting."
+            }
+        ];
+
+        // Level 4 correct severity order
+        const L4_CORRECT_ORDER = [
+            "User cannot complete the main task",
+            "User gets lost and cannot recover",
+            "User enters wrong data because of unclear design",
+            "User takes too long to find information",
+            "User dislikes the visual style"
+        ];
+
+        const L4_PROBLEMS_DEFS = {
+            p1: { id: "p1", text: "User cannot complete the main task", severity: "Critical" },
+            p2: { id: "p2", text: "User gets lost and cannot recover", severity: "Major" },
+            p3: { id: "p3", text: "User enters wrong data because of unclear design", severity: "Moderate" },
+            p4: { id: "p4", text: "User takes too long to find information", severity: "Minor" },
+            p5: { id: "p5", text: "User dislikes the visual style", severity: "Cosmetic" }
+        };
+
+        // Level 5 bugs
+        const L5_BUGS = {
+            t1: {
+                id: "t1",
+                name: "Unclear navigation icons",
+                desc: "Sidebar navigation menu has abstract symbols (⬡, ⛛, ⎔) without text labels.",
+                options: [
+                    "Keep symbols to make layout clean and modern.",
+                    "Add clear text labels next to the icons (e.g. Dashboard, Courses, Grades) to satisfy ease of learning.",
+                    "Remove icons entirely and use colored warning borders."
+                ],
+                correct: 1,
+                explain: "Icons without labels are ambiguous. Adding text descriptions ensures recognition over recall."
+            },
+            t2: {
+                id: "t2",
+                name: "No active menu highlight",
+                desc: "The sidebar has no visual distinction for the currently active tab.",
+                options: [
+                    "Highlight the active menu tab using a solid accent background and bold text.",
+                    "Make the inactive items flash until they are clicked.",
+                    "Keep all items styled identically to look unified."
+                ],
+                correct: 0,
+                explain: "Providing visual cues for 'where am I' maps to clear navigation orientation and user control."
+            },
+            t3: {
+                id: "t3",
+                name: "Hidden primary action button",
+                desc: "The 'Submit Exam' button is hidden in a corner styled as a tiny light gray text link.",
+                options: [
+                    "Keep it as a link to save space.",
+                    "Style it as a prominent primary CTA button (e.g., solid red background) placed in the main user viewport.",
+                    "Hide it inside a dropdown menu."
+                ],
+                correct: 1,
+                explain: "Important primary task actions must have strong visual weight to draw attention and invite interaction."
+            },
+            t4: {
+                id: "t4",
+                name: "Poor contrast alert box",
+                desc: "The emergency alert warning text is light pink on a slightly lighter pink background.",
+                options: [
+                    "Style the warning alert with a solid red container and high-contrast bold white text.",
+                    "Make the font style italic to attract attention.",
+                    "Leave it as is to keep the layout calm."
+                ],
+                correct: 0,
+                explain: "Alerts require high visibility and immediate contrast to prevent users from missing critical system messages."
+            },
+            t5: {
+                id: "t5",
+                name: "Information overload list",
+                desc: "A massive list of 25 course rows displayed in a dense flat table layout.",
+                options: [
+                    "Leave it flat; users should scroll as much as possible.",
+                    "Chunk courses into collapsible tabs or add a filter search to reduce cognitive load.",
+                    "Shrink the text size so the entire table fits in a tiny screen."
+                ],
+                correct: 1,
+                explain: "Chunking information and providing filters keeps data management under the 7±2 cognitive limit."
+            },
+            t6: {
+                id: "t6",
+                name: "Lack of action feedback",
+                desc: "Clicking 'Save Preferences' performs work but displays no loading state or confirmation message.",
+                options: [
+                    "Add a loading spinner on the button and show a success confirmation toast message when complete.",
+                    "Perform a hard page refresh immediately.",
+                    "Leave it; silent saves are standard."
+                ],
+                correct: 0,
+                explain: "Informing the user of progress and success maps directly to Nielsen's aspect of 'System Status Visibility'."
+            },
+            t7: {
+                id: "t7",
+                name: "Vague error warning",
+                desc: "Form validation shows 'Action failed: parameters invalid'.",
+                options: [
+                    "Keep it; it represents accurate technical logs.",
+                    "Provide explicit, user-friendly details like: 'Email field cannot be empty. Please enter your email address.'",
+                    "Do not show error text; just block submission."
+                ],
+                correct: 1,
+                explain: "Error messages must help the user diagnose the problem and provide a clear step to recover."
+            },
+            t8: {
+                id: "t8",
+                name: "Unnecessary server warning modal",
+                desc: "A prompt asking users to wait 60 seconds before clicking to 'prevent server overload' for simple views.",
+                options: [
+                    "Optimize page queries to load fast, and remove this unnecessary buffer message.",
+                    "Double the buffer to 120 seconds for safety.",
+                    "Style the server warning in a blinking orange box."
+                ],
+                correct: 0,
+                explain: "Imposing arbitrary delays damages the 'Efficiency of Use' aspect. Optimize page load times instead."
+            }
+        };
+
+        /* ============================================================
+           ENGINE LOGIC
+           ============================================================ */
+        const S1_STATE_KEY = 'ux_design_lab_s1_state';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadGameState();
+            initLevel(GAME.currentLevel);
+            setupGlobalEvents();
+        });
+
+        function setupGlobalEvents() {
+            document.getElementById('btn-check').addEventListener('click', checkLevelAnswer);
+            document.getElementById('btn-hint').addEventListener('click', requestHint);
+            document.getElementById('btn-next').addEventListener('click', nextLevel);
+            document.getElementById('btn-reset').addEventListener('click', resetLevel);
+        }
+
+        function saveGameState() {
+            localStorage.setItem(S1_STATE_KEY, JSON.stringify({
+                currentLevel: GAME.currentLevel,
+                state: GAME.state
+            }));
+        }
+
+        function loadGameState() {
+            const saved = localStorage.getItem(S1_STATE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    GAME.currentLevel = parsed.currentLevel ?? 1;
+                    GAME.state = parsed.state ?? GAME.state;
+                } catch (e) {
+                    console.error("Error loading state:", e);
+                }
+            }
+        }
+
+        function restartGame() {
+            localStorage.removeItem(S1_STATE_KEY);
+            GAME.currentLevel = 1;
+            GAME.state = {
+                l1_found: [],
+                l2_matches: {},
+                l2_selected_chip: null,
+                l3_current: 0,
+                l3_answers: [],
+                l4_order: ['p1', 'p2', 'p3', 'p4', 'p5'],
+                l5_fixed: [],
+                l5_selected_bug: null
+            };
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('main-workspace').style.display = 'flex';
+            document.getElementById('sidebar-notebook').style.display = 'flex';
+            document.getElementById('theory-container').style.display = 'block';
+            initLevel(1);
+        }
+
+        function initLevel(lvlNum) {
+            GAME.currentLevel = lvlNum;
+            GAME.hintUsed = false;
+
+            // UI elements update
+            document.getElementById('ui-level-num').textContent = `${lvlNum} / 5`;
+            document.getElementById('level-title').textContent = LEVEL_DEFS[lvlNum].title;
+            document.getElementById('level-desc').innerHTML = LEVEL_DEFS[lvlNum].desc;
+            document.getElementById('hint-display').style.display = 'none';
+            document.getElementById('feedback-panel').className = 'fb-box';
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('btn-next').style.display = 'none';
+
+            // Update level controls state
+            if (lvlNum === 1 || lvlNum === 3 || lvlNum === 5) {
+                // Interactive Click-based or sequential, check answer is disabled/inline
+                document.getElementById('btn-check').disabled = true;
+            } else {
+                document.getElementById('btn-check').disabled = false;
+            }
+
+            const zone = document.getElementById('interactive-zone');
+            zone.innerHTML = '';
+            zone.className = "fade-in";
+
+            // Render Level specific content
+            if (lvlNum === 1) {
+                renderLevel1(zone);
+                const progressPct = (GAME.state.l1_found.length / 5) * 100;
+                updateLevelProgress(progressPct);
+            } else if (lvlNum === 2) {
+                renderLevel2(zone);
+                const progressPct = (Object.keys(GAME.state.l2_matches).length / 5) * 100;
+                updateLevelProgress(progressPct);
+            } else if (lvlNum === 3) {
+                renderLevel3(zone);
+                const progressPct = (GAME.state.l3_current / 5) * 100;
+                updateLevelProgress(progressPct);
+            } else if (lvlNum === 4) {
+                renderLevel4(zone);
+                updateLevelProgress(0);
+            } else if (lvlNum === 5) {
+                renderLevel5(zone);
+                const progressPct = (GAME.state.l5_fixed.length / 8) * 100;
+                updateLevelProgress(progressPct);
+            }
+
+            updateObservation();
+            saveGameState();
+        }
+
+        function updateLevelProgress(pct) {
+            document.getElementById('level-progress').style.width = pct + '%';
+        }
+
+        function toast(msg, type = 't-ok') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + type;
+            setTimeout(() => { t.classList.remove('show'); }, 2500);
+        }
+
+        function requestHint() {
+            if (GAME.hintUsed) {
+                toast("Hint already retrieved for this level!", "t-err");
+                return;
+            }
+            GAME.hintUsed = true;
+            const display = document.getElementById('hint-display');
+            display.textContent = LEVEL_DEFS[GAME.currentLevel].hint;
+            display.style.display = 'block';
+            toast("Hint revealed.", "t-ok");
+            saveGameState();
+        }
+
+        function resetLevel() {
+            toast("Level reset.", "t-ok");
+            // Reset level-specific variables in state
+            if (GAME.currentLevel === 1) GAME.state.l1_found = [];
+            else if (GAME.currentLevel === 2) {
+                GAME.state.l2_matches = {};
+                GAME.state.l2_selected_chip = null;
+            }
+            else if (GAME.currentLevel === 3) {
+                GAME.state.l3_current = 0;
+                GAME.state.l3_answers = [];
+            }
+            else if (GAME.currentLevel === 4) GAME.state.l4_order = ['p1', 'p2', 'p3', 'p4', 'p5'];
+            else if (GAME.currentLevel === 5) {
+                GAME.state.l5_fixed = [];
+                GAME.state.l5_selected_bug = null;
+            }
+            initLevel(GAME.currentLevel);
+        }
+
+        function nextLevel() {
+            if (GAME.currentLevel < 5) {
+                initLevel(GAME.currentLevel + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        /* ============================================================
+           LEVEL 1: Spot the Usability Bugs
+           ============================================================ */
+        function renderLevel1(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'mock-device';
+
+            // Build bad form container
+            wrap.innerHTML = `
+                <div class="mock-form-card" id="l1-form">
+                    <!-- Bug 1: screaming button text -->
+                    <div class="l1-bug l1-header-btn form-group-interactive" id="l1-b1" data-bug="bh1" style="cursor: pointer;">
+                        REGISTER NOW!!!!!
+                    </div>
+                    
+                    <!-- Label Issue: n label (Bug 2) -->
+                    <div class="form-group-interactive" style="margin-bottom: 12px; padding: 4px; border-radius: 4px; cursor: pointer;" id="l1-group-b2">
+                        <span class="l1-bug l1-label-unclear" id="l1-b2" data-bug="bh2">n</span>
+                        <input type="text" class="l1-generic-field" placeholder="Full name" disabled style="cursor: pointer;">
+                    </div>
+
+                    <!-- Password rules Box: Too many rules (Bug 3) -->
+                    <div class="form-group-interactive" style="margin-bottom: 12px; padding: 4px; border-radius: 4px; cursor: pointer;" id="l1-group-b3">
+                        <label style="font-size: 11px; font-weight:700; color:#555; display:block; margin-bottom:4px; cursor: pointer;">Create Password</label>
+                        <input type="password" class="l1-generic-field" placeholder="••••••••" disabled style="cursor: pointer;">
+                        <div class="l1-bug l1-pwd-rules" id="l1-b3" data-bug="bh3">
+                            ⚠️ Passwords must contain at least 32 characters, 3 uppercase characters, 2 non-adjacent symbols, and cannot match any words in English dictionary databases.
+                        </div>
+                    </div>
+
+                    <!-- Inconsistent inputs: email double border vs phone dashed (Bug 4) -->
+                    <div class="l1-bug form-group-interactive" id="l1-b4" data-bug="bh4" style="margin-bottom: 12px; padding: 8px; border-radius: 4px; cursor: pointer;">
+                        <div style="margin-bottom:8px;">
+                            <label style="font-size:11px; font-weight:700; color:#555; display:block; margin-bottom:4px; cursor: pointer;">Email Address</label>
+                            <input type="text" class="l1-input-email" placeholder="example@email.com" disabled style="cursor: pointer;">
+                        </div>
+                        <div>
+                            <label style="font-size:11px; font-weight:700; color:#555; display:block; margin-bottom:4px; cursor: pointer;">Contact Phone</label>
+                            <input type="text" class="l1-input-phone" placeholder="000-000-0000" disabled style="cursor: pointer;">
+                        </div>
+                    </div>
+
+                    <!-- Submit: Vague button text (Bug 5) -->
+                    <div class="form-group-interactive" style="padding: 4px; border-radius: 4px; cursor: pointer;" id="l1-group-b5">
+                        <button class="l1-bug l1-btn-submit" id="l1-b5" data-bug="bh5" style="cursor: pointer;">
+                            maybe submit?
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(wrap);
+
+            // Bind click handlers directly to bugs
+            wrap.querySelectorAll('.l1-bug').forEach(el => {
+                // If it is already solved in state, apply correct outline
+                const bugId = el.getAttribute('data-bug');
+                if (GAME.state.l1_found.includes(bugId)) {
+                    el.classList.add('found-correct');
+                }
+
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    onL1BugClick(el, bugId);
+                });
+            });
+
+            // Bind click handlers to the form/groups to catch incorrect click spots (miss clicks)
+            wrap.querySelector('#l1-form').addEventListener('click', (e) => {
+                // If the target clicked is a bug or inside a bug, do nothing
+                if (e.target.closest('.l1-bug')) return;
+
+                // Otherwise, it is an incorrect spot!
+                e.stopPropagation();
+                e.stopPropagation();
+                showLevelFeedback(false, "Healthy Element!", "This element is built correctly. Look for elements with chaotic rules, confusing labels, shouting words, or inconsistent style borders.");
+                toast("Wrong spot!", "t-err");
+                wrap.classList.remove('shake');
+                void wrap.offsetWidth; // Trigger reflow
+                wrap.classList.add('shake');
+                saveGameState();
+            });
+        }
+
+        function onL1BugClick(element, bugId) {
+            if (GAME.state.l1_found.includes(bugId)) return;
+
+            GAME.state.l1_found.push(bugId);
+            element.classList.add('found-correct');
+
+            const bugInfo = L1_BUGS[bugId];
+            showLevelFeedback(true, `Correct: ${bugInfo.label}!`, bugInfo.explain);
+            toast("Bug Found!", "t-ok");
+
+            const progressPct = (GAME.state.l1_found.length / 5) * 100;
+            updateLevelProgress(progressPct);
+
+            if (GAME.state.l1_found.length === 5) {
+                completeLevel();
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 2: Match Problem With Usability Principle
+           ============================================================ */
+        function renderLevel2(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'match-container';
+
+            // Left Column (Problems)
+            const colProblems = document.createElement('div');
+            colProblems.className = 'match-column';
+            colProblems.innerHTML = `<h4 style="font-size: 14px; font-weight:700; color:var(--text-dark); margin-bottom:8px;">Usability Problems</h4>`;
+
+            // Filter out problems that are already matched and dropped in a zone
+            const matchedProblems = Object.values(GAME.state.l2_matches);
+            const remainingProblems = L2_PROBLEMS.filter(p => !matchedProblems.includes(p.id));
+
+            remainingProblems.forEach(prob => {
+                const chip = document.createElement('div');
+                chip.className = 'match-problem-chip';
+                chip.draggable = true;
+                chip.id = prob.id;
+                chip.textContent = prob.text;
+
+                // HTML5 Drag Events
+                chip.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', chip.id);
+                    chip.classList.add('dragging');
+                });
+                chip.addEventListener('dragend', () => {
+                    chip.classList.remove('dragging');
+                });
+
+                // Mobile Click Fallback Match
+                chip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Clear previous highlights
+                    colProblems.querySelectorAll('.match-problem-chip').forEach(c => c.style.borderColor = '');
+                    chip.style.borderColor = 'var(--primary)';
+                    GAME.state.l2_selected_chip = chip.id;
+                    toast("Selected! Now tap a Principle Zone on the right to match.", "t-ok");
+                });
+
+                colProblems.appendChild(chip);
+            });
+
+            // Right Column (Zones)
+            const colZones = document.createElement('div');
+            colZones.className = 'match-column';
+            colZones.innerHTML = `<h4 style="font-size: 14px; font-weight:700; color:var(--text-dark); margin-bottom:8px;">Usability Principles</h4>`;
+
+            L2_ZONES.forEach(zone => {
+                const zoneBox = document.createElement('div');
+                zoneBox.className = 'match-zone';
+                zoneBox.id = zone.id;
+                zoneBox.innerHTML = `<span class="match-zone-title">${zone.title}</span>`;
+
+                // HTML5 Drop Events
+                zoneBox.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zoneBox.classList.add('drag-over');
+                });
+                zoneBox.addEventListener('dragleave', () => {
+                    zoneBox.classList.remove('drag-over');
+                });
+                zoneBox.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zoneBox.classList.remove('drag-over');
+                    const problemId = e.dataTransfer.getData('text/plain');
+                    if (problemId) {
+                        applyMatch(problemId, zone.id, zoneBox);
+                    }
+                });
+
+                // Mobile Tap match
+                zoneBox.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l2_selected_chip) {
+                        applyMatch(GAME.state.l2_selected_chip, zone.id, zoneBox);
+                        GAME.state.l2_selected_chip = null;
+                        // Re-render level 2 to clear columns and place properly
+                        const z = document.getElementById('interactive-zone');
+                        z.innerHTML = '';
+                        renderLevel2(z);
+                    }
+                });
+
+                // If this zone already holds an item in saved state, render it inside
+                const matchedId = GAME.state.l2_matches[zone.id];
+                if (matchedId) {
+                    const prob = L2_PROBLEMS.find(p => p.id === matchedId);
+                    if (prob) {
+                        const chip = document.createElement('div');
+                        chip.className = 'match-problem-chip';
+                        chip.style.margin = '4px 0 0 0';
+                        chip.style.width = '100%';
+                        chip.textContent = prob.text;
+                        zoneBox.appendChild(chip);
+                    }
+                }
+
+                colZones.appendChild(zoneBox);
+            });
+
+            wrap.appendChild(colProblems);
+            wrap.appendChild(colZones);
+            container.appendChild(wrap);
+        }
+
+        function applyMatch(problemId, zoneId, zoneElement) {
+            // Remove this problemId from any existing match keys
+            for (const key in GAME.state.l2_matches) {
+                if (GAME.state.l2_matches[key] === problemId) {
+                    delete GAME.state.l2_matches[key];
+                }
+            }
+            // Match the problem to this zone
+            GAME.state.l2_matches[zoneId] = problemId;
+            toast("Matched item successfully!", "t-ok");
+
+            // Re-render Level 2 to show matching state
+            const z = document.getElementById('interactive-zone');
+            z.innerHTML = '';
+            renderLevel2(z);
+
+            const matchedCount = Object.keys(GAME.state.l2_matches).length;
+            updateLevelProgress((matchedCount / 5) * 100);
+            saveGameState();
+        }
+
+        function checkLevel2Match() {
+            const matchedCount = Object.keys(GAME.state.l2_matches).length;
+            if (matchedCount < 5) {
+                showLevelFeedback(false, "Unfinished matches", "Please match all 5 problems to principles before checking.");
+                toast("Please match all items!", "t-err");
+                return;
+            }
+
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            L2_ZONES.forEach(zone => {
+                const zoneElement = document.getElementById(zone.id);
+                const matchedId = GAME.state.l2_matches[zone.id];
+
+                zoneElement.classList.remove('correct-zone', 'wrong-zone');
+
+                const prob = L2_PROBLEMS.find(p => p.id === matchedId);
+                if (prob && prob.correctZone === zone.id) {
+                    zoneElement.classList.add('correct-zone');
+                    correctCount++;
+                } else {
+                    zoneElement.classList.add('wrong-zone');
+                    wrongCount++;
+                }
+            });
+
+            if (wrongCount === 0) {
+                showLevelFeedback(true, "Perfect Matches!", "You correctly matched all usability problems to Jakob Nielsen's aspects. Click Next Level to proceed.");
+                completeLevel();
+            } else {
+                showLevelFeedback(false, "Errors Detected!", `You correctly positioned ${correctCount} out of 5 items. Wrong principles are highlighted in red. Rearrange them and check again.`);
+                toast("Incorrect match!", "t-err");
+
+                const wrap = document.querySelector('.match-container');
+                wrap.classList.add('shake');
+                setTimeout(() => wrap.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 3: Fix the Interface
+           ============================================================ */
+        function renderLevel3(container) {
+            const progressVal = (GAME.state.l3_current / 5) * 100;
+            updateLevelProgress(progressVal);
+
+            const wrap = document.createElement('div');
+            wrap.className = 'l3-container';
+
+            // Left: Visually rendered bad mockup device
+            const mockHTML = getL3MockupHTML();
+
+            wrap.innerHTML = `
+                <div class="l3-device-mock">
+                    <div style="background:#fff; border:1px solid #cbd5e1; border-radius:6px; padding:16px; width:100%; display:flex; flex-direction:column; gap:10px;">
+                        <h3 style="font-size:14px; font-weight:700; text-align:center; color:#1b1e22; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">Create Account</h3>
+                        ${mockHTML}
+                    </div>
+                </div>
+                <div class="l3-wizard">
+                    <h4 style="font-size: 13px; font-weight:700; color:var(--primary); text-transform:uppercase;">
+                        Fix ${GAME.state.l3_current + 1} of 5
+                    </h4>
+                    <p style="font-size:13.5px; font-weight:700;" id="l3-question-title"></p>
+                    <div class="l3-options" id="l3-question-options"></div>
+                </div>
+            `;
+
+            container.appendChild(wrap);
+
+            // Populate the active question
+            if (GAME.state.l3_current < 5) {
+                const q = L3_QUESTIONS[GAME.state.l3_current];
+                document.getElementById('l3-question-title').textContent = q.problem;
+
+                const optBox = document.getElementById('l3-question-options');
+                const letters = ['A', 'B', 'C'];
+                q.options.forEach((optText, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'l3-opt-btn';
+                    btn.innerHTML = `
+                        <span class="l3-opt-letter">${letters[idx]}</span>
+                        <span>${optText}</span>
+                    `;
+                    btn.addEventListener('click', () => {
+                        submitL3Choice(wrap, idx, q);
+                    });
+                    optBox.appendChild(btn);
+                });
+            }
+        }
+
+        function getL3MockupHTML() {
+            let html = '';
+
+            // 1. Label Section (Q2)
+            const labelFixed = GAME.state.l3_current > 1 || (GAME.state.l3_current === 1 && GAME.state.l3_answers[1] === 1);
+            const labelHighlight = GAME.state.l3_current === 1 ? 'class="inspector-highlight"' : '';
+            if (labelFixed) {
+                html += `<div ${labelHighlight} style="position:relative;"><label style="font-size:10px; font-weight:700; color:#555; display:block; margin-bottom:2px;">Email Address</label><input type="text" class="l1-generic-field" placeholder="example@email.com" disabled></div>`;
+            } else {
+                html += `<div ${labelHighlight} style="position:relative;"><input type="text" class="l1-generic-field" placeholder="Email Address (disappears on type)" disabled></div>`;
+            }
+
+            // 2. Grouping Section (Q3)
+            const groupFixed = GAME.state.l3_current > 2 || (GAME.state.l3_current === 2 && GAME.state.l3_answers[2] === 1);
+            const groupHighlight = GAME.state.l3_current === 2 ? 'class="inspector-highlight"' : '';
+            if (groupFixed) {
+                html += `
+                    <div ${groupHighlight} style="position:relative; display:flex; flex-direction:column; gap:8px; border:1px solid #e2e8f0; padding:10px; border-radius:6px;">
+                        <span style="font-size:9px; font-weight:700; color:var(--primary); text-transform:uppercase;">Security Credentials</span>
+                        <input type="password" class="l1-generic-field" placeholder="Password" disabled>
+                        <input type="password" class="l1-generic-field" placeholder="Confirm Password" disabled>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div ${groupHighlight} style="position:relative; display:flex; flex-direction:column; gap:8px;">
+                        <input type="password" class="l1-generic-field" placeholder="Password" disabled>
+                        <input type="password" class="l1-generic-field" placeholder="Confirm Password" disabled>
+                    </div>
+                `;
+            }
+
+            // 3. Contrast Text (Q5)
+            const contrastFixed = GAME.state.l3_current > 4 || (GAME.state.l3_current === 4 && GAME.state.l3_answers[4] === 2);
+            const contrastHighlight = GAME.state.l3_current === 4 ? 'class="inspector-highlight"' : '';
+            if (contrastFixed) {
+                html += `<div ${contrastHighlight} style="position:relative; font-size:10px; color:#4b5563; font-weight:600;">ℹ️ Password must be at least 8 characters.</div>`;
+            } else {
+                html += `<div ${contrastHighlight} style="position:relative; font-size:10px; color:#e5e5e5;">ℹ️ Password must be at least 8 characters.</div>`;
+            }
+
+            // 4. Error Message Section (Q4)
+            const errorFixed = GAME.state.l3_current > 3 || (GAME.state.l3_current === 3 && GAME.state.l3_answers[3] === 1);
+            const errorHighlight = GAME.state.l3_current === 3 ? 'class="inspector-highlight"' : '';
+            if (errorFixed) {
+                html += `<div ${errorHighlight} style="position:relative; background:var(--danger-light); border:1px solid var(--danger); border-radius:4px; padding:6px; color:#c1121f; font-size:9px; font-weight:600;">Login failed. Please verify your credentials and try again.</div>`;
+            } else {
+                html += `<div ${errorHighlight} style="position:relative; background:var(--danger-light); border:1px solid var(--danger); border-radius:4px; padding:6px; color:#c1121f; font-size:9px; font-weight:600; font-family:'JetBrains Mono';">Error Code: AUTH_0x8291_EXPIRED</div>`;
+            }
+
+            // 5. Button Section (Q1)
+            const btnFixed = GAME.state.l3_current > 0 || (GAME.state.l3_current === 0 && GAME.state.l3_answers[0] === 1);
+            const btnHighlight = GAME.state.l3_current === 0 ? 'class="inspector-highlight"' : '';
+            if (btnFixed) {
+                html += `<button ${btnHighlight} style="position:relative; background:var(--primary); color:#fff; padding:8px; border:none; border-radius:4px; font-weight:700; width:100%; cursor:pointer;">Login to Account</button>`;
+            } else {
+                html += `<button ${btnHighlight} style="position:relative; background:#cccccc; color:#666666; padding:8px; border:1px solid #b5b5b5; border-radius:4px; width:100%; cursor:pointer;">Click Here</button>`;
+            }
+
+            return html;
+        }
+
+        function submitL3Choice(container, choiceIdx, questionData) {
+            container.querySelectorAll('.l3-opt-btn').forEach(btn => btn.disabled = true);
+
+            const isCorrect = (choiceIdx === questionData.correct);
+
+            GAME.state.l3_answers[GAME.state.l3_current] = choiceIdx;
+
+            const btnChosen = container.querySelector(`.l3-opt-btn[data-opt="${choiceIdx}"]`);
+            if (isCorrect) {
+                btnChosen.classList.add('correct-choice');
+                showLevelFeedback(true, "Correct Fix Applied!", questionData.explain);
+                toast("Correct!", "t-ok");
+            } else {
+                btnChosen.classList.add('wrong-choice');
+                const btnCorrect = container.querySelector(`.l3-opt-btn[data-opt="${questionData.correct}"]`);
+                btnCorrect.classList.add('correct-choice');
+                showLevelFeedback(false, "Suboptimal Recommendation!", questionData.explain);
+                toast("Incorrect choice!", "t-err");
+
+                const dev = container.querySelector('.l3-device-mock');
+                dev.classList.add('shake');
+                setTimeout(() => dev.classList.remove('shake'), 500);
+            }
+
+            GAME.state.l3_current++;
+            const progressVal = (GAME.state.l3_current / 5) * 100;
+            updateLevelProgress(progressVal);
+            saveGameState();
+
+            setTimeout(() => {
+                if (GAME.state.l3_current < 5) {
+                    const z = document.getElementById('interactive-zone');
+                    z.innerHTML = '';
+                    renderLevel3(z);
+                } else {
+                    completeLevel();
+                }
+            }, 3000);
+        }
+
+        /* ============================================================
+           LEVEL 4: Arrange Usability Severity
+           ============================================================ */
+        function renderLevel4(container) {
+            const list = document.createElement('div');
+            list.className = 'severity-list';
+
+            GAME.state.l4_order.forEach((probId, idx) => {
+                const prob = L4_PROBLEMS_DEFS[probId];
+
+                const item = document.createElement('div');
+                item.className = 'severity-item';
+                item.draggable = true;
+                item.id = prob.id;
+
+                let bCls = '';
+                if (prob.severity === 'Critical') bCls = 'critical';
+                else if (prob.severity === 'Major') bCls = 'major';
+                else if (prob.severity === 'Moderate') bCls = 'moderate';
+                else if (prob.severity === 'Minor') bCls = 'minor';
+                else if (prob.severity === 'Cosmetic') bCls = 'cosmetic';
+
+                item.innerHTML = `
+                    <span class="sev-handle">⠿</span>
+                    <span class="sev-num">${idx + 1}</span>
+                    <span class="sev-badge ${bCls}">${prob.severity}</span>
+                    <span class="sev-text">${prob.text}</span>
+                    <div class="sev-order-controls">
+                        <button class="btn-order-arrow arrow-up">▲</button>
+                        <button class="btn-order-arrow arrow-down">▼</button>
+                    </div>
+                `;
+
+                // HTML5 Drag Events
+                item.addEventListener('dragstart', (e) => {
+                    draggedElement = item;
+                    item.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', item.id);
+                });
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (draggedElement && draggedElement !== item) {
+                        const children = [...list.children];
+                        const srcIdx = children.indexOf(draggedElement);
+                        const tgtIdx = children.indexOf(item);
+                        if (srcIdx < tgtIdx) {
+                            list.insertBefore(draggedElement, item.nextSibling);
+                        } else {
+                            list.insertBefore(draggedElement, item);
+                        }
+                        recalculateL4Order(list);
+                    }
+                });
+
+                // Arrow controls click handlers
+                item.querySelector('.arrow-up').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const prev = item.previousElementSibling;
+                    if (prev) {
+                        list.insertBefore(item, prev);
+                        recalculateL4Order(list);
+                    }
+                });
+                item.querySelector('.arrow-down').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const next = item.nextElementSibling;
+                    if (next) {
+                        list.insertBefore(next, item);
+                        recalculateL4Order(list);
+                    }
+                });
+
+                list.appendChild(item);
+            });
+
+            container.appendChild(list);
+        }
+
+        function recalculateL4Order(list) {
+            GAME.state.l4_order = [...list.children].map(item => item.id);
+            [...list.children].forEach((c, idx) => {
+                c.querySelector('.sev-num').textContent = idx + 1;
+            });
+            saveGameState();
+        }
+
+        function checkLevel4Match() {
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            GAME.state.l4_order.forEach((probId, idx) => {
+                const prob = L4_PROBLEMS_DEFS[probId];
+                const expectedText = L4_CORRECT_ORDER[idx];
+                const itemEl = document.getElementById(probId);
+
+                itemEl.classList.remove('correct-position', 'wrong-position');
+                if (prob.text === expectedText) {
+                    itemEl.classList.add('correct-position');
+                    correctCount++;
+                } else {
+                    itemEl.classList.add('wrong-position');
+                    wrongCount++;
+                }
+            });
+
+            if (correctCount === 5) {
+                showLevelFeedback(true, "Perfect Severity Hierarchy!", "You correctly arranged the usability issues. Blocker bugs that prevent task completion take highest priority; aesthetic preference takes lowest.");
+                updateLevelProgress(100);
+                completeLevel();
+            } else {
+                showLevelFeedback(false, "Incomplete Arrangement!", `You placed ${correctCount} out of 5 issues in their correct severity slot. Review the items highlighted in red and re-sort.`);
+                toast("Incorrect order!", "t-err");
+
+                const list = document.querySelector('.severity-list');
+                list.classList.add('shake');
+                setTimeout(() => list.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 5: Final UX Inspection Portal Challenge
+           ============================================================ */
+        function renderLevel5(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'l5-grid-layout';
+
+            const nav1Text = GAME.state.l5_fixed.includes('t1') ? 'Dashboard' : '';
+            const nav2Text = GAME.state.l5_fixed.includes('t1') ? 'Courses' : '';
+            const nav3Text = GAME.state.l5_fixed.includes('t1') ? 'Grades' : '';
+            const sidebarHighlight1 = GAME.state.l5_fixed.includes('t2') ? 'style="background:var(--primary-light); border-left:3px solid var(--primary); font-weight:700;"' : '';
+
+            let btnStyle = 'style="font-size:9px; color:#b0b5bb; text-decoration:underline;"';
+            if (GAME.state.l5_fixed.includes('t3')) {
+                btnStyle = 'style="background:var(--primary); color:#fff; padding:6px 12px; border-radius:4px; font-weight:700; text-decoration:none;"';
+            }
+
+            let alertStyle = 'style="background:#ffe4e6; color:#fda4af; border:1px solid #fecdd3;"';
+            if (GAME.state.l5_fixed.includes('t4')) {
+                alertStyle = 'style="background:#c1121f; color:#ffffff; font-weight:700; border:1px solid #780000;"';
+            }
+
+            let tableHTML = '';
+            if (GAME.state.l5_fixed.includes('t5')) {
+                tableHTML = `
+                    <div style="background:var(--success-light); border:1px solid var(--success); padding:8px; border-radius:4px; color:#1e5a52; font-weight:600;">
+                        ✓ Courses grouped dynamically. Search filter applied. (Miller's Law)
+                    </div>
+                `;
+            } else {
+                tableHTML = `
+                    <table class="portal-table">
+                        <thead><tr><th>Code</th><th>Name</th><th>Professor</th></tr></thead>
+                        <tbody>
+                            <tr><td>CS-101</td><td>Intro to Programming</td><td>Dr. Smith</td></tr>
+                            <tr><td>CS-102</td><td>Information Systems</td><td>Dr. Jones</td></tr>
+                            <tr><td>CS-103</td><td>Aesthetics & UI Design</td><td>Dr. Evans</td></tr>
+                            <tr><td>CS-104</td><td>System Operations</td><td>Dr. Miller</td></tr>
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            let serverMsgStyle = '';
+            if (GAME.state.l5_fixed.includes('t8')) {
+                serverMsgStyle = 'style="display:none;"';
+            }
+
+            let errorHTML = '';
+            if (GAME.state.l5_fixed.includes('t7')) {
+                errorHTML = '<span style="color:var(--success); font-weight:600;">✓ Email is required. Please type your address.</span>';
+            } else {
+                errorHTML = '<span style="color:var(--danger); font-weight:600; font-family:\'JetBrains Mono\'">Action failed: parameters invalid</span>';
+            }
+
+            let saveBtnHTML = '';
+            if (GAME.state.l5_fixed.includes('t6')) {
+                saveBtnHTML = '<button class="btn btn-primary" style="background:var(--success); padding:4px 8px; font-size:10px;">✓ Preferences Saved</button>';
+            } else {
+                saveBtnHTML = '<button class="btn btn-muted" style="padding:4px 8px; font-size:10px;">Save Preferences</button>';
+            }
+
+            // Construct Dashboard visual grid
+            wrap.innerHTML = `
+                <div class="portal-preview" id="l5-portal-mockup">
+                    <div class="portal-ui">
+                        <div class="portal-header">
+                            <span style="font-weight:700; color:var(--primary); font-size:12px;">🏫 PORTAL</span>
+                            <div class="l5-bug portal-alert" id="l5-t4" data-bug="t4" ${alertStyle}>
+                                ⚠️ Update profile information before exam deadline!
+                            </div>
+                        </div>
+                        
+                        <div class="portal-sidebar">
+                            <div class="l5-bug portal-nav-item" id="l5-t1" data-bug="t1" ${sidebarHighlight1}>
+                                <span style="font-size:14px; font-weight:700;">⬡</span>
+                                <span>${nav1Text || 'Dashboard'}</span>
+                            </div>
+                            <div class="l5-bug portal-nav-item" id="l5-t2" data-bug="t2">
+                                <span style="font-size:14px; font-weight:700;">⛛</span>
+                                <span>${nav2Text || 'Courses'}</span>
+                            </div>
+                            <div class="portal-nav-item">
+                                <span style="font-size:14px; font-weight:700;">⎔</span>
+                                <span>${nav3Text || 'Grades'}</span>
+                            </div>
+                        </div>
+
+                        <div class="portal-main">
+                            <div class="l5-bug portal-card" id="l5-t8" data-bug="t8" ${serverMsgStyle} style="background:#fff7ed; border-color:#ffedd5; color:#c2410c; padding:8px; font-size:10px;">
+                                ℹ️ Please wait 60 seconds between clicks to prevent server buffer overload.
+                            </div>
+
+                            <div class="portal-card" style="display:flex; flex-direction:column; gap:6px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <strong style="font-size:11px;">Term Courses</strong>
+                                    <span class="l5-bug" id="l5-t3" data-bug="t3" ${btnStyle}>Submit Exam</span>
+                                </div>
+                                <div class="l5-bug" id="l5-t5" data-bug="t5">
+                                    ${tableHTML}
+                                </div>
+                            </div>
+
+                            <div class="portal-card" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div class="l5-bug" id="l5-t7" data-bug="t7">
+                                    ${errorHTML}
+                                </div>
+                                <div class="l5-bug" id="l5-t6" data-bug="t6">
+                                    ${saveBtnHTML}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portal-inspector-console" id="l5-console">
+                    <div class="inspector-console-header">
+                        💻 UX Inspector Console
+                    </div>
+                    <div id="l5-console-body" style="font-size:12.5px; line-height:1.5;">
+                        <p style="color:var(--text-muted); font-style:italic;">Click on any element in the Student Portal mockup to inspect it and apply fixes.</p>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(wrap);
+
+            // Bind click handlers to bugs
+            wrap.querySelectorAll('.l5-bug').forEach(el => {
+                const bugKey = el.getAttribute('data-bug');
+                if (GAME.state.l5_fixed.includes(bugKey)) {
+                    el.classList.add('fixed');
+                }
+
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    inspectElement(el, bugKey);
+                });
+            });
+
+            // Catch portal mockup click failures
+            wrap.querySelector('#l5-portal-mockup').addEventListener('click', (e) => {
+                if (e.target.closest('.l5-bug')) return;
+
+                e.stopPropagation();
+                showLevelFeedback(false, "Inspection Fail!", "This element satisfies standard design. Look for pale boxes, raw script errors, delays, or unlabeled navigation icons.");
+                toast("Wrong spot!", "t-err");
+
+                const mockup = wrap.querySelector('#l5-portal-mockup');
+                mockup.classList.add('shake');
+                setTimeout(() => mockup.classList.remove('shake'), 500);
+                saveGameState();
+            });
+        }
+
+        function inspectElement(element, bugKey) {
+            // Highlight selected element
+            document.querySelectorAll('.l5-bug').forEach(b => b.classList.remove('inspector-highlight'));
+            element.classList.add('inspector-highlight');
+            GAME.state.l5_selected_bug = bugKey;
+
+            const consoleBody = document.getElementById('l5-console-body');
+            const bugInfo = L5_BUGS[bugKey];
+
+            if (GAME.state.l5_fixed.includes(bugKey)) {
+                consoleBody.innerHTML = `
+                    <p style="color:var(--success); font-weight:700;">✓ Bug Resolved!</p>
+                    <p style="font-weight:600; margin:4px 0 8px 0;">Element: ${bugInfo.name}</p>
+                    <p style="font-size:12px; color:var(--text-muted);">${bugInfo.explain}</p>
+                `;
+                return;
+            }
+
+            // Populate multiple choices inside the Inspector console
+            const letters = ['A', 'B', 'C'];
+            let optsHTML = '';
+            bugInfo.options.forEach((optText, i) => {
+                optsHTML += `
+                    <button class="l3-opt-btn" onclick="submitL5Fix('${bugKey}', ${i})">
+                        <span class="l3-opt-letter">${letters[i]}</span>
+                        <span>${optText}</span>
+                    </button>
+                `;
+            });
+
+            consoleBody.innerHTML = `
+                <p style="font-weight:700; color:var(--primary);">Inspection Node: &lt;${element.tagName.toLowerCase()}&gt; (${bugInfo.name})</p>
+                <p style="margin:4px 0 12px 0; color:var(--text-muted); font-size:12px;">${bugInfo.desc}</p>
+                <div class="l3-options">${optsHTML}</div>
+            `;
+            saveGameState();
+        }
+
+        function submitL5Fix(bugKey, choiceIdx) {
+            const bugInfo = L5_BUGS[bugKey];
+            const isCorrect = (choiceIdx === bugInfo.correct);
+
+            if (isCorrect) {
+                GAME.state.l5_fixed.push(bugKey);
+                showLevelFeedback(true, "Heuristic Resolved!", bugInfo.explain);
+                toast("Correct Fix!", "t-ok");
+
+                // Refresh L5 Interactive zone to apply live changes
+                const z = document.getElementById('interactive-zone');
+                z.innerHTML = '';
+                renderLevel5(z);
+
+                const progressPct = (GAME.state.l5_fixed.length / 8) * 100;
+                updateLevelProgress(progressPct);
+
+                // Auto open the next bug if there's any left, otherwise complete
+                if (GAME.state.l5_fixed.length === 8) {
+                    completeLevel();
+                } else {
+                    // Update inspector console to show resolved
+                    inspectElement(document.getElementById(`l5-${bugKey}`), bugKey);
+                }
+            } else {
+                showLevelFeedback(false, "Suboptimal Recommendation!", `That solution does not correct the core heuristic constraint. Heuristic explanation: ${bugInfo.explain}`);
+                toast("Suboptimal fix!", "t-err");
+
+                const mockup = document.getElementById('l5-portal-mockup');
+                mockup.classList.add('shake');
+                setTimeout(() => mockup.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL VALIDATION & GENERAL NAVIGATION
+           ============================================================ */
+        function checkLevelAnswer() {
+            if (GAME.currentLevel === 2) {
+                checkLevel2Match();
+            } else if (GAME.currentLevel === 4) {
+                checkLevel4Match();
+            }
+        }
+
+        function showLevelFeedback(success, title, msg) {
+            const panel = document.getElementById('feedback-panel');
+            panel.style.display = 'block';
+            panel.className = 'fb-box ' + (success ? 'correct' : 'wrong');
+            document.getElementById('feedback-title').textContent = (success ? '✅ ' : '❌ ') + title;
+            document.getElementById('feedback-body').innerHTML = msg;
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function completeLevel() {
+            toast("Level Complete!", "t-ok");
+
+            const nextBtn = document.getElementById('btn-next');
+            nextBtn.style.display = 'block';
+            nextBtn.scrollIntoView({ behavior: 'smooth' });
+
+            if (GAME.currentLevel === 5) {
+                nextBtn.textContent = "See Inspector Evaluation Report →";
+            } else {
+                nextBtn.textContent = `Proceed to Level ${GAME.currentLevel + 1} →`;
+            }
+
+            document.getElementById('btn-check').disabled = true;
+            saveGameState();
+        }
+
+        function updateObservation() {
+            const obsEl = document.getElementById('observation-panel');
+            let insight = "";
+
+            if (GAME.currentLevel === 1) {
+                insight = "<strong>Inspector's Observation:</strong> Inconsistent inputs and loud instructions increase user confusion. Removing formatting clutter clarifies focus immediately.";
+            } else if (GAME.currentLevel === 2) {
+                insight = "<strong>Inspector's Observation:</strong> Matching usability problems to guidelines helps designers identify and categorize errors using objective heuristics.";
+            } else if (GAME.currentLevel === 3) {
+                insight = "<strong>Inspector's Observation:</strong> Replacing disappearing placeholders with persistent labels and grouping fields decreases cognitive strain.";
+            } else if (GAME.currentLevel === 4) {
+                insight = "<strong>Inspector's Observation:</strong> Usability errors are ranked by task obstruction. Blockers take highest priority, whereas stylistic dislikes are cosmetic.";
+            } else if (GAME.currentLevel === 5) {
+                insight = "<strong>Inspector's Observation:</strong> A student portal needs clear navigation, high contrast warnings, chunked information grids, and action feedback.";
+            }
+
+            obsEl.innerHTML = insight;
+        }
+
+        function showResults() {
+            document.getElementById('main-workspace').style.display = 'none';
+            document.getElementById('sidebar-notebook').style.display = 'none';
+            document.getElementById('theory-container').style.display = 'none';
+
+            const resContainer = document.getElementById('results-container');
+            resContainer.style.display = 'block';
+
+            const badgeTitle = "UX Usability Expert";
+            const badgeIcon = "🏆";
+            const badgeDesc = "Splendid job! You completed all inspection levels and resolved UI bugs systematically using heuristics.";
+
+            document.getElementById('res-badge').textContent = badgeIcon;
+            document.getElementById('res-title').textContent = badgeTitle;
+            document.getElementById('res-subtitle').textContent = badgeDesc;
+
+            resContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Design Lab — Human Considerations in Design (Module 1.3)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* =========================================
+           ROOT & COLOR PALETTE (Red & White Theme)
+           ========================================= */
+        :root {
+            --bg: #fdfdfd;
+            --surface-bg: #f7f9fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e9eb;
+            --primary: #c1121f;
+            /* Vibrant Dark Crimson */
+            --primary-hover: #780000;
+            /* Deep Red Accent */
+            --primary-light: #fdf2f2;
+            /* Soft Red Highlight tint */
+            --text-dark: #1b1e22;
+            --text-muted: #5e6973;
+            --success: #2a9d8f;
+            /* Soft emerald green for success */
+            --success-light: #eef8f6;
+            --danger: #e63946;
+            /* Red for alerts/errors */
+            --danger-light: #fdf2f3;
+            --warning: #f4a261;
+            /* Warm orange for warnings/hints */
+            --warning-light: #fef6ee;
+            --r: 10px;
+            --shadow: 0 4px 20px rgba(193, 18, 31, 0.05);
+            --shadow-btn: 0 4px 12px rgba(193, 18, 31, 0.15);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        /* =========================================
+           HEADER & STATS BAR
+           ========================================= */
+        .topbar {
+            background: var(--card-bg);
+            border-bottom: 3px solid var(--primary);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .topbar-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .badge-role {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 99px;
+            border: 1px solid rgba(193, 18, 31, 0.2);
+        }
+
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat-pill {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-pill strong {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .stat-pill.success-pill strong {
+            color: var(--success);
+        }
+
+        /* =========================================
+           MAIN CONTAINER & LAYOUT
+           ========================================= */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+            flex: 1;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 900px) {
+            .container {
+                grid-template-columns: 3fr 1fr;
+            }
+        }
+
+        /* =========================================
+           GAME CONTROLS PANEL
+           ========================================= */
+        .workspace-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .notebook-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: fit-content;
+        }
+
+        .nb-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* =========================================
+           LEVEL HEADERS & PROGRESS
+           ========================================= */
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .level-title-area {
+            flex: 1;
+        }
+
+        .level-title-area h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .level-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .level-progress-bar-wrap {
+            width: 100%;
+            background: var(--border-color);
+            height: 6px;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .level-progress-fill {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* =========================================
+           BUTTON SYSTEM
+           ========================================= */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow-btn);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: #fff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--primary-light);
+        }
+
+        .btn-warning {
+            background: var(--warning-light);
+            border-color: var(--warning);
+            color: #d47a2a;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background: #fde8d4;
+        }
+
+        .btn-muted {
+            background: #fff;
+            border-color: var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .btn-muted:hover:not(:disabled) {
+            background: #f0f2f5;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* =========================================
+           FEEDBACK AND PANEL SYSTEM
+           ========================================= */
+        .fb-box {
+            display: none;
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+
+        .fb-box.correct {
+            display: block;
+            background-color: var(--success-light);
+            border-color: var(--success);
+            color: #1e5a52;
+        }
+
+        .fb-box.wrong {
+            display: block;
+            background-color: var(--danger-light);
+            border-color: var(--danger);
+            color: #8c202a;
+        }
+
+        .fb-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hint-box {
+            display: none;
+            background: var(--warning-light);
+            border: 1px solid var(--warning);
+            color: #7b4f2c;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+        }
+
+        /* =========================================
+           LEVEL-SPECIFIC INTERACTIVE UIs
+           ========================================= */
+
+        /* LEVEL 1: Mental Model Violation Hunt */
+        .l1-mock-device {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 20px;
+            max-width: 550px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23c1121f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") 8 8, auto;
+        }
+
+        .l1-mock-canvas {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            height: 380px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .l1-bug-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+
+        .l1-bug-item:hover {
+            outline: 2px dashed var(--warning);
+            outline-offset: 1px;
+        }
+
+        .l1-bug-item.found {
+            outline: 2.5px solid var(--success) !important;
+            background: rgba(42, 157, 143, 0.08) !important;
+            pointer-events: none;
+        }
+
+        /* LEVEL 2: Task Analysis Sorter */
+        .l2-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .l2-grid {
+                grid-template-columns: 1fr 1.5fr;
+            }
+        }
+
+        .l2-pool {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .l2-card {
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-left: 5px solid var(--primary);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .l2-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .l2-card.distractor {
+            border-left-color: var(--warning);
+        }
+
+        .l2-card.dragging {
+            opacity: 0.4;
+        }
+
+        .l2-card.used {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-left-color: #cbd5e1;
+        }
+
+        .l2-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .l2-slot-item {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 52px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .l2-slot-item.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .l2-slot-item.correct-slot {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+        }
+
+        .l2-slot-item.wrong-slot {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+        }
+
+        .l2-slot-num {
+            width: 24px;
+            height: 24px;
+            background: var(--surface-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .l2-placed-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 11.5px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+        }
+
+        .l2-placed-card.ok {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: #1e5a52;
+        }
+
+        .l2-placed-card.bad {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: #8c202a;
+            cursor: pointer;
+        }
+
+        /* LEVEL 3: Metaphor Matching & Replacement */
+        .l3-matching-view {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 800px) {
+            .l3-matching-view {
+                grid-template-columns: 1.2fr 1fr;
+            }
+        }
+
+        .l3-mockup-panel {
+            background: #f8fafc;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .l3-mockup-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .l3-icon-box {
+            font-size: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: var(--surface-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid var(--border-color);
+        }
+
+        .l3-icon-box.drop-replace {
+            border: 2px dashed var(--primary);
+            background: var(--primary-light);
+            cursor: pointer;
+        }
+
+        .l3-icon-box.replaced {
+            border: 2px solid var(--success) !important;
+            background: var(--success-light) !important;
+        }
+
+        .l3-match-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            background: var(--surface-bg);
+            padding: 8px;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 220px;
+            transition: all 0.2s;
+        }
+
+        .l3-match-zone.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .l3-match-zone.correct-zone {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+        }
+
+        .l3-match-zone.wrong-zone {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+        }
+
+        /* LEVEL 4: Direct vs Indirect Involvement */
+        .classify-bins {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 700px) {
+            .classify-bins {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .classify-bin {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--r);
+            padding: 16px;
+            min-height: 160px;
+            transition: border-color .2s;
+            background: #fff;
+        }
+
+        .classify-bin.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .classify-bin h5 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .classify-bin.green h5 {
+            color: var(--success);
+        }
+
+        .classify-bin.blue h5 {
+            color: var(--accent, #2563eb);
+        }
+
+        .bin-chips {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bin-chip {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background: var(--surface-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bin-chip.ok {
+            background: var(--success-light);
+            color: #1e5a52;
+            border-color: var(--success);
+        }
+
+        .bin-chip.bad {
+            background: var(--danger-light);
+            color: #8c202a;
+            border-color: var(--danger);
+            cursor: pointer;
+        }
+
+        /* LEVEL 5: Final Human-Centered Redesign Mission */
+        .l5-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 900px) {
+            .l5-layout {
+                grid-template-columns: 1.3fr 1fr;
+            }
+        }
+
+        .portal-preview {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: #f1f5f9;
+            padding: 16px;
+            position: relative;
+        }
+
+        .portal-ui {
+            background: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            grid-template-rows: 50px 1fr;
+            height: 480px;
+            border: 1px solid #cbd5e1;
+            font-size: 11px;
+        }
+
+        .portal-header {
+            grid-column: 1 / -1;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .portal-sidebar {
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .portal-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .portal-main {
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8fafc;
+        }
+
+        .portal-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 14px;
+        }
+
+        /* Highlightable slots on Level 5 Mockup */
+        .l5-slot {
+            border: 2.5px dashed var(--border-color);
+            background: rgba(193, 18, 31, 0.01);
+            border-radius: 4px;
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .l5-slot:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .l5-slot.drag-over {
+            border-color: var(--primary) !important;
+            background: var(--primary-light) !important;
+        }
+
+        .l5-slot.resolved {
+            border: 2px solid var(--success) !important;
+            background: var(--success-light) !important;
+            pointer-events: none;
+        }
+
+        /* Fix cards deck */
+        .l5-fix-deck {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: fit-content;
+        }
+
+        .l5-fix-card {
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-left: 5px solid var(--primary);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .l5-fix-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary);
+        }
+
+        .l5-fix-card.dragging {
+            opacity: 0.4;
+        }
+
+        .l5-fix-card.used {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-left-color: #cbd5e1;
+        }
+
+        /* =========================================
+           FINAL REPORT / RESULT STYLES
+           ========================================= */
+        .results-card {
+            text-align: center;
+            padding: 40px 24px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .results-badge {
+            font-size: 64px;
+            margin-bottom: 8px;
+        }
+
+        .results-score-highlight {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+        }
+
+        .results-cell {
+            background: var(--surface-bg);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .results-cell span {
+            display: block;
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* =========================================
+           THEORY & OBSERVATION ACCORDIONS
+           ========================================= */
+        .theory-section {
+            border-top: 1px solid var(--border-color);
+            margin-top: 32px;
+            padding-top: 24px;
+        }
+
+        .theory-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theory-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .theory-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .theory-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .theory-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .theory-card p {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .obs-box {
+            background: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: 16px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            margin-top: 16px;
+            line-height: 1.6;
+        }
+
+        /* =========================================
+           UTILITIES / TOAST / ANIMATIONS
+           ========================================= */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.t-ok {
+            background: var(--success-light);
+            color: #1e5a52;
+            border: 1px solid var(--success);
+        }
+
+        .toast.t-err {
+            background: var(--danger-light);
+            color: #8c202a;
+            border: 1px solid var(--danger);
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-6px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(6px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================================
+         HEADER & STATS BAR
+         ========================================= -->
+    <header class="topbar">
+        <div class="topbar-container">
+            <div class="brand">
+                🔬 UX <span>Design Lab</span>
+                <span class="badge-role">UX Consultant</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-pill">
+                    Level: <strong id="ui-level-num">1 / 5</strong>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================
+         MAIN CONTENT CONTAINER
+         ========================================= -->
+    <div class="container" id="game-container">
+
+        <!-- WORKSPACE (Left Side) -->
+        <main class="workspace-card" id="main-workspace">
+
+            <!-- LEVEL HEADER -->
+            <div class="level-header">
+                <div class="level-title-area">
+                    <h2 id="level-title">Mental Model Violation Hunt</h2>
+                    <div class="level-subtitle" id="level-desc">Find settings page expectations breaches. Click on the 5
+                        issues.</div>
+                </div>
+                <div class="level-progress-bar-wrap">
+                    <div class="level-progress-fill" id="level-progress"></div>
+                </div>
+            </div>
+
+            <!-- LEVEL INTERACTIVE DISPLAY ZONE -->
+            <div id="interactive-zone" class="fade-in">
+                <!-- Dynamically populated by JS -->
+            </div>
+
+            <!-- DYNAMIC FEEDBACK BOX -->
+            <div class="fb-box" id="feedback-panel">
+                <div class="fb-title" id="feedback-title">Correct!</div>
+                <div id="feedback-body">Excellent HCD observation!</div>
+            </div>
+
+        </main>
+
+        <!-- INSPECTOR NOTEBOOK / ACTIONS (Right Side) -->
+        <aside class="notebook-card" id="sidebar-notebook">
+            <div class="nb-title">📋 Consultant Tools</div>
+
+            <div class="btn-row" style="flex-direction: column; width: 100%; gap: 12px;">
+                <button class="btn btn-primary" id="btn-check" style="width: 100%;">Check Answer</button>
+                <button class="btn btn-warning" id="btn-hint" style="width: 100%;">🔍 Reveal Hint</button>
+                <button class="btn btn-outline" id="btn-next" style="width: 100%; display: none;">Next Level →</button>
+                <button class="btn btn-muted" id="btn-reset" style="width: 100%;">↺ Reset Level</button>
+            </div>
+
+            <!-- HINT DISPLAY ZONE -->
+            <div class="hint-box" id="hint-display">
+                <!-- Hint text -->
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- =========================================
+         RESULTS CONTAINER (Shows only at the end)
+         ========================================= -->
+    <div class="container" style="display:none;" id="results-container">
+        <main class="workspace-card results-card" style="grid-column: 1 / -1;">
+            <div class="results-badge" id="res-badge">🏆</div>
+            <h2 id="res-title">Human-Centered UX Expert</h2>
+            <p id="res-subtitle">You have demonstrated expert HCD consulting skills!</p>
+
+            <div class="results-grid">
+                <div class="results-cell" style="text-align: center;">
+                    Redesigns Solved
+                    <span id="res-bugs">18 / 18</span>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="restartGame()">↺ Restart Course</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- =========================================
+         THEORY, OBSERVATION, CONCLUSION
+         ========================================= -->
+    <div class="container" id="theory-container">
+        <section class="theory-section" style="grid-column: 1 / -1;">
+            <div class="theory-header">📚 Human Considerations Notebook</div>
+
+            <div class="theory-grid">
+                <div class="theory-card">
+                    <h4>Core Principles & Metaphors</h4>
+                    <p>
+                        • <strong>Mental models:</strong> The internal understanding user forms of a system's operation.
+                        Design layout must align with standard expectations.
+                        <br>• <strong>Real-world metaphors:</strong> Familiar real-world icons (Trash for delete, Folder
+                        for files, Gear for settings) reduce system learning curves.
+                        <br>• <strong>Task analysis:</strong> Decomposing a user goal into discrete, minimal, logical
+                        sequential steps. Prevents visual clutter.
+                    </p>
+                </div>
+                <div class="theory-card">
+                    <h4>Standards & User Involvement</h4>
+                    <p>
+                        • <strong>ISO Standards:</strong>
+                        <br>&nbsp;&nbsp;- <em>ISO 9241:</em> Ergonomic displays & software usability.
+                        <br>&nbsp;&nbsp;- <em>ISO 14915:</em> Multimedia interface ergonomics.
+                        <br>&nbsp;&nbsp;- <em>ISO 13407:</em> Human-centered design lifecycle processes.
+                        <br>&nbsp;&nbsp;- <em>ISO/CD 20282:</em> Usability of everyday products.
+                        <br>• <strong>User Involvement:</strong>
+                        <br>&nbsp;&nbsp;- <em>Direct Methods:</em> Interviews, field observations, testing, prototyping.
+                        <br>&nbsp;&nbsp;- <em>Indirect Methods:</em> Online surveys, log file audits, support ticket
+                        analysis.
+                    </p>
+                </div>
+            </div>
+
+            <!-- OBSERVATION PANEL -->
+            <div class="obs-box" id="observation-panel">
+                <strong>Consultant's Observation:</strong> Complete challenges to generate UX insights. When interfaces
+                match users’ mental models, use familiar metaphors, and follow clear task flows, users can complete
+                tasks faster with less confusion.
+            </div>
+
+            <!-- CONCLUSION PANEL -->
+            <div class="theory-card" style="margin-top: 16px;">
+                <h4>Consultant's Conclusion</h4>
+                <p>
+                    Human-centered design improves usability by matching the interface with user expectations,
+                    real-world understanding, task flow, and design standards.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- TOAST ALERT -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ============================================================
+         GAME ENGINE (JavaScript)
+         ============================================================ -->
+    <script>
+        /* ============================================================
+           DATA: LEVEL CONFIGURATIONS
+           ============================================================ */
+        const GAME = {
+            currentLevel: 1,
+            hintUsed: false,
+            state: {
+                l1_found: [], // bug ids found
+                l2_assignments: {}, // stepIdx -> cardId
+                l2_selected_card: null, // click match state
+                l3_matches: {}, // targetZoneId -> cardId
+                l3_replaced: [], // ids of replaced confusing icons ('r1', 'r2')
+                l3_selected_chip: null, // click match state
+                l4_assignments: {}, // cardId -> binId
+                l4_selected_card: null, // click match state
+                l5_fixed: [], // resolved slot ids
+                l5_selected_card: null // click match state
+            }
+        };
+
+        const LEVEL_DEFS = {
+            1: {
+                title: "Level 1: Mental Model Violation Hunt",
+                desc: "Test the bad settings mockup. Click on the 5 items that violate familiar patterns and user expectations.",
+                hint: "Search for a Save action placed at top-left, a sidebarsettings link containing an abstract ⬡ symbol, no location path indicators at the header, staggered unaligned containers, and a vague 'Do it' action button."
+            },
+            2: {
+                title: "Level 2: Task Analysis Builder",
+                desc: "User Goal: <strong>'Download semester results'</strong>. Drag the 6 correct actions into steps 1-6. Ignore distractor actions.",
+                hint: "Correct flow: Open Portal → Login → Go to Academics/Exams → Select results → Select Semester → Download. Avoid unrelated distractor options."
+            },
+            3: {
+                title: "Level 3: Metaphor Matching & Replacement",
+                desc: "Associate standard icons with metaphors on the right. Drag Refresh and Shield replacements onto the 2 confusing icons to fix them.",
+                hint: "Match Home to Dashboard, Bell to Alerts. Then, drag 'Refresh Arrows' onto the banana, and 'Shield Lock' onto the cloud-with-eye icon."
+            },
+            4: {
+                title: "Level 4: User Involvement Methods",
+                desc: "Categorize the 8 research tools and 4 scenarios into Direct (face-to-face) or Indirect (intermediary) research methods.",
+                hint: "Direct involves direct contact (testing, observation, interviews). Indirect uses data proxies (surveys, tickets, competitor reviews)."
+            },
+            5: {
+                title: "Level 5: Final Human-Centered Redesign Mission",
+                desc: "Redesign the portal mockup. Drag the 8 UX Fix Cards onto their respective highlighted layout problems to optimize the user flow.",
+                hint: "Add breadcrumb to location. Add labels to icons. Use consistent buttons. Move action higher to lift hidden items. Arrange layout into grid. Simplify task flow."
+            }
+        };
+
+        // Level 1 mental model violations
+        const L1_BUGS = {
+            m1: { id: "m1", label: "Save Button Placement", explain: "The 'Save' action button is placed at the top-left corner. Mental models expect settings submissions at the bottom-right or top-right." },
+            m2: { id: "m2", label: "Abstract Icon Choice", explain: "The settings tab uses a raw ⬡ symbol without labels. Abstract visual representations without descriptors fail standard recognition." },
+            m3: { id: "m3", label: "Missing Location Path", explain: "The settings card lacks breadcrumbs (e.g. Home > Settings), leaving the user without system orientation." },
+            m4: { id: "m4", label: "Unaligned Container Cards", explain: "Scatter-positioned cards offset from standard vertical grid layout lines degrade rapid visual scanning." },
+            m5: { id: "m5", label: "Vague Action Link", explain: "The action link says 'Do it'. Buttons and labels must use explicit verb instructions (e.g., 'Change Password')." }
+        };
+
+        // Level 2 task analysis cards
+        const L2_CARDS = [
+            { id: "s1", text: "Open Student Portal", isDistractor: false },
+            { id: "s2", text: "Login", isDistractor: false },
+            { id: "s3", text: "Go to Academics / Exams", isDistractor: false },
+            { id: "s4", text: "Select Exam Results", isDistractor: false },
+            { id: "s5", text: "Choose Semester", isDistractor: false },
+            { id: "s6", text: "Download Result", isDistractor: false },
+            { id: "d1", text: "Open Fee Receipt", isDistractor: true },
+            { id: "d2", text: "Go to Profile Picture", isDistractor: true }
+        ];
+
+        // Level 3 matching data
+        const L3_PROBLEMS = [
+            { id: "p1", text: "Folder icon", correctZone: "z1", icon: "📁" },
+            { id: "p2", text: "Trash icon", correctZone: "z2", icon: "🗑️" },
+            { id: "p3", text: "Bell icon", correctZone: "z3", icon: "🔔" },
+            { id: "p4", text: "Home icon", correctZone: "z4", icon: "🏠" },
+            { id: "p5", text: "Magnifying glass", correctZone: "z5", icon: "🔍" },
+            { id: "p6", text: "Gear icon", correctZone: "z6", icon: "⚙️" }
+        ];
+
+        const L3_ZONES = [
+            { id: "z1", title: "Stores files/documents" },
+            { id: "z2", title: "Delete/remove item" },
+            { id: "z3", title: "Notifications" },
+            { id: "z4", title: "Main dashboard" },
+            { id: "z5", title: "Search" },
+            { id: "z6", title: "Settings" }
+        ];
+
+        // Confusing icons and replacements
+        const L3_CONFUSING = {
+            r1: { id: "r1", label: "Confusing Banana Icon (Refresh)", initial: "🍌", target: "↻", fixLabel: "Refresh Arrows" },
+            r2: { id: "r2", label: "Confusing Cloud Eye Icon (Security)", initial: "☁️👁️", target: "🛡️🔒", fixLabel: "Shield Lock" }
+        };
+
+        // Level 4 Direct/Indirect categories
+        const L4_CARDS = [
+            { id: "c1", text: "Face-to-face interview", cat: "direct", isScenario: false },
+            { id: "c2", text: "Field observation", cat: "direct", isScenario: false },
+            { id: "c3", text: "Usability testing", cat: "direct", isScenario: false },
+            { id: "c4", text: "Requirements prototyping", cat: "direct", isScenario: false },
+            { id: "c5", text: "Online survey", cat: "indirect", isScenario: false },
+            { id: "c6", text: "Support ticket analysis", cat: "indirect", isScenario: false },
+            { id: "c7", text: "Competitor analysis", cat: "indirect", isScenario: false },
+            { id: "c8", text: "Feedback form", cat: "indirect", isScenario: false },
+            { id: "s_sc1", text: "Scenario: 'You want to know why students get stuck during exam form filling.'", cat: "direct", isScenario: true },
+            { id: "s_sc2", text: "Scenario: 'You want quick feedback from 500 students.'", cat: "indirect", isScenario: true },
+            { id: "s_sc3", text: "Scenario: 'You want to observe how faculty use the dashboard.'", cat: "direct", isScenario: true },
+            { id: "s_sc4", text: "Scenario: 'You want to compare your app with another college portal.'", cat: "indirect", isScenario: true }
+        ];
+
+        const L4_BINS = [
+            { id: "direct", title: "Direct Methods (Face-to-Face)", color: "green" },
+            { id: "indirect", title: "Indirect Methods (Intermediary)", color: "blue" }
+        ];
+
+        // Level 5 Redesign Match
+        const L5_PROBLEMS = {
+            t1: { id: "t1", name: "No breadcrumb", desc: "No orientation trail path shown at the header.", fixId: "f1" },
+            t2: { id: "t2", name: "Unclear icons", desc: "abstract geometric shapes on navigation menu.", fixId: "f2" },
+            t3: { id: "t3", name: "No task flow", desc: "Course enrollment task flow feels scattered.", fixId: "f3" },
+            t4: { id: "t4", name: "Random layout", desc: "Unaligned dashboard components staggered.", fixId: "f4" },
+            t5: { id: "t5", name: "Inconsistent buttons", desc: "Mix of big borders and link buttons.", fixId: "f5" },
+            t6: { id: "t6", name: "No real-world metaphor", desc: "Abstract buttons without familiar labels.", fixId: "f6" },
+            t7: { id: "t7", name: "Important action is not visible", desc: "Course registration button hidden at the footer.", fixId: "f7" },
+            t8: { id: "t8", name: "No clear feedback after saving", desc: "Settings save action triggers silently without warnings.", fixId: "f8" }
+        };
+
+        const L5_FIX_DECK = [
+            { id: "f1", label: "Add breadcrumb" },
+            { id: "f2", label: "Use familiar icons" },
+            { id: "f3", label: "Simplify task flow" },
+            { id: "f4", label: "Arrange layout using grid" },
+            { id: "f5", label: "Use consistent button style" },
+            { id: "f6", label: "Add icon labels" },
+            { id: "f7", label: "Move important action higher" },
+            { id: "f8", label: "Add clear Save confirmation" }
+        ];
+
+        /* ============================================================
+           ENGINE BOOT
+           ============================================================ */
+        const S3_STATE_KEY = 'ux_design_lab_s3_state';
+        let draggedElement = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadGameState();
+            initLevel(GAME.currentLevel);
+            setupGlobalEvents();
+        });
+
+        function setupGlobalEvents() {
+            document.getElementById('btn-check').addEventListener('click', checkLevelAnswer);
+            document.getElementById('btn-hint').addEventListener('click', requestHint);
+            document.getElementById('btn-next').addEventListener('click', nextLevel);
+            document.getElementById('btn-reset').addEventListener('click', resetLevel);
+        }
+
+        function saveGameState() {
+            localStorage.setItem(S3_STATE_KEY, JSON.stringify({
+                currentLevel: GAME.currentLevel,
+                state: GAME.state
+            }));
+        }
+
+        function loadGameState() {
+            const saved = localStorage.getItem(S3_STATE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    GAME.currentLevel = parsed.currentLevel ?? 1;
+                    GAME.state = parsed.state ?? GAME.state;
+                } catch (e) {
+                    console.error("Error loading state:", e);
+                }
+            }
+        }
+
+        function restartGame() {
+            localStorage.removeItem(S3_STATE_KEY);
+            GAME.currentLevel = 1;
+            GAME.state = {
+                l1_found: [],
+                l2_assignments: {},
+                l2_selected_card: null,
+                l3_matches: {},
+                l3_replaced: [],
+                l3_selected_chip: null,
+                l4_assignments: {},
+                l4_selected_card: null,
+                l5_fixed: [],
+                l5_selected_card: null
+            };
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('main-workspace').style.display = 'flex';
+            document.getElementById('sidebar-notebook').style.display = 'flex';
+            document.getElementById('theory-container').style.display = 'block';
+            initLevel(1);
+        }
+
+        function initLevel(lvlNum) {
+            GAME.currentLevel = lvlNum;
+            GAME.hintUsed = false;
+
+            document.getElementById('ui-level-num').textContent = `${lvlNum} / 5`;
+            document.getElementById('level-title').textContent = LEVEL_DEFS[lvlNum].title;
+            document.getElementById('level-desc').innerHTML = LEVEL_DEFS[lvlNum].desc;
+            document.getElementById('hint-display').style.display = 'none';
+            document.getElementById('feedback-panel').className = 'fb-box';
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('btn-next').style.display = 'none';
+
+            // Active/inactive check answer
+            if (lvlNum === 1 || lvlNum === 5) {
+                document.getElementById('btn-check').disabled = true;
+            } else {
+                document.getElementById('btn-check').disabled = false;
+            }
+
+            const zone = document.getElementById('interactive-zone');
+            zone.innerHTML = '';
+            zone.className = "fade-in";
+
+            if (lvlNum === 1) {
+                renderLevel1(zone);
+                updateLevelProgress((GAME.state.l1_found.length / 5) * 100);
+            } else if (lvlNum === 2) {
+                renderLevel2(zone);
+                const assignedCount = Object.keys(GAME.state.l2_assignments).length;
+                updateLevelProgress((assignedCount / 6) * 100);
+            } else if (lvlNum === 3) {
+                renderLevel3(zone);
+                const matchCount = Object.keys(GAME.state.l3_matches).length;
+                const replacedCount = GAME.state.l3_replaced.length;
+                updateLevelProgress(((matchCount + replacedCount) / 8) * 100);
+            } else if (lvlNum === 4) {
+                renderLevel4(zone);
+                const assignedCount = Object.keys(GAME.state.l4_assignments).length;
+                updateLevelProgress((assignedCount / 12) * 100);
+            } else if (lvlNum === 5) {
+                renderLevel5(zone);
+                updateLevelProgress((GAME.state.l5_fixed.length / 8) * 100);
+            }
+
+            updateObservation();
+            saveGameState();
+        }
+
+        function updateLevelProgress(pct) {
+            document.getElementById('level-progress').style.width = pct + '%';
+        }
+
+        function toast(msg, type = 't-ok') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + type;
+            setTimeout(() => { t.classList.remove('show'); }, 2500);
+        }
+
+        function requestHint() {
+            if (GAME.hintUsed) {
+                toast("Hint already retrieved!", "t-err");
+                return;
+            }
+            GAME.hintUsed = true;
+            const display = document.getElementById('hint-display');
+            display.textContent = LEVEL_DEFS[GAME.currentLevel].hint;
+            display.style.display = 'block';
+            toast("Hint revealed.", "t-ok");
+            saveGameState();
+        }
+
+        function resetLevel() {
+            toast("Level reset.", "t-ok");
+            if (GAME.currentLevel === 1) GAME.state.l1_found = [];
+            else if (GAME.currentLevel === 2) {
+                GAME.state.l2_assignments = {};
+                GAME.state.l2_selected_card = null;
+            }
+            else if (GAME.currentLevel === 3) {
+                GAME.state.l3_matches = {};
+                GAME.state.l3_replaced = [];
+                GAME.state.l3_selected_chip = null;
+            }
+            else if (GAME.currentLevel === 4) {
+                GAME.state.l4_assignments = {};
+                GAME.state.l4_selected_card = null;
+            }
+            else if (GAME.currentLevel === 5) {
+                GAME.state.l5_fixed = [];
+                GAME.state.l5_selected_card = null;
+            }
+            initLevel(GAME.currentLevel);
+        }
+
+        function nextLevel() {
+            if (GAME.currentLevel < 5) {
+                initLevel(GAME.currentLevel + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function completeLevel() {
+            toast("Level Complete!", "t-ok");
+
+            const nextBtn = document.getElementById('btn-next');
+            nextBtn.style.display = 'block';
+            nextBtn.scrollIntoView({ behavior: 'smooth' });
+
+            if (GAME.currentLevel === 5) {
+                nextBtn.textContent = "See HCD UX Consultant Report →";
+            } else {
+                nextBtn.textContent = `Proceed to Level ${GAME.currentLevel + 1} →`;
+            }
+
+            document.getElementById('btn-check').disabled = true;
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 1: Mental Model Violation Hunt
+           ============================================================ */
+        function renderLevel1(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'l1-mock-device';
+
+            wrap.innerHTML = `
+                <div class="l1-mock-canvas" id="l1-canvas">
+                    <!-- Header with Breadcrumbs Missing violation (m3) and save button at unexpected top-left (m1) -->
+                    <div style="background:#fff; border-bottom:1.5px solid var(--border-color); padding:10px; display:flex; justify-content:space-between; align-items:center;">
+                        <button class="l1-bug-item btn btn-primary" id="l1-m1" data-bug="m1" style="font-size:10px; padding:4px 10px;">💾 Save</button>
+                        
+                        <!-- Missing path indicator (m3) -->
+                        <div class="l1-bug-item" id="l1-m3" data-bug="m3" style="font-weight:700; font-size:12px; border: 1.5px dotted transparent;">
+                            Settings Card
+                        </div>
+                    </div>
+
+                    <!-- Sidebar mockup with abstract settings icon ⬡ (m2) -->
+                    <div style="position:absolute; top:46px; left:0; width:50px; bottom:0; background:#f8fafc; border-right:1px solid var(--border-color); display:flex; flex-direction:column; align-items:center; padding-top:12px; gap:16px;">
+                        <span style="font-size:16px; color:#aaa;">🏠</span>
+                        <span style="font-size:16px; color:#aaa;">📚</span>
+                        
+                        <!-- Settings abstract (m2) -->
+                        <span class="l1-bug-item" id="l1-m2" data-bug="m2" style="font-size:18px; color:var(--primary); font-weight:700;">⬡</span>
+                    </div>
+
+                    <!-- Main Area with Unaligned container cards (m4) and vague link Do it (m5) -->
+                    <div style="position:absolute; top:46px; left:50px; right:0; bottom:0; padding:16px; background:#fdfdfd; overflow-y:auto;">
+                        <!-- m4: Unaligned container cards -->
+                        <div class="l1-bug-item" id="l1-m4" data-bug="m4" style="background:#fff8f8; border:2.5px dotted var(--primary); padding:10px; border-radius:6px; margin-left:25px; width:150px; display:inline-block; font-size:10px;">
+                            <strong>User Info Card</strong>
+                            <p style="color:#888; font-size:8px;">Off-grid offset alignment card.</p>
+                        </div>
+                        
+                        <div style="background:#fff; border:1px solid var(--border-color); padding:10px; border-radius:6px; margin-top:12px; width:190px; display:inline-block; font-size:10px;">
+                            <strong>Secondary Details</strong>
+                            <p style="color:#888; font-size:8px;">Standard aligned details block.</p>
+                        </div>
+
+                        <!-- Password details with vague link Do it (m5) -->
+                        <div style="margin-top:20px; border-top:1.5px solid var(--border-color); padding-top:12px;">
+                            <span style="font-size:10px; font-weight:700; display:block; margin-bottom:4px;">Change Account Password</span>
+                            
+                            <!-- Vague Action (m5) -->
+                            <button class="l1-bug-item btn btn-outline" id="l1-m5" data-bug="m5" style="padding:4px 10px; font-size:10px;">Do it</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(wrap);
+
+            // Bind click handlers to bugs
+            wrap.querySelectorAll('.l1-bug-item').forEach(el => {
+                const bugId = el.getAttribute('data-bug');
+                if (GAME.state.l1_found.includes(bugId)) {
+                    el.classList.add('found');
+                }
+
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    onL1BugClick(el, bugId);
+                });
+            });
+
+            wrap.querySelector('#l1-canvas').addEventListener('click', (e) => {
+                if (e.target.closest('.l1-bug-item')) return;
+
+                e.stopPropagation();
+                showLevelFeedback(false, "Familiar Pattern Spot!", "This settings element follows standard user mental models. Click the top-left Save button, abstract icon tab, unaligned box, or confusing vague buttons.");
+                toast("Wrong spot!", "t-err");
+
+                wrap.classList.add('shake');
+                setTimeout(() => wrap.classList.remove('shake'), 500);
+                saveGameState();
+            });
+        }
+
+        function onL1BugClick(element, bugId) {
+            if (GAME.state.l1_found.includes(bugId)) return;
+
+            GAME.state.l1_found.push(bugId);
+            element.classList.add('found');
+
+            const bug = L1_BUGS[bugId];
+            showLevelFeedback(true, `Correct expectation breach: ${bug.label}!`, bug.explain);
+            toast("Mental model error found!", "t-ok");
+
+            const progressPct = (GAME.state.l1_found.length / 5) * 100;
+            updateLevelProgress(progressPct);
+
+            if (GAME.state.l1_found.length === 5) {
+                completeLevel();
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 2: Task Analysis Builder
+           ============================================================ */
+        function renderLevel2(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'l2-grid';
+
+            // Left column: available card actions pool
+            const pool = document.createElement('div');
+            pool.className = 'l2-pool';
+            pool.innerHTML = `<h5 style="font-size:11px; text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; color:var(--text-muted);">Available Actions</h5>`;
+
+            // Filter out cards that are already assigned to a step
+            const assignedCardIds = Object.values(GAME.state.l2_assignments);
+            const unassignedCards = L2_CARDS.filter(c => !assignedCardIds.includes(c.id));
+
+            unassignedCards.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'l2-card' + (card.isDistractor ? ' distractor' : '');
+                cardEl.draggable = true;
+                cardEl.id = card.id;
+                cardEl.textContent = card.text;
+
+                // HTML5 Drag Events
+                cardEl.addEventListener('dragstart', (e) => {
+                    draggedElement = cardEl;
+                    cardEl.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', cardEl.id);
+                });
+                cardEl.addEventListener('dragend', () => {
+                    cardEl.classList.remove('dragging');
+                });
+
+                // Tap match fallback
+                cardEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    pool.querySelectorAll('.l2-card').forEach(c => c.style.borderColor = '');
+                    cardEl.style.borderColor = 'var(--primary)';
+                    GAME.state.l2_selected_card = cardEl.id;
+                    toast("Action card selected. Tap a Step Slot on the right to assign.", "t-ok");
+                });
+
+                pool.appendChild(cardEl);
+            });
+
+            // Right column: step slots 1 to 6
+            const slotsContainer = document.createElement('div');
+            slotsContainer.className = 'l2-slots';
+
+            for (let i = 0; i < 6; i++) {
+                const stepNum = i + 1;
+                const slot = document.createElement('div');
+                slot.className = 'l2-slot-item';
+                slot.id = `step-slot-${i}`;
+                slot.innerHTML = `<span class="l2-slot-num">${stepNum}</span>`;
+
+                // HTML5 Drop Events
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    const cardId = e.dataTransfer.getData('text/plain');
+                    if (cardId) {
+                        assignL2CardToStep(cardId, i);
+                    }
+                });
+
+                // Mobile Click fallback match
+                slot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l2_selected_card) {
+                        assignL2CardToStep(GAME.state.l2_selected_card, i);
+                        GAME.state.l2_selected_card = null;
+                    }
+                });
+
+                // Render placed card if any
+                const cardIdPlaced = GAME.state.l2_assignments[i];
+                if (cardIdPlaced) {
+                    const card = L2_CARDS.find(c => c.id === cardIdPlaced);
+                    if (card) {
+                        const subChip = document.createElement('div');
+                        subChip.className = 'l2-placed-card';
+                        subChip.textContent = card.text;
+
+                        // Check answer highlights
+                        if (slot.classList.contains('wrong-slot')) {
+                            const correctExpectedCard = L2_CARDS[i];
+                            if (correctExpectedCard && correctExpectedCard.id === card.id) {
+                                subChip.classList.add('ok');
+                            } else {
+                                subChip.classList.add('bad');
+                                subChip.innerHTML += ` <span style="font-size:10px;">❌ Return</span>`;
+
+                                // Click to remove card
+                                subChip.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    delete GAME.state.l2_assignments[i];
+                                    toast(`Returned card to deck.`, "t-ok");
+                                    const z = document.getElementById('interactive-zone');
+                                    z.innerHTML = '';
+                                    renderL2(z);
+                                    saveGameState();
+                                });
+                            }
+                        }
+
+                        slot.appendChild(subChip);
+                    }
+                }
+
+                slotsContainer.appendChild(slot);
+            }
+
+            wrap.appendChild(pool);
+            wrap.appendChild(slotsContainer);
+            container.appendChild(wrap);
+        }
+
+        function assignL2CardToStep(cardId, stepIndex) {
+            // Remove this card if placed in another slot
+            for (const idx in GAME.state.l2_assignments) {
+                if (GAME.state.l2_assignments[idx] === cardId) {
+                    delete GAME.state.l2_assignments[idx];
+                }
+            }
+            GAME.state.l2_assignments[stepIndex] = cardId;
+            toast("Task step placed!", "t-ok");
+
+            const z = document.getElementById('interactive-zone');
+            z.innerHTML = '';
+            renderLevel2(z);
+
+            const count = Object.keys(GAME.state.l2_assignments).length;
+            updateLevelProgress((count / 6) * 100);
+            saveGameState();
+        }
+
+        function checkLevel2TaskAnalysis() {
+            const count = Object.keys(GAME.state.l2_assignments).length;
+            if (count < 6) {
+                showLevelFeedback(false, "Unfinished Flow", "Please assign actions to all 6 step slots before validating.");
+                toast("Please fill all slots!", "t-err");
+                return;
+            }
+
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            for (let i = 0; i < 6; i++) {
+                const slotEl = document.getElementById(`step-slot-${i}`);
+                slotEl.classList.remove('correct-slot', 'wrong-slot');
+
+                const placedCardId = GAME.state.l2_assignments[i];
+                const card = L2_CARDS.find(c => c.id === placedCardId);
+
+                // Check correct sequence mapping: L2_CARDS[0..5] are the correct sequence elements in order
+                const expectedCard = L2_CARDS[i];
+
+                if (card && expectedCard && card.id === expectedCard.id) {
+                    slotEl.classList.add('correct-slot');
+                    correctCount++;
+                } else {
+                    slotEl.classList.add('wrong-slot');
+                    wrongCount++;
+                }
+            }
+
+            if (wrongCount === 0) {
+                showLevelFeedback(true, "Perfect Task Flow!", "Excellent task analysis! You structured the sequence exactly to achieve the result download while ignoring distractor actions.");
+                completeLevel();
+            } else {
+                showLevelFeedback(false, "Flow Errors!", `You correctly arranged ${correctCount} out of 6 steps. Red slots indicate incorrect choices or distractors. Tap red cards to return them to the deck.`);
+                toast("Incorrect task sequence!", "t-err");
+
+                // Redraw to apply chip highlights
+                const z = document.getElementById('interactive-zone');
+                z.innerHTML = '';
+                renderLevel2(z);
+
+                const wrap = document.querySelector('.l2-grid');
+                wrap.classList.add('shake');
+                setTimeout(() => wrap.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 3: Metaphor Matching & Replacement
+           ============================================================ */
+        function renderLevel3(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'l3-matching-view';
+
+            // Left: Mockup panel with icons to match, and confusing icons to replace
+            const mockPanel = document.createElement('div');
+            mockPanel.className = 'l3-mockup-panel';
+            mockPanel.innerHTML = `<h5 style="font-size:11px; text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; color:var(--text-muted);">Interface Mockup</h5>`;
+
+            // Render standard icons and match slots
+            L3_PROBLEMS.forEach(prob => {
+                const row = document.createElement('div');
+                row.className = 'l3-mockup-row';
+
+                // Icon representation
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="l3-icon-box">${prob.icon}</span>
+                        <strong style="font-size:11.5px;">${prob.text}</strong>
+                    </div>
+                `;
+
+                // Matching Zone on the right of the row
+                const zone = document.createElement('div');
+                zone.className = 'l3-match-zone';
+                zone.id = prob.correctZone;
+                zone.innerHTML = `<span style="font-size:10px; color:#aaa; font-style:italic;">Drop Metaphor here</span>`;
+
+                // Drag/Drop events
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+                zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const cardId = e.dataTransfer.getData('text/plain');
+                    if (cardId) applyL3MetaphorMatch(cardId, prob.correctZone);
+                });
+
+                // Tap match fallback
+                zone.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l3_selected_chip && GAME.state.l3_selected_chip.startsWith('z')) {
+                        // The user clicked a descriptor chip to match
+                        applyL3MetaphorMatch(GAME.state.l3_selected_chip, prob.correctZone);
+                        GAME.state.l3_selected_chip = null;
+                    }
+                });
+
+                // Render match state if completed
+                const placedCardId = GAME.state.l3_matches[prob.correctZone];
+                if (placedCardId) {
+                    const zoneDef = L3_ZONES.find(z => z.id === placedCardId);
+                    if (zoneDef) {
+                        const chip = document.createElement('div');
+                        chip.className = 'l2-card';
+                        chip.style.width = '100%';
+                        chip.style.margin = '0';
+                        chip.textContent = zoneDef.title;
+
+                        if (zone.classList.contains('wrong-zone')) {
+                            chip.style.borderColor = 'var(--danger)';
+                            chip.style.background = 'var(--danger-light)';
+                        } else if (zone.classList.contains('correct-zone')) {
+                            chip.style.borderColor = 'var(--success)';
+                            chip.style.background = 'var(--success-light)';
+                        }
+
+                        zone.innerHTML = '';
+                        zone.appendChild(chip);
+                    }
+                }
+
+                row.appendChild(zone);
+                mockPanel.appendChild(row);
+            });
+
+            // Confusing Icons Section
+            const confusingHeader = document.createElement('div');
+            confusingHeader.style.cssText = "font-size:11px; text-transform:uppercase; border-top:1.5px solid var(--border-color); padding-top:12px; margin-top:8px; color:var(--text-muted); font-weight:700;";
+            confusingHeader.textContent = "Confusing Portal Metaphors";
+            mockPanel.appendChild(confusingHeader);
+
+            for (const key in L3_CONFUSING) {
+                const conf = L3_CONFUSING[key];
+                const row = document.createElement('div');
+                row.className = 'l3-mockup-row';
+
+                const isReplaced = GAME.state.l3_replaced.includes(key);
+                const currentIcon = isReplaced ? conf.target : conf.initial;
+                const activeHighlightClass = isReplaced ? 'replaced' : 'drop-replace';
+
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="l3-icon-box ${activeHighlightClass}" id="replace-${key}" data-replace="${key}">
+                            ${currentIcon}
+                        </div>
+                        <div>
+                            <strong style="font-size:11.5px; display:block;">${conf.label}</strong>
+                            <span style="font-size:9.5px; color:#888;">${isReplaced ? '✓ Correct metaphor applied' : 'Breaks expectaton. Drag/tap replacement.'}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Drop Events to replace
+                const dropBox = row.querySelector(`#replace-${key}`);
+                dropBox.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropBox.style.borderColor = 'var(--primary)';
+                });
+                dropBox.addEventListener('dragleave', () => {
+                    dropBox.style.borderColor = '';
+                });
+                dropBox.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropBox.style.borderColor = '';
+                    const replacementCardId = e.dataTransfer.getData('text/plain');
+                    if (replacementCardId) {
+                        applyIconReplacement(key, replacementCardId);
+                    }
+                });
+
+                // Tap match fallback
+                dropBox.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l3_selected_chip && (GAME.state.l3_selected_chip === 'repl-refresh' || GAME.state.l3_selected_chip === 'repl-shield')) {
+                        applyIconReplacement(key, GAME.state.l3_selected_chip);
+                        GAME.state.l3_selected_chip = null;
+                    } else if (!isReplaced) {
+                        toast("Confusing icon! Find 'Refresh Arrows' or 'Shield Lock' card to replace it.", "t-warn");
+                    }
+                });
+
+                mockPanel.appendChild(row);
+            }
+
+            // Right: Metaphors descriptors & Visual replacement options deck
+            const rightColumn = document.createElement('div');
+            rightColumn.className = 'match-column';
+
+            // Descriptors cards deck
+            const descriptorsDeck = document.createElement('div');
+            descriptorsDeck.className = 'l2-pool';
+            descriptorsDeck.innerHTML = `<h5 style="width:100%; font-size:11px; text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; color:var(--text-muted);">Metaphors Descriptors</h5>`;
+
+            // Filter out descriptors already placed
+            const matchedZoneIds = Object.values(GAME.state.l3_matches);
+            const remainingZones = L3_ZONES.filter(z => !matchedZoneIds.includes(z.id));
+
+            remainingZones.forEach(z => {
+                const chip = document.createElement('div');
+                chip.className = 'l2-card';
+                chip.draggable = true;
+                chip.id = z.id;
+                chip.textContent = z.title;
+
+                chip.addEventListener('dragstart', (e) => {
+                    draggedElement = chip;
+                    chip.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', chip.id);
+                });
+                chip.addEventListener('dragend', () => {
+                    chip.classList.remove('dragging');
+                });
+
+                chip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    descriptorsDeck.querySelectorAll('.l2-card').forEach(c => c.style.borderColor = '');
+                    chip.style.borderColor = 'var(--primary)';
+                    GAME.state.l3_selected_chip = chip.id;
+                    toast("Descriptor selected. Tap a matching grid row slot.", "t-ok");
+                });
+
+                descriptorsDeck.appendChild(chip);
+            });
+
+            // Replacement cards deck ( banana -> refresh, cloud -> shield)
+            const replacementsDeck = document.createElement('div');
+            replacementsDeck.className = 'l2-pool';
+            replacementsDeck.style.marginTop = '16px';
+            replacementsDeck.innerHTML = `<h5 style="width:100%; font-size:11px; text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; color:var(--text-muted);">Replacement Icons</h5>`;
+
+            const replCards = [
+                { id: "repl-refresh", text: "↻ Refresh Arrows" },
+                { id: "repl-shield", text: "🛡️🔒 Shield Lock" }
+            ];
+
+            replCards.forEach(card => {
+                const isRefreshUsed = GAME.state.l3_replaced.includes('r1') && card.id === 'repl-refresh';
+                const isShieldUsed = GAME.state.l3_replaced.includes('r2') && card.id === 'repl-shield';
+                const isUsed = isRefreshUsed || isShieldUsed;
+
+                const chip = document.createElement('div');
+                chip.className = 'l2-card' + (isUsed ? ' used' : '');
+                chip.style.borderColor = 'var(--accent, #2563eb)';
+                chip.style.borderLeftColor = 'var(--accent, #2563eb)';
+                chip.draggable = !isUsed;
+                chip.id = card.id;
+                chip.textContent = card.text;
+
+                if (!isUsed) {
+                    chip.addEventListener('dragstart', (e) => {
+                        draggedElement = chip;
+                        chip.classList.add('dragging');
+                        e.dataTransfer.setData('text/plain', chip.id);
+                    });
+                    chip.addEventListener('dragend', () => {
+                        chip.classList.remove('dragging');
+                    });
+                    chip.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        replacementsDeck.querySelectorAll('.l2-card').forEach(c => c.style.borderColor = '');
+                        chip.style.borderColor = 'var(--primary)';
+                        GAME.state.l3_selected_chip = card.id;
+                        toast("Replacement selected. Click the matching confusing icon to apply.", "t-ok");
+                    });
+                }
+
+                replacementsDeck.appendChild(chip);
+            });
+
+            rightColumn.appendChild(descriptorsDeck);
+            rightColumn.appendChild(replacementsDeck);
+
+            wrap.appendChild(mockPanel);
+            wrap.appendChild(rightColumn);
+            container.appendChild(wrap);
+        }
+
+        function applyL3MetaphorMatch(cardId, zoneId) {
+            for (const key in GAME.state.l3_matches) {
+                if (GAME.state.l3_matches[key] === cardId) {
+                    delete GAME.state.l3_matches[key];
+                }
+            }
+            GAME.state.l3_matches[zoneId] = cardId;
+            toast("Metaphor linked successfully!", "t-ok");
+
+            const z = document.getElementById('interactive-zone');
+            z.innerHTML = '';
+            renderLevel3(z);
+
+            const matchCount = Object.keys(GAME.state.l3_matches).length;
+            const replacedCount = GAME.state.l3_replaced.length;
+            updateLevelProgress(((matchCount + replacedCount) / 8) * 100);
+            saveGameState();
+        }
+
+        function applyIconReplacement(confusingKey, replacementId) {
+            const conf = L3_CONFUSING[confusingKey];
+
+            // Check if correct mapping
+            let isCorrect = false;
+            if (confusingKey === 'r1' && replacementId === 'repl-refresh') isCorrect = true;
+            if (confusingKey === 'r2' && replacementId === 'repl-shield') isCorrect = true;
+
+            if (isCorrect) {
+                GAME.state.l3_replaced.push(confusingKey);
+                toast("Metaphor Corrected!", "t-ok");
+
+                const z = document.getElementById('interactive-zone');
+                z.innerHTML = '';
+                renderLevel3(z);
+
+                const matchCount = Object.keys(GAME.state.l3_matches).length;
+                const replacedCount = GAME.state.l3_replaced.length;
+                updateLevelProgress(((matchCount + replacedCount) / 8) * 100);
+
+                if (matchCount + replacedCount === 8) {
+                    completeLevel();
+                }
+            } else {
+                toast("Suboptimal Metaphor!", "t-err");
+
+                const box = document.getElementById(`replace-${confusingKey}`);
+                box.classList.add('shake');
+                setTimeout(() => box.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        function checkLevel3Matching() {
+            const matchCount = Object.keys(GAME.state.l3_matches).length;
+            const replacedCount = GAME.state.l3_replaced.length;
+
+            if (matchCount < 6 || replacedCount < 2) {
+                showLevelFeedback(false, "Unfinished Metaphors", "Please complete all 6 matches and 2 icon replacements before checking.");
+                toast("Please match/replace all items!", "t-err");
+                return;
+            }
+
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            L3_PROBLEMS.forEach(prob => {
+                const zoneElement = document.getElementById(prob.correctZone);
+                const placedCardId = GAME.state.l3_matches[prob.correctZone];
+
+                zoneElement.classList.remove('correct-zone', 'wrong-zone');
+
+                if (placedCardId === prob.correctZone) {
+                    zoneElement.classList.add('correct-zone');
+                    correctCount++;
+                } else {
+                    zoneElement.classList.add('wrong-zone');
+                    wrongCount++;
+                }
+            });
+
+            if (wrongCount === 0) {
+                showLevelFeedback(true, "All Metaphors Correct!", "Splendid work! Utilizing clear, real-world metaphors helps align interfaces with standard human expectations.");
+                completeLevel();
+            } else {
+                showLevelFeedback(false, "Metaphor Errors!", `You correctly matched ${correctCount} out of 6 standard icon guidelines. Incorrect items are highlighted in red.`);
+                toast("Incorrect matching!", "t-err");
+
+                // Redraw to show correct/wrong state colors
+                const z = document.getElementById('interactive-zone');
+                z.innerHTML = '';
+                renderLevel3(z);
+
+                const wrap = document.querySelector('.l3-matching-view');
+                wrap.classList.add('shake');
+                setTimeout(() => wrap.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 4: Choose the Right User Involvement Method
+           ============================================================ */
+        function renderLevel4(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'match-container';
+
+            // Left: Draggable Pool (Methods & Scenarios)
+            const pool = document.createElement('div');
+            pool.className = 'match-column';
+            pool.innerHTML = `<h5 style="font-size:11px; text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; color:var(--text-muted);">Research Cards</h5>`;
+
+            // Filter out cards already placed in bins
+            const placedCardIds = Object.keys(GAME.state.l4_assignments);
+            const remainingCards = L4_CARDS.filter(c => !placedCardIds.includes(c.id));
+
+            remainingCards.forEach(card => {
+                const chip = document.createElement('div');
+                chip.className = 'match-problem-chip';
+                chip.draggable = true;
+                chip.id = card.id;
+                chip.textContent = card.text;
+
+                if (card.isScenario) {
+                    chip.style.borderLeftColor = 'var(--warning)';
+                    chip.style.fontSize = '11px';
+                } else {
+                    chip.style.borderLeftColor = 'var(--accent, #2563eb)';
+                }
+
+                // HTML5 Drag Events
+                chip.addEventListener('dragstart', (e) => {
+                    draggedElement = chip;
+                    chip.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', chip.id);
+                });
+                chip.addEventListener('dragend', () => {
+                    chip.classList.remove('dragging');
+                });
+
+                // Tap match fallback
+                chip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    pool.querySelectorAll('.match-problem-chip').forEach(c => c.style.borderColor = '');
+                    chip.style.borderColor = 'var(--primary)';
+                    GAME.state.l4_selected_card = chip.id;
+                    toast("Selected! Tap a folder category on the right to sort.", "t-ok");
+                });
+
+                pool.appendChild(chip);
+            });
+
+            // Right: Bins
+            const binsContainer = document.createElement('div');
+            binsContainer.className = 'match-column';
+            binsContainer.innerHTML = `<h5 style="font-size:11px; text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; color:var(--text-muted);">Categories</h5>`;
+
+            const binsInner = document.createElement('div');
+            binsInner.className = 'classify-bins';
+
+            L4_BINS.forEach(bin => {
+                const binEl = document.createElement('div');
+                binEl.className = `classify-bin ${bin.color}`;
+                binEl.id = `bin-${bin.id}`;
+                binEl.innerHTML = `<h5>${bin.title}</h5>`;
+
+                const chipsWrap = document.createElement('div');
+                chipsWrap.className = 'bin-chips';
+                chipsWrap.id = `bc-${bin.id}`;
+                binEl.appendChild(chipsWrap);
+
+                // HTML5 Drop Events
+                binEl.addEventListener('dragover', (e) => { e.preventDefault(); binEl.classList.add('drag-over'); });
+                binEl.addEventListener('dragleave', () => binEl.classList.remove('drag-over'));
+                binEl.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    binEl.classList.remove('drag-over');
+                    const cardId = e.dataTransfer.getData('text/plain');
+                    if (cardId) applyL4Classification(cardId, bin.id);
+                });
+
+                // Mobile click fallback
+                binEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l4_selected_card) {
+                        applyL4Classification(GAME.state.l4_selected_card, bin.id);
+                        GAME.state.l4_selected_card = null;
+                    }
+                });
+
+                // Populating chips inside this bin
+                for (const cardId in GAME.state.l4_assignments) {
+                    if (GAME.state.l4_assignments[cardId] === bin.id) {
+                        const card = L4_CARDS.find(c => c.id === cardId);
+                        if (card) {
+                            const subChip = document.createElement('div');
+                            subChip.className = 'bin-chip';
+                            subChip.textContent = card.text;
+
+                            if (binEl.classList.contains('wrong-bin')) {
+                                if (card.cat === bin.id) {
+                                    subChip.classList.add('ok');
+                                } else {
+                                    subChip.classList.add('bad');
+                                    subChip.innerHTML += ` <span style="font-size:10px;">❌ Return</span>`;
+
+                                    subChip.addEventListener('click', (e) => {
+                                        e.stopPropagation();
+                                        delete GAME.state.l4_assignments[cardId];
+                                        toast("Card returned.", "t-ok");
+                                        const z = document.getElementById('interactive-zone');
+                                        z.innerHTML = '';
+                                        renderLevel4(z);
+                                        saveGameState();
+                                    });
+                                }
+                            }
+
+                            chipsWrap.appendChild(subChip);
+                        }
+                    }
+                }
+
+                binsInner.appendChild(binEl);
+            });
+
+            binsContainer.appendChild(binsInner);
+            wrap.appendChild(pool);
+            wrap.appendChild(binsContainer);
+            container.appendChild(wrap);
+        }
+
+        function applyL4Classification(cardId, binId) {
+            GAME.state.l4_assignments[cardId] = binId;
+            toast("Involvement card sorted!", "t-ok");
+
+            const z = document.getElementById('interactive-zone');
+            z.innerHTML = '';
+            renderLevel4(z);
+
+            const count = Object.keys(GAME.state.l4_assignments).length;
+            updateLevelProgress((count / 12) * 100);
+            saveGameState();
+        }
+
+        function checkLevel4Involvement() {
+            const count = Object.keys(GAME.state.l4_assignments).length;
+            if (count < 12) {
+                showLevelFeedback(false, "Unfinished Classify", "Please sort all 12 cards before validation.");
+                toast("Sort all cards!", "t-err");
+                return;
+            }
+
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            L4_BINS.forEach(bin => {
+                const binEl = document.getElementById(`bin-${bin.id}`);
+                binEl.className = `classify-bin ${bin.color}`; // Reset wrong highlights
+
+                let binHasError = false;
+                let cardsPlaced = 0;
+
+                for (const cardId in GAME.state.l4_assignments) {
+                    if (GAME.state.l4_assignments[cardId] === bin.id) {
+                        cardsPlaced++;
+                        const card = L4_CARDS.find(c => c.id === cardId);
+                        if (card && card.cat === bin.id) {
+                            correctCount++;
+                        } else {
+                            binHasError = true;
+                            wrongCount++;
+                        }
+                    }
+                }
+
+                if (binHasError || cardsPlaced === 0) {
+                    binEl.classList.add('wrong-bin');
+                } else {
+                    binEl.classList.add('correct-bin');
+                }
+            });
+
+            if (wrongCount === 0) {
+                showLevelFeedback(true, "All Research Methods Classified!", "Splendid work! Choosing between direct observations (face-to-face feedback) and indirect proxy records is fundamental depending on scope and scale.");
+                completeLevel();
+            } else {
+                showLevelFeedback(false, "Classification Errors!", `You correctly categorized ${correctCount} out of 12 items. Red-outlined folders contain mismatched cards. Tap red cards to return them.`);
+                toast("Mismatched categories!", "t-err");
+
+                const z = document.getElementById('interactive-zone');
+                z.innerHTML = '';
+                renderLevel4(z);
+
+                const wrap = document.querySelector('.match-container');
+                wrap.classList.add('shake');
+                setTimeout(() => wrap.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL 5: Final Human-Centered Redesign Mission
+           ============================================================ */
+        function renderLevel5(container) {
+            const wrap = document.createElement('div');
+            wrap.className = 'l5-layout';
+
+            const f1Active = GAME.state.l5_fixed.includes('t1');
+            const f2Active = GAME.state.l5_fixed.includes('t2');
+            const f3Active = GAME.state.l5_fixed.includes('t3');
+            const f4Active = GAME.state.l5_fixed.includes('t4');
+            const f5Active = GAME.state.l5_fixed.includes('t5');
+            const f6Active = GAME.state.l5_fixed.includes('t6');
+            const f7Active = GAME.state.l5_fixed.includes('t7');
+            const f8Active = GAME.state.l5_fixed.includes('t8');
+
+            const s1HTML = f1Active ? '<span style="color:var(--success); font-weight:700;">🏠 Home > 📚 Academics > 📝 Redesign</span>' : '<span style="color:#aaa;">(No orientation trail path shown at header)</span>';
+            const s2HTML = f2Active ? '👤 Profile | 📚 Academics | 💳 Finance' : '⬡ | ⬡ | ⬡ (Abstract menu symbols)';
+            const s3HTML = f3Active ? '<div style="background:var(--success-light); border:1px solid var(--success); padding:6px; color:#1e5a52; border-radius:4px; font-weight:700;">✓ Registration Task Flow: Open Portal → Login → Enroll</div>' : 'Registration Flow: Stacked list elements scattered';
+            const s4HTML = f4Active ? '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"><div>Enrolments</div><div>Grades</div></div>' : 'Enrolments (left margins staggered, cards unaligned)';
+            const s5HTML = f5Active ? '<button class="btn btn-primary" style="font-size:10px; padding:4px 8px;">Save Settings</button>' : '<button style="border:3px double red;">Save Settings</button>';
+            const s6HTML = f6Active ? '<span style="font-size:11px;">Update preferences below</span>' : '<span style="font-size:8px;">Do It</span>';
+
+            let s7HTML = '';
+            if (f7Active) {
+                s7HTML = `
+                    <div style="background:var(--primary); color:#fff; text-align:center; padding:10px; font-weight:700; border-radius:4px; margin-bottom:8px;">
+                        🎯 PRIMARY TASK: REGISTRATION OPEN NOW
+                    </div>
+                `;
+            }
+
+            const s8HTML = f8Active ? '<div style="background:var(--success-light); border:1px solid var(--success); color:#1e5a52; padding:4px; font-size:10px; font-weight:600;">✓ Profile saved successfully!</div>' : 'Save Details (silent click action)';
+
+            // Portal Redesign Visual
+            wrap.innerHTML = `
+                <div class="portal-preview" id="l5-portal-redesign">
+                    <!-- s7: registration CTA placed higher -->
+                    ${s7HTML}
+
+                    <div class="portal-ui">
+                        <div class="portal-header">
+                            <!-- s1: Breadcrumb location trail -->
+                            <div class="l5-slot ${f1Active ? 'resolved' : ''}" id="slot-t1" data-slot="t1" style="flex:1;">
+                                ${s1HTML}
+                            </div>
+                        </div>
+
+                        <!-- s2: Sidebar menu unique icons -->
+                        <div class="portal-sidebar l5-slot ${f2Active ? 'resolved' : ''}" id="slot-t2" data-slot="t2" style="font-size:9.5px; gap:8px;">
+                            ${s2HTML}
+                        </div>
+
+                        <div class="portal-main">
+                            <!-- s6: metaphor descriptors labels -->
+                            <div class="l5-slot ${f6Active ? 'resolved' : ''}" id="slot-t6" data-slot="t6">
+                                ${s6HTML}
+                            </div>
+
+                            <!-- s4: Layout alignment grid -->
+                            <div class="l5-slot ${f4Active ? 'resolved' : ''}" id="slot-t4" data-slot="t4">
+                                ${s4HTML}
+                            </div>
+
+                            <!-- s3: Simplified task flow -->
+                            <div class="l5-slot ${f3Active ? 'resolved' : ''}" id="slot-t3" data-slot="t3">
+                                ${s3HTML}
+                            </div>
+
+                            <!-- s5: buttons consistency styling -->
+                            <div class="l5-slot ${f5Active ? 'resolved' : ''}" id="slot-t5" data-slot="t5" style="text-align:center;">
+                                ${s5HTML}
+                            </div>
+
+                            <!-- s8: save feedback confirmation alert -->
+                            <div class="l5-slot ${f8Active ? 'resolved' : ''}" id="slot-t8" data-slot="t8" style="text-align:center;">
+                                ${s8HTML}
+                            </div>
+
+                            <!-- s7 distractor hidden CTA in disclaimers footer -->
+                            ${!f7Active ? `
+                                <div class="l5-slot" id="slot-t7" data-slot="t7">
+                                    <span style="font-size:9px; color:#888;">Welcome disclaimer agreements scroll to click:</span>
+                                    <div style="background:#ddd; padding:4px; text-align:center; font-weight:700;">REGISTRATION OPEN NOW</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="l5-fix-deck" id="l5-deck">
+                    <h5 style="font-size:11px; text-transform:uppercase; border-bottom:1.5px solid var(--border-color); padding-bottom:4px; color:var(--text-muted);">Consultant Fix Cards</h5>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        ${L5_FIX_DECK.map(fix => {
+                const isUsed = GAME.state.l5_fixed.some(key => L5_PROBLEMS[key].fixId === fix.id);
+                return `
+                                <div class="l5-fix-card ${isUsed ? 'used' : ''}" draggable="${!isUsed}" id="${fix.id}" data-fix="${fix.id}">
+                                    ${fix.label}
+                                </div>
+                            `;
+            }).join('')}
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(wrap);
+
+            // HTML5 Drag Events for Deck
+            wrap.querySelectorAll('.l5-fix-card:not(.used)').forEach(card => {
+                card.addEventListener('dragstart', (e) => {
+                    draggedElement = card;
+                    card.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', card.id);
+                });
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+
+                // Mobile click-to-match fallback
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    wrap.querySelectorAll('.l5-fix-card').forEach(c => c.style.borderColor = '');
+                    card.style.borderColor = 'var(--primary)';
+                    GAME.state.l5_selected_card = card.id;
+                    toast("Fix card selected. Tap a highlighted slot in the mockup.", "t-ok");
+                });
+            });
+
+            // HTML5 Drag Events for Mockup slots
+            wrap.querySelectorAll('.l5-slot:not(.resolved)').forEach(slot => {
+                const slotKey = slot.getAttribute('data-slot');
+
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    const fixId = e.dataTransfer.getData('text/plain');
+                    if (fixId) {
+                        applyL5Fix(slotKey, fixId, slot);
+                    }
+                });
+
+                // Mobile Tap Match
+                slot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (GAME.state.l5_selected_card) {
+                        applyL5Fix(slotKey, GAME.state.l5_selected_card, slot);
+                        GAME.state.l5_selected_card = null;
+                    } else {
+                        const prob = L5_PROBLEMS[slotKey];
+                        toast(`Selected: ${prob.name}. Drag matching Fix card.`, "t-warn");
+                    }
+                });
+            });
+
+            // Miss clicks
+            wrap.querySelector('#l5-portal-redesign').addEventListener('click', (e) => {
+                if (e.target.closest('.l5-slot')) return;
+
+                e.stopPropagation();
+                showLevelFeedback(false, "Symmetrical Element!", "This mockup area matches standards. Drag HCD Fix cards directly onto the dotted border slots.");
+                toast("Wrong spot!", "t-err");
+
+                const p = wrap.querySelector('#l5-portal-redesign');
+                p.classList.add('shake');
+                setTimeout(() => p.classList.remove('shake'), 500);
+                saveGameState();
+            });
+        }
+
+        function applyL5Fix(slotKey, fixId, slotElement) {
+            const prob = L5_PROBLEMS[slotKey];
+            const isCorrect = (prob.fixId === fixId);
+
+            if (isCorrect) {
+                GAME.state.l5_fixed.push(slotKey);
+                showLevelFeedback(true, `Redesign Success!`, `Correctly applied fix to: ${prob.name}.`);
+                toast("Redesign success!", "t-ok");
+
+                // Redraw Level 5 UI
+                const z = document.getElementById('interactive-zone');
+                z.innerHTML = '';
+                renderLevel5(z);
+
+                const progressPct = (GAME.state.l5_fixed.length / 8) * 100;
+                updateLevelProgress(progressPct);
+
+                if (GAME.state.l5_fixed.length === 8) {
+                    completeLevel();
+                }
+            } else {
+                showLevelFeedback(false, "Suboptimal Redesign Fix!", `This HCD Fix doesn't address: "${prob.desc}".`);
+                toast("Incorrect fix!", "t-err");
+
+                const mockup = document.getElementById('l5-portal-redesign');
+                mockup.classList.add('shake');
+                setTimeout(() => mockup.classList.remove('shake'), 500);
+            }
+            saveGameState();
+        }
+
+        /* ============================================================
+           LEVEL VALIDATION & CONTROL ROUTING
+           ============================================================ */
+        function checkLevelAnswer() {
+            if (GAME.currentLevel === 2) {
+                checkLevel2TaskAnalysis();
+            } else if (GAME.currentLevel === 3) {
+                checkLevel3Matching();
+            } else if (GAME.currentLevel === 4) {
+                checkLevel4Involvement();
+            }
+        }
+
+        function showLevelFeedback(success, title, msg) {
+            const panel = document.getElementById('feedback-panel');
+            panel.style.display = 'block';
+            panel.className = 'fb-box ' + (success ? 'correct' : 'wrong');
+            document.getElementById('feedback-title').textContent = (success ? '✅ ' : '❌ ') + title;
+            document.getElementById('feedback-body').innerHTML = msg;
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function updateObservation() {
+            const obsEl = document.getElementById('observation-panel');
+            let insight = "";
+
+            if (GAME.currentLevel === 1) {
+                insight = "<strong>Consultant's Insight:</strong> Users expect familiar patterns. Placing buttons in non-obvious locations and using abstract icons breaks mental models and delays tasks.";
+            } else if (GAME.currentLevel === 2) {
+                insight = "<strong>Consultant's Insight:</strong> Task analysis decomposes goals into minimal steps. Avoiding distractor actions prevents visual clutter and confusion.";
+            } else if (GAME.currentLevel === 3) {
+                insight = "<strong>Consultant's Insight:</strong> Using familiar metaphors (Trash, Home, Folder) matches user expectations. Confusing metaphors (bananas for refresh) must be replaced.";
+            } else if (GAME.currentLevel === 4) {
+                insight = "<strong>Consultant's Insight:</strong> Direct involvement (observation, testing) captures deep qualitative blockages. Indirect involvement (surveys, tickets) gathers high-scale feedback.";
+            } else if (GAME.currentLevel === 5) {
+                insight = "<strong>Consultant's Insight:</strong> Optimal HCD portals provide breadcrumbs, unique labeled icons, clear grid structures, visible primary actions, and confirmation save alerts.";
+            }
+
+            obsEl.innerHTML = insight;
+        }
+
+        function showResults() {
+            document.getElementById('main-workspace').style.display = 'none';
+            document.getElementById('sidebar-notebook').style.display = 'none';
+            document.getElementById('theory-container').style.display = 'none';
+
+            const resContainer = document.getElementById('results-container');
+            resContainer.style.display = 'block';
+
+            const badgeTitle = "Human-Centered UX Expert";
+            const badgeIcon = "🏆";
+            const badgeDesc = "Excellent! You completed all HCD consulting review levels and verified standard standards and user research alignments.";
+
+            document.getElementById('res-badge').textContent = badgeIcon;
+            document.getElementById('res-title').textContent = badgeTitle;
+            document.getElementById('res-subtitle').textContent = badgeDesc;
+
+            resContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>
