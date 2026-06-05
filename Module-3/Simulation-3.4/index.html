@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 3.4 — Lookup & Feedback Patterns</title>
+
+    <!-- Typography & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+    <style>
+        :root {
+            --red-primary: #C0302B;
+            --red-hover: #A52520;
+            --red-light: #E8534E;
+            --red-dark: #8B1A16;
+            --red-pale: #FDECEA;
+            --red-border: rgba(192, 48, 43, 0.2);
+            --white: #FFFFFF;
+            --bg-light: #FAFAFA;
+            --bg-card: #FFFFFF;
+            --text-main: #2D2D2D;
+            --text-muted: #666666;
+            --border-color: rgba(192, 48, 43, 0.15);
+
+            --success-bg: #EDF7EE;
+            --success-text: #1B5E20;
+            --success-border: #A5D6A7;
+
+            --error-bg: #FDECEA;
+            --error-text: #7F1010;
+            --error-border: #FFCDD2;
+
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ── HEADER & TOP NAVIGATION ── */
+        header {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(192, 48, 43, 0.04);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red-primary);
+        }
+
+        .logo i {
+            font-size: 22px;
+        }
+
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-pill {
+            background-color: var(--red-pale);
+            color: var(--red-dark);
+            border: 1px solid var(--red-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── PROGRESS STEPPER ── */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .step-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .step-item.active .step-circle {
+            border-color: var(--red-primary);
+            background-color: var(--red-primary);
+            color: var(--white);
+        }
+
+        .step-item.active .step-label {
+            color: var(--red-primary);
+            font-weight: 600;
+        }
+
+        .step-item.completed .step-circle {
+            background-color: var(--red-pale);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+        }
+
+        .step-item.completed .step-label {
+            color: var(--text-main);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+        }
+
+        .step-line.completed {
+            background-color: var(--red-primary);
+        }
+
+        /* ── MAIN LAYOUT GRID ── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(192, 48, 43, 0.02);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--red-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .task-box {
+            background: var(--red-pale);
+            border-left: 4px solid var(--red-primary);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .task-box strong {
+            color: var(--red-dark);
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--red-primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--red-hover);
+        }
+
+        .btn-primary:disabled {
+            background-color: #E0E0E0;
+            color: #9E9E9E;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--red-primary);
+            border: 1px solid var(--red-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--red-pale);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* ── INTERACTIVE WORKSPACE PANELS ── */
+        .workspace-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workspace-tag {
+            font-size: 11px;
+            background-color: var(--red-pale);
+            color: var(--red-dark);
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid var(--red-border);
+        }
+
+        /* ── LEVEL-SPECIFIC UI ELEMENTS ── */
+
+        /* Level 1: Autocomplete Search */
+        .search-stage {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper i {
+            position: absolute;
+            left: 12px;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .search-input-field {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            font-size: 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .search-input-field:focus {
+            border-color: var(--red-primary);
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            z-index: 10;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .suggestions-dropdown.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 8px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(192, 48, 43, 0.05);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background-color: var(--red-pale);
+        }
+
+        .suggestion-highlight {
+            font-weight: 700;
+            color: var(--red-primary);
+            text-decoration: underline;
+        }
+
+        /* Level 2: Forgiving Input Form */
+        .forgiving-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .forgiving-group {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            background-color: var(--white);
+        }
+
+        .forgiving-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .forgiving-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .forgiving-input {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .forgiving-input:focus {
+            border-color: var(--red-primary);
+        }
+
+        .input-status-text {
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .input-status-text.success {
+            display: inline-flex;
+            color: var(--success-text);
+        }
+
+        .input-status-text.error {
+            display: inline-flex;
+            color: var(--error-text);
+        }
+
+        /* Level 3: Signup Inline Validation */
+        .inline-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .inline-group {
+            position: relative;
+        }
+
+        .inline-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .inline-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .inline-input {
+            width: 100%;
+            padding: 8px 32px 8px 10px;
+            font-size: 13px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .inline-input.valid {
+            border-color: #2E7D32;
+            background-color: #EDF7EE;
+        }
+
+        .inline-input.invalid {
+            border-color: #C62828;
+            background-color: #FDECEA;
+        }
+
+        .validation-icon {
+            position: absolute;
+            right: 10px;
+            font-size: 16px;
+            display: none;
+        }
+
+        .inline-input.valid+.validation-icon {
+            display: block;
+            color: #2E7D32;
+        }
+
+        .inline-input.invalid+.validation-icon {
+            display: block;
+            color: #C62828;
+        }
+
+        .validation-message {
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .inline-input.valid~.validation-message {
+            display: block;
+            color: #2E7D32;
+        }
+
+        .inline-input.invalid~.validation-message {
+            display: block;
+            color: #C62828;
+        }
+
+        /* Level 4: Password Strength Meter */
+        .pw-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .pw-strength-bar-container {
+            background-color: #E0E0E0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .pw-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+            border-radius: 4px;
+        }
+
+        .pw-strength-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .pw-checklist {
+            list-style: none;
+            margin-top: 8px;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+
+        .pw-check-item {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .pw-check-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .pw-check-item.met {
+            color: #2E7D32;
+            font-weight: 500;
+        }
+
+        .pw-check-item.met i {
+            color: #2E7D32;
+        }
+
+        /* Level 5: Decision Challenge */
+        .decision-row {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .decision-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .decision-select {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            font-family: inherit;
+            min-width: 140px;
+        }
+
+        .decision-select:focus {
+            border-color: var(--red-primary);
+        }
+
+        /* ── FEEDBACK PANEL ── */
+        .feedback-panel {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .feedback-panel.success {
+            display: flex;
+            background-color: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success-text);
+        }
+
+        .feedback-panel.error {
+            display: flex;
+            background-color: var(--error-bg);
+            border-color: var(--error-border);
+            color: var(--error-text);
+        }
+
+        .feedback-panel i {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .feedback-content h5 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feedback-content p {
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        /* Hint box */
+        .hint-box {
+            display: none;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--red-primary);
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .hint-box.active {
+            display: flex;
+        }
+
+        .hint-box i {
+            color: var(--red-primary);
+            font-size: 16px;
+        }
+
+        /* ── SCREEN CONTROLS (INTRO & END) ── */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .intro-screen,
+        .end-screen {
+            text-align: center;
+            max-width: 580px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(192, 48, 43, 0.03);
+        }
+
+        .intro-screen h2,
+        .end-screen h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--red-dark);
+            margin-bottom: 12px;
+        }
+
+        .intro-screen p,
+        .end-screen p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .learn-bullet-list {
+            text-align: left;
+            margin: 18px 0;
+            padding-left: 20px;
+        }
+
+        .learn-bullet-list li {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        /* Star ratings */
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin: 16px 0;
+        }
+
+        .star-icon {
+            font-size: 28px;
+            color: #E0E0E0;
+        }
+
+        .star-icon.active {
+            color: #FFB300;
+        }
+
+        /* Badges */
+        .badge-award {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--red-pale);
+            border: 2px solid var(--red-primary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .badge-icon {
+            font-size: 48px;
+            color: var(--red-primary);
+            margin-bottom: 8px;
+        }
+
+        .badge-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red-dark);
+        }
+
+        .badge-level {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* ── THEORY ACCORDION (End Screen) ── */
+        .theory-accordion {
+            margin-top: 24px;
+            text-align: left;
+        }
+
+        .theory-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .theory-header {
+            background-color: var(--bg-light);
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .theory-header:hover {
+            background-color: var(--red-pale);
+        }
+
+        .theory-body {
+            display: none;
+            padding: 12px 14px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .theory-body.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Top header -->
+        <header>
+            <div class="logo">
+                <i class="ti ti-heart-rate-monitor"></i>
+                <span>Simulation 3.4 — Lookup & Feedback Patterns</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-pill" title="Score Points">
+                    <i class="ti ti-award"></i>
+                    <span id="score-counter">Score: 0</span>
+                </div>
+                <div class="stat-pill" title="Level Progress">
+                    <i class="ti ti-steps"></i>
+                    <span id="progress-indicator">L1 / L5</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ── SCREEN 1: INTRO SCREEN ── -->
+        <div id="intro-screen" class="screen active">
+            <div class="intro-screen">
+                <i class="ti ti-database-search"
+                    style="font-size: 52px; color: var(--red-primary); margin-bottom: 12px; display: inline-block;"></i>
+                <h2>Lookup & Feedback Patterns</h2>
+                <p>
+                    Help users find valid data quickly and provide immediate validation to avoid mistakes before form
+                    submission:
+                </p>
+                <ul class="learn-bullet-list">
+                    <li><strong>Autocomplete & Search Suggest</strong>: Reduce typing effort and steer queries toward
+                        matching items.</li>
+                    <li><strong>Forgiving Formats</strong>: Standardize variable format entries automatically rather
+                        than erroring instantly.</li>
+                    <li><strong>Inline Form Validation</strong>: Point out missing requirements or field formats in real
+                        time.</li>
+                    <li><strong>Password Meters</strong>: Encourage secure accounts instead of rejecting weak
+                        submissions post-facto.</li>
+                    <li><strong>Feedback States</strong>: Align confirmation alerts, errors, and spinners to correct
+                        system statuses.</li>
+                </ul>
+                <p style="font-size: 12px; font-weight: 500; color: var(--red-primary);">
+                    Scoring: Correct: +10 pts | Mistake: -3 pts | Hint: -2 pts. Complete all levels to win the badge!
+                </p>
+                <button class="btn btn-primary" onclick="startSimulation()">Start Simulation</button>
+            </div>
+        </div>
+
+        <!-- ── SCREEN 2: PLAYING SCREEN ── -->
+        <div id="playing-screen" class="screen">
+
+            <!-- Progress Stepper -->
+            <div class="stepper">
+                <div class="step-item active" id="step-1" onclick="jumpToLevel(1)">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Autocomplete</div>
+                </div>
+                <div class="step-line" id="line-1"></div>
+                <div class="step-item" id="step-2" onclick="jumpToLevel(2)">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Forgiving Format</div>
+                </div>
+                <div class="step-line" id="line-2"></div>
+                <div class="step-item" id="step-3" onclick="jumpToLevel(3)">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Inline Validate</div>
+                </div>
+                <div class="step-line" id="line-3"></div>
+                <div class="step-item" id="step-4" onclick="jumpToLevel(4)">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Password Meter</div>
+                </div>
+                <div class="step-line" id="line-4"></div>
+                <div class="step-item" id="step-5" onclick="jumpToLevel(5)">
+                    <div class="step-circle">5</div>
+                    <div class="step-label">Decision Match</div>
+                </div>
+            </div>
+
+            <!-- Main Workspace Grid -->
+            <div class="main-grid">
+
+                <!-- Left Column: Instructions & Level Info -->
+                <div>
+                    <div class="card">
+                        <div class="card-title">
+                            <span id="level-title-id">Level 1</span>: <span id="level-title-name">Autocomplete Search
+                                Challenge</span>
+                        </div>
+
+                        <div class="level-desc" id="level-description-text">
+                            Predictive text search matches keystrokes with existing records in real time. Choose matched
+                            suggestions to accelerate search tasks.
+                        </div>
+
+                        <div class="task-box" id="level-task-box">
+                            <!-- Dynamic task text here -->
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="revealHint()"><i class="ti ti-bulb"></i> Request
+                                Hint</button>
+                            <button class="btn btn-secondary" onclick="resetLevel()"><i class="ti ti-refresh"></i> Reset
+                                Level</button>
+                        </div>
+
+                        <!-- Inline hint drawer -->
+                        <div class="hint-box" id="hint-drawer">
+                            <i class="ti ti-info-circle"></i>
+                            <span id="hint-text">This is a level hint.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Sandbox Workspace -->
+                <div>
+                    <div class="card" style="min-height: 350px;">
+                        <div class="workspace-title">
+                            <span>Interactive Workspace</span>
+                            <span class="workspace-tag">Sandbox</span>
+                        </div>
+
+                        <!-- Dynamic Workspace content container -->
+                        <div id="sandbox-content">
+                            <!-- Dynamic content loaded via JS -->
+                        </div>
+
+                        <!-- Shared feedback panel inside the playing workspace -->
+                        <div class="feedback-panel" id="action-feedback">
+                            <i class="ti ti-circle-check" id="feedback-icon"></i>
+                            <div class="feedback-content">
+                                <h5 id="feedback-title">Title</h5>
+                                <p id="feedback-text">Detailed message feedback explaining usability guidelines.</p>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Action navigation -->
+                        <div
+                            style="margin-top: 24px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <button class="btn btn-primary" id="next-level-btn" onclick="goToNextLevel()" disabled>
+                                Next Level <i class="ti ti-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── SCREEN 3: END/SCOREBOARD SCREEN ── -->
+        <div id="end-screen" class="screen">
+            <div class="end-screen">
+                <i class="ti ti-trophy"
+                    style="font-size: 56px; color: var(--red-primary); margin-bottom: 12px; display: inline-block;"></i>
+                <h2>Simulation Completed!</h2>
+                <p>Here is your performance summary for Lookup & Feedback Patterns.</p>
+
+                <!-- Badge Award Box -->
+                <div class="badge-award">
+                    <i class="ti ti-certificate" id="earned-badge-icon" class="badge-icon"
+                        style="font-size: 48px; margin-bottom: 8px;"></i>
+                    <div class="badge-title" id="earned-badge-name">Feedback Master</div>
+                    <div class="badge-level" id="earned-badge-level">Gold Tier</div>
+                </div>
+
+                <!-- Stars rating -->
+                <div class="stars-container" id="stars-row">
+                    <!-- Render stars dynamic -->
+                </div>
+
+                <p style="font-weight: 600; font-size: 16px; color: var(--text-main);" id="final-score-text">
+                    Final Score: 0 points
+                </p>
+
+                <button class="btn btn-primary" style="margin-top: 10px;" onclick="retrySimulation()">
+                    <i class="ti ti-refresh"></i> Retry Simulation
+                </button>
+
+                <!-- Clear Learning Summary Accordion -->
+                <div class="theory-accordion">
+                    <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--text-main);">What You Learned Summary:
+                    </h3>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(0)">
+                            1. Predictive Lookups (Autocomplete)
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-0">
+                            Autocomplete assists users in spelling queries correctly and entering pre-verified terms. By
+                            showing matched options in a dropdown, it speeds up query processes and prevents zero-result
+                            outcomes.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(1)">
+                            2. Forgiving Inputs vs Strict Rejection
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-1">
+                            Accepting data in varied format permutations (e.g. phone spacing or date separators)
+                            improves onboarding conversions. Rather than rejecting inputs instantly, parsing algorithms
+                            should normalize entry strings silently behind the scenes.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(2)">
+                            3. Inline Verification Toggles
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-2">
+                            Inline validation monitors input compliance dynamically. Checking rules immediately guides
+                            correct password and string syntax before submission actions, which prevents page-level form
+                            rejection states.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(3)">
+                            4. Feedback State Suitability
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-3">
+                            Selecting correct feedback patterns prevents critical operations from being confusing.
+                            Spinning loading states confirm page tasks, dialogue warnings intercept destructive actions,
+                            and confirmation toasts validate success states.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Interactive simulation script -->
+    <script>
+        // Game state
+        let state = {
+            currentLevel: 1,
+            score: 0,
+            maxUnlockedLevel: 1,
+            levelCompleted: [false, false, false, false, false, false], // 1-indexed
+            hintUsed: [false, false, false, false, false, false],
+            mistakesCount: [0, 0, 0, 0, 0, 0],
+            levelData: {
+                1: {
+                    title: "Autocomplete Search Challenge",
+                    desc: "Predictive text search matches keystrokes with existing records in real time. Choose matched suggestions to accelerate search tasks.",
+                    task: "Search for: <strong>Find the pattern used when the system predicts user input while typing.</strong> Begin typing and select the correct option from the suggestions.",
+                    hint: "Begin typing 'auto' or 'comp' inside the input box to reveal matching terms. The correct lookup term to select is 'Autocomplete'."
+                },
+                2: {
+                    title: "Forgiving Input Formats",
+                    desc: "Forgiving input patterns accept spaces, dashes, or country codes, standardizing them automatically to prevent validation errors.",
+                    task: "Enter raw values in different formats: Phone: <strong>98765 43210</strong>, Date: <strong>12/06/2026</strong>, Student ID: <strong>tyit001</strong>, Email: <strong>user@site.com</strong>. Focus out or click Standardize to inspect.",
+                    hint: "Enter the requested values into the inputs. Once entered, the system will format them into standardized layouts. Valid values must pass basic structural checks."
+                },
+                3: {
+                    title: "Inline Validation Form",
+                    desc: "Inline validation informs users of errors as they type. Success and warning highlights direct inputs before submission.",
+                    task: "Complete the signup credentials: <br>1. Username (>= 4 chars), 2. Email (valid format), 3. Password (>= 8 chars), 4. Confirm Password (must match). The submit button enables once all are correct.",
+                    hint: "Each input field tests string rules dynamically. Make sure password values match exactly. Submit will enable when all inputs display green validation states."
+                },
+                4: {
+                    title: "Password Strength Meter",
+                    desc: "Password meters guide users on security checks dynamically, turning warning bars to green status lines on success.",
+                    task: "Create a <strong>Strong</strong> password. Requirements: At least 8 characters, an uppercase letter, a lowercase letter, a number, and a special character.",
+                    hint: "Type a complex password. Example: 'Sec#2026'. Ensure all checklist requirements turn green and the strength meter displays 'Strong'."
+                },
+                5: {
+                    title: "Feedback Pattern Decision Challenge",
+                    desc: "Match UI events with their correct feedback patterns to ensure system status clarity and prevent accidental errors.",
+                    task: "Choose the best feedback response from dropdown lists for all 5 scenario states. Submit once matched.",
+                    hint: "Deletions need confirmation dialogue panels. Input mistakes need inline validation markers. Waiting states need loading spinners. Submissions need success toasts."
+                }
+            }
+        };
+
+        // Start simulation
+        function startSimulation() {
+            document.getElementById("intro-screen").classList.remove("active");
+            document.getElementById("playing-screen").classList.add("active");
+            loadLevel(1);
+        }
+
+        // Load specific level
+        function loadLevel(lvlNum) {
+            state.currentLevel = lvlNum;
+
+            // Clear feedback and hints
+            hideFeedback();
+            document.getElementById("hint-drawer").classList.remove("active");
+
+            // Stepper updates
+            for (let i = 1; i <= 5; i++) {
+                let stepEl = document.getElementById("step-" + i);
+                let lineEl = document.getElementById("line-" + i);
+
+                stepEl.className = "step-item";
+                if (i < lvlNum || state.levelCompleted[i]) {
+                    stepEl.classList.add("completed");
+                }
+                if (i === lvlNum) {
+                    stepEl.classList.add("active");
+                }
+
+                if (lineEl) {
+                    lineEl.className = "step-line";
+                    if (i < lvlNum || state.levelCompleted[i]) {
+                        lineEl.classList.add("completed");
+                    }
+                }
+            }
+
+            // Navigation state
+            document.getElementById("progress-indicator").innerText = "L" + lvlNum + " / L5";
+            document.getElementById("level-title-id").innerText = "Level " + lvlNum;
+            document.getElementById("level-title-name").innerText = state.levelData[lvlNum].title;
+            document.getElementById("level-description-text").innerText = state.levelData[lvlNum].desc;
+            document.getElementById("level-task-box").innerHTML = state.levelData[lvlNum].task;
+
+            // Disable Next button initially unless level already completed
+            document.getElementById("next-level-btn").disabled = !state.levelCompleted[lvlNum];
+
+            // Render level workspace content
+            renderWorkspace(lvlNum);
+        }
+
+        function jumpToLevel(lvlNum) {
+            if (lvlNum <= state.maxUnlockedLevel) {
+                loadLevel(lvlNum);
+            } else {
+                showErrorFeedback("Level Locked", "Complete preceding levels to unlock this challenge!");
+            }
+        }
+
+        function resetLevel() {
+            loadLevel(state.currentLevel);
+        }
+
+        function revealHint() {
+            let lvl = state.currentLevel;
+            if (!state.hintUsed[lvl] && !state.levelCompleted[lvl]) {
+                state.hintUsed[lvl] = true;
+                updateScore(-2);
+            }
+
+            let drawer = document.getElementById("hint-drawer");
+            document.getElementById("hint-text").innerText = state.levelData[lvl].hint;
+            drawer.classList.add("active");
+        }
+
+        function updateScore(amt) {
+            state.score += amt;
+            if (state.score < 0) state.score = 0;
+            document.getElementById("score-counter").innerText = "Score: " + state.score;
+        }
+
+        function showSuccessFeedback(title, msg) {
+            let panel = document.getElementById("action-feedback");
+            panel.className = "feedback-panel success";
+            document.getElementById("feedback-icon").className = "ti ti-circle-check";
+            document.getElementById("feedback-title").innerText = title;
+            document.getElementById("feedback-text").innerText = msg;
+        }
+
+        function showErrorFeedback(title, msg) {
+            let panel = document.getElementById("action-feedback");
+            panel.className = "feedback-panel error";
+            document.getElementById("feedback-icon").className = "ti ti-alert-circle";
+            document.getElementById("feedback-title").innerText = title;
+            document.getElementById("feedback-text").innerText = msg;
+        }
+
+        function hideFeedback() {
+            document.getElementById("action-feedback").className = "feedback-panel";
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < 5) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function completeLevel() {
+            let lvl = state.currentLevel;
+            if (!state.levelCompleted[lvl]) {
+                state.levelCompleted[lvl] = true;
+                updateScore(10);
+                if (lvl === state.maxUnlockedLevel && state.maxUnlockedLevel < 5) {
+                    state.maxUnlockedLevel++;
+                }
+            }
+            document.getElementById("next-level-btn").disabled = false;
+
+            document.getElementById("step-" + lvl).className = "step-item completed";
+            let lineEl = document.getElementById("line-" + lvl);
+            if (lineEl) lineEl.classList.add("completed");
+        }
+
+        // Suggestions pool Level 1
+        const searchPool = [
+            "Autocomplete",
+            "Auto-suggest",
+            "Button Click",
+            "Hover Tools",
+            "Modal Overlay",
+            "Form Inline Check",
+            "Drag & Drop Reorder",
+            "Success Banner"
+        ];
+
+        // Render workspace content
+        function renderWorkspace(lvl) {
+            let sandbox = document.getElementById("sandbox-content");
+            sandbox.innerHTML = "";
+
+            if (lvl === 1) {
+                sandbox.innerHTML = `
+        <div class="search-stage">
+          <div class="search-input-wrapper">
+            <i class="ti ti-search"></i>
+            <input type="text" class="search-input-field" placeholder="Search patterns..." id="lvl1-search" oninput="lvl1_onInput(this)">
+          </div>
+          <div class="suggestions-dropdown" id="lvl1-dropdown"></div>
+        </div>
+      `;
+            } else if (lvl === 2) {
+                sandbox.innerHTML = `
+        <div class="forgiving-form">
+          <div class="forgiving-group">
+            <label>Phone Number (Accepts spaces, dashes, +91)</label>
+            <div class="forgiving-row">
+              <input type="text" class="forgiving-input" id="lvl2-phone" placeholder="e.g. 98765 43210" onblur="lvl2_validatePhone()">
+            </div>
+            <span class="input-status-text" id="status-phone"></span>
+          </div>
+
+          <div class="forgiving-group">
+            <label>Date (Accepts / or - separators)</label>
+            <div class="forgiving-row">
+              <input type="text" class="forgiving-input" id="lvl2-date" placeholder="e.g. 12/06/2026" onblur="lvl2_validateDate()">
+            </div>
+            <span class="input-status-text" id="status-date"></span>
+          </div>
+
+          <div class="forgiving-group">
+            <label>Student ID (Case insensitive, accepts dashes)</label>
+            <div class="forgiving-row">
+              <input type="text" class="forgiving-input" id="lvl2-id" placeholder="e.g. tyit001" onblur="lvl2_validateID()">
+            </div>
+            <span class="input-status-text" id="status-id"></span>
+          </div>
+
+          <div class="forgiving-group">
+            <label>Email Address</label>
+            <div class="forgiving-row">
+              <input type="text" class="forgiving-input" id="lvl2-email" placeholder="e.g. user@site.com" onblur="lvl2_validateEmail()">
+            </div>
+            <span class="input-status-text" id="status-email"></span>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:8px;" onclick="lvl2_submit()">
+            Standardize Inputs
+          </button>
+        </div>
+      `;
+            } else if (lvl === 3) {
+                sandbox.innerHTML = `
+        <div class="inline-form">
+          <div class="inline-group">
+            <label>Username (Min 4 characters)</label>
+            <div class="inline-input-wrapper">
+              <input type="text" class="inline-input" id="lvl3-user" oninput="lvl3_validateUser()">
+              <i class="ti ti-circle-check-filled validation-icon"></i>
+            </div>
+            <span class="validation-message"></span>
+          </div>
+
+          <div class="inline-group">
+            <label>Email Address (Must contain @ and domain)</label>
+            <div class="inline-input-wrapper">
+              <input type="text" class="inline-input" id="lvl3-email" oninput="lvl3_validateEmail()">
+              <i class="ti ti-circle-check-filled validation-icon"></i>
+            </div>
+            <span class="validation-message"></span>
+          </div>
+
+          <div class="inline-group">
+            <label>Password (Min 8 characters)</label>
+            <div class="inline-input-wrapper">
+              <input type="password" class="inline-input" id="lvl3-pass" oninput="lvl3_validatePass()">
+              <i class="ti ti-circle-check-filled validation-icon"></i>
+            </div>
+            <span class="validation-message"></span>
+          </div>
+
+          <div class="inline-group">
+            <label>Confirm Password</label>
+            <div class="inline-input-wrapper">
+              <input type="password" class="inline-input" id="lvl3-confirm" oninput="lvl3_validateConfirm()">
+              <i class="ti ti-circle-check-filled validation-icon"></i>
+            </div>
+            <span class="validation-message"></span>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px;" id="lvl3-submit" onclick="lvl3_submit()" disabled>
+            Create Account
+          </button>
+        </div>
+      `;
+            } else if (lvl === 4) {
+                sandbox.innerHTML = `
+        <div class="pw-group">
+          <div class="inline-group">
+            <label>Create Secure Password</label>
+            <input type="text" class="inline-input" id="lvl4-pass" oninput="lvl4_checkStrength()">
+            <div class="pw-strength-bar-container">
+              <div class="pw-strength-bar" id="lvl4-bar"></div>
+            </div>
+            <div class="pw-strength-label" id="lvl4-label">None</div>
+          </div>
+
+          <ul class="pw-checklist">
+            <li class="pw-check-item" id="chk-len"><i class="ti ti-circle-dashed"></i> At least 8 characters</li>
+            <li class="pw-check-item" id="chk-upper"><i class="ti ti-circle-dashed"></i> Includes uppercase letter</li>
+            <li class="pw-check-item" id="chk-lower"><i class="ti ti-circle-dashed"></i> Includes lowercase letter</li>
+            <li class="pw-check-item" id="chk-num"><i class="ti ti-circle-dashed"></i> Includes a number</li>
+            <li class="pw-check-item" id="chk-spec"><i class="ti ti-circle-dashed"></i> Includes special character</li>
+          </ul>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:8px;" onclick="lvl4_submit()">
+            Save Password
+          </button>
+        </div>
+      `;
+            } else if (lvl === 5) {
+                sandbox.innerHTML = `
+        <div class="decision-container">
+          <div class="decision-row">
+            <span class="decision-text">1. User clicks "Submit Assignment" button</span>
+            <select class="decision-select" id="fds-1">
+              <option value="">Select feedback...</option>
+              <option value="success">Success Message Banner</option>
+              <option value="error">Error Validation Message</option>
+              <option value="loading">Loading Spinner / Progress Bar</option>
+              <option value="dialog">Confirmation Dialog Box</option>
+            </select>
+          </div>
+
+          <div class="decision-row">
+            <span class="decision-text">2. User enters completely invalid email structure</span>
+            <select class="decision-select" id="fds-2">
+              <option value="">Select feedback...</option>
+              <option value="success">Success Message Banner</option>
+              <option value="error">Inline Validation Error Alert</option>
+              <option value="loading">Loading Spinner / Progress Bar</option>
+              <option value="dialog">Confirmation Dialog Box</option>
+            </select>
+          </div>
+
+          <div class="decision-row">
+            <span class="decision-text">3. User clicks to delete a course syllabus module</span>
+            <select class="decision-select" id="fds-3">
+              <option value="">Select feedback...</option>
+              <option value="success">Success Message Banner</option>
+              <option value="error">Inline Validation Error Alert</option>
+              <option value="loading">Loading Spinner / Progress Bar</option>
+              <option value="dialog">Warning Confirmation Dialog</option>
+            </select>
+          </div>
+
+          <div class="decision-row">
+            <span class="decision-text">4. User waits for quiz results computation</span>
+            <select class="decision-select" id="fds-4">
+              <option value="">Select feedback...</option>
+              <option value="success">Success Message Banner</option>
+              <option value="error">Inline Validation Error Alert</option>
+              <option value="loading">Loading Spinner / Progress Bar</option>
+              <option value="dialog">Warning Confirmation Dialog</option>
+            </select>
+          </div>
+
+          <div class="decision-row">
+            <span class="decision-text">5. User successfully completes a course payment</span>
+            <select class="decision-select" id="fds-5">
+              <option value="">Select feedback...</option>
+              <option value="success">Success Message Toast</option>
+              <option value="error">Inline Validation Error Alert</option>
+              <option value="loading">Loading Spinner / Progress Bar</option>
+              <option value="dialog">Warning Confirmation Dialog</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="lvl5_submit()">
+            Submit Redesign Settings
+          </button>
+        </div>
+      `;
+            }
+        }
+
+        /* ── LEVEL 1 LOGIC ── */
+        function lvl1_onInput(inputEl) {
+            let val = inputEl.value.trim();
+            let dropdown = document.getElementById("lvl1-dropdown");
+            dropdown.innerHTML = "";
+
+            if (val === "") {
+                dropdown.classList.remove("active");
+                return;
+            }
+
+            let matches = searchPool.filter(item => item.toLowerCase().includes(val.toLowerCase()));
+
+            if (matches.length > 0) {
+                dropdown.classList.add("active");
+                matches.forEach(item => {
+                    let itemEl = document.createElement("div");
+                    itemEl.className = "suggestion-item";
+
+                    // Highlight logic
+                    let regex = new RegExp(`(${val})`, "gi");
+                    let highlighted = item.replace(regex, `<span class="suggestion-highlight">$1</span>`);
+                    itemEl.innerHTML = highlighted;
+
+                    itemEl.onclick = () => {
+                        inputEl.value = item;
+                        dropdown.classList.remove("active");
+                        lvl1_checkSelection(item);
+                    };
+                    dropdown.appendChild(itemEl);
+                });
+            } else {
+                dropdown.classList.remove("active");
+            }
+        }
+
+        function lvl1_checkSelection(selectedItem) {
+            if (selectedItem === "Autocomplete") {
+                completeLevel();
+                showSuccessFeedback("Autocomplete Match!", "Correct. Predictive lookup autocomplete patterns reduce keystrokes and constrain search triggers to verified options.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[1]++;
+                showErrorFeedback("Incorrect Option", "This pattern does not match predictions of user input text queries. Try matching 'Autocomplete'.");
+            }
+        }
+
+        /* ── LEVEL 2 LOGIC ── */
+        let lvl2Validation = {
+            phone: false,
+            date: false,
+            id: false,
+            email: false
+        };
+
+        function lvl2_validatePhone() {
+            let input = document.getElementById("lvl2-phone");
+            let val = input.value.trim();
+            let statusEl = document.getElementById("status-phone");
+
+            if (val === "") {
+                statusEl.style.display = "none";
+                return;
+            }
+
+            // Forgiving Phone checks: accepts spaces, dashes, optional +91. Max 10 digits check.
+            let cleanVal = val.replace(/[\s\-\+]/g, "");
+            // Remove leading 91 if it has 12 chars
+            if (cleanVal.length === 12 && cleanVal.startsWith("91")) {
+                cleanVal = cleanVal.substring(2);
+            }
+
+            if (/^\d{10}$/.test(cleanVal)) {
+                lvl2Validation.phone = true;
+                statusEl.className = "input-status-text success";
+                statusEl.innerHTML = `<i class="ti ti-circle-check-filled"></i> Accepted & Formatted: +91 ${cleanVal.substring(0, 5)}-${cleanVal.substring(5)}`;
+                input.value = `+91 ${cleanVal.substring(0, 5)}-${cleanVal.substring(5)}`;
+            } else {
+                lvl2Validation.phone = false;
+                statusEl.className = "input-status-text error";
+                statusEl.innerHTML = `<i class="ti ti-alert-circle-filled"></i> Invalid format. Please enter a 10-digit number.`;
+            }
+        }
+
+        function lvl2_validateDate() {
+            let input = document.getElementById("lvl2-date");
+            let val = input.value.trim();
+            let statusEl = document.getElementById("status-date");
+
+            if (val === "") {
+                statusEl.style.display = "none";
+                return;
+            }
+
+            // Accepts: DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD
+            let parts = val.split(/[\/\-]/);
+            let day = 0, month = 0, year = 0;
+            let valid = false;
+
+            if (parts.length === 3) {
+                if (parts[0].length === 4) { // YYYY-MM-DD
+                    year = parseInt(parts[0]);
+                    month = parseInt(parts[1]);
+                    day = parseInt(parts[2]);
+                } else { // DD/MM/YYYY
+                    day = parseInt(parts[0]);
+                    month = parseInt(parts[1]);
+                    year = parseInt(parts[2]);
+                }
+
+                if (day >= 1 && day <= 31 && month >= 1 && month <= 12 && year >= 2000 && year <= 2100) {
+                    valid = true;
+                }
+            }
+
+            if (valid) {
+                lvl2Validation.date = true;
+                // Pad single digits
+                let dStr = String(day).padStart(2, '0');
+                let mStr = String(month).padStart(2, '0');
+
+                statusEl.className = "input-status-text success";
+                statusEl.innerHTML = `<i class="ti ti-circle-check-filled"></i> Accepted & Formatted: ${year}-${mStr}-${dStr}`;
+                input.value = `${year}-${mStr}-${dStr}`;
+            } else {
+                lvl2Validation.date = false;
+                statusEl.className = "input-status-text error";
+                statusEl.innerHTML = `<i class="ti ti-alert-circle-filled"></i> Invalid Date format. Provide valid DD/MM/YYYY values.`;
+            }
+        }
+
+        function lvl2_validateID() {
+            let input = document.getElementById("lvl2-id");
+            let val = input.value.trim();
+            let statusEl = document.getElementById("status-id");
+
+            if (val === "") {
+                statusEl.style.display = "none";
+                return;
+            }
+
+            // Accepts tyit001, TYIT001, TY-IT-001
+            let clean = val.replace(/[\-]/g, "").toUpperCase();
+
+            if (clean === "TYIT001") {
+                lvl2Validation.id = true;
+                statusEl.className = "input-status-text success";
+                statusEl.innerHTML = `<i class="ti ti-circle-check-filled"></i> Accepted & Formatted: TY-IT-001`;
+                input.value = "TY-IT-001";
+            } else {
+                lvl2Validation.id = false;
+                statusEl.className = "input-status-text error";
+                statusEl.innerHTML = `<i class="ti ti-alert-circle-filled"></i> Invalid Student ID. Enter a valid ID like 'tyit001'.`;
+            }
+        }
+
+        function lvl2_validateEmail() {
+            let input = document.getElementById("lvl2-email");
+            let val = input.value.trim();
+            let statusEl = document.getElementById("status-email");
+
+            if (val === "") {
+                statusEl.style.display = "none";
+                return;
+            }
+
+            // Accepts basic email regex
+            let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (regex.test(val)) {
+                lvl2Validation.email = true;
+                statusEl.className = "input-status-text success";
+                statusEl.innerHTML = `<i class="ti ti-circle-check-filled"></i> Accepted & Formatted: ${val.toLowerCase()}`;
+                input.value = val.toLowerCase();
+            } else {
+                lvl2Validation.email = false;
+                statusEl.className = "input-status-text error";
+                statusEl.innerHTML = `<i class="ti ti-alert-circle-filled"></i> Invalid Email structure (must contain @ and domain).`;
+            }
+        }
+
+        function lvl2_submit() {
+            // Force validate all fields first
+            lvl2_validatePhone();
+            lvl2_validateDate();
+            lvl2_validateID();
+            lvl2_validateEmail();
+
+            if (lvl2Validation.phone && lvl2Validation.date && lvl2Validation.id && lvl2Validation.email) {
+                completeLevel();
+                showSuccessFeedback("Inputs Standardized!", "Success. Forgiving input standardizers silently normalize text formatting behind the scenes to avoid user friction.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[2]++;
+                showErrorFeedback("Submission Rejected", "One or more entries are still invalid. Review formatting instructions and repair them.");
+            }
+        }
+
+        /* ── LEVEL 3 LOGIC ── */
+        let lvl3Checks = {
+            user: false,
+            email: false,
+            pass: false,
+            confirm: false
+        };
+
+        function lvl3_validateUser() {
+            let input = document.getElementById("lvl3-user");
+            let val = input.value.trim();
+            let msgEl = input.parentElement.nextElementSibling;
+
+            if (val.length >= 4) {
+                lvl3Checks.user = true;
+                input.className = "inline-input valid";
+                msgEl.innerText = "Username looks good!";
+                msgEl.style.color = "#2E7D32";
+            } else {
+                lvl3Checks.user = false;
+                input.className = "inline-input invalid";
+                msgEl.innerText = "Username must be at least 4 characters.";
+                msgEl.style.color = "#C62828";
+            }
+            lvl3_toggleSubmit();
+        }
+
+        function lvl3_validateEmail() {
+            let input = document.getElementById("lvl3-email");
+            let val = input.value.trim();
+            let msgEl = input.parentElement.nextElementSibling;
+            let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (regex.test(val)) {
+                lvl3Checks.email = true;
+                input.className = "inline-input valid";
+                msgEl.innerText = "Email structure valid.";
+                msgEl.style.color = "#2E7D32";
+            } else {
+                lvl3Checks.email = false;
+                input.className = "inline-input invalid";
+                msgEl.innerText = "Email must contain @ and a domain name.";
+                msgEl.style.color = "#C62828";
+            }
+            lvl3_toggleSubmit();
+        }
+
+        function lvl3_validatePass() {
+            let input = document.getElementById("lvl3-pass");
+            let val = input.value;
+            let msgEl = input.parentElement.nextElementSibling;
+
+            if (val.length >= 8) {
+                lvl3Checks.pass = true;
+                input.className = "inline-input valid";
+                msgEl.innerText = "Password length meets requirements.";
+                msgEl.style.color = "#2E7D32";
+            } else {
+                lvl3Checks.pass = false;
+                input.className = "inline-input invalid";
+                msgEl.innerText = "Password must be at least 8 characters.";
+                msgEl.style.color = "#C62828";
+            }
+            lvl3_validateConfirm(); // revalidate confirm match
+            lvl3_toggleSubmit();
+        }
+
+        function lvl3_validateConfirm() {
+            let passVal = document.getElementById("lvl3-pass").value;
+            let input = document.getElementById("lvl3-confirm");
+            let val = input.value;
+            let msgEl = input.parentElement.nextElementSibling;
+
+            if (val === passVal && val !== "") {
+                lvl3Checks.confirm = true;
+                input.className = "inline-input valid";
+                msgEl.innerText = "Passwords match.";
+                msgEl.style.color = "#2E7D32";
+            } else {
+                lvl3Checks.confirm = false;
+                input.className = "inline-input invalid";
+                msgEl.innerText = "Confirm password must match password exactly.";
+                msgEl.style.color = "#C62828";
+            }
+            lvl3_toggleSubmit();
+        }
+
+        function lvl3_toggleSubmit() {
+            let valid = lvl3Checks.user && lvl3Checks.email && lvl3Checks.pass && lvl3Checks.confirm;
+            document.getElementById("lvl3-submit").disabled = !valid;
+        }
+
+        function lvl3_submit() {
+            completeLevel();
+            showSuccessFeedback("Form Validated!", "Terrific. Real-time inline feedback guides inputs dynamically, allowing users to correct errors before submitting.");
+        }
+
+        /* ── LEVEL 4 LOGIC ── */
+        function lvl4_checkStrength() {
+            let val = document.getElementById("lvl4-pass").value;
+
+            // Checks
+            let lenMet = val.length >= 8;
+            let upperMet = /[A-Z]/.test(val);
+            let lowerMet = /[a-z]/.test(val);
+            let numMet = /\d/.test(val);
+            let specMet = /[^A-Za-z0-9]/.test(val);
+
+            // Update Checklist UI
+            updateCheckItem("chk-len", lenMet);
+            updateCheckItem("chk-upper", upperMet);
+            updateCheckItem("chk-lower", lowerMet);
+            updateCheckItem("chk-num", numMet);
+            updateCheckItem("chk-spec", specMet);
+
+            // Calculate score
+            let score = 0;
+            if (lenMet) score++;
+            if (upperMet) score++;
+            if (lowerMet) score++;
+            if (numMet) score++;
+            if (specMet) score++;
+
+            let bar = document.getElementById("lvl4-bar");
+            let label = document.getElementById("lvl4-label");
+
+            if (val === "") {
+                bar.style.width = "0%";
+                bar.style.backgroundColor = "#E0E0E0";
+                label.innerText = "None";
+                label.style.color = "var(--text-muted)";
+            } else if (score <= 2) {
+                bar.style.width = "33%";
+                bar.style.backgroundColor = "var(--error-text)";
+                label.innerText = "Weak";
+                label.style.color = "var(--error-text)";
+            } else if (score <= 4) {
+                bar.style.width = "66%";
+                bar.style.backgroundColor = "#FF9800";
+                label.innerText = "Medium";
+                label.style.color = "#FF9800";
+            } else {
+                bar.style.width = "100%";
+                bar.style.backgroundColor = "#2E7D32";
+                label.innerText = "Strong";
+                label.style.color = "#2E7D32";
+            }
+        }
+
+        function updateCheckItem(id, met) {
+            let el = document.getElementById(id);
+            if (met) {
+                el.className = "pw-check-item met";
+                el.querySelector("i").className = "ti ti-circle-check-filled";
+            } else {
+                el.className = "pw-check-item";
+                el.querySelector("i").className = "ti ti-circle-dashed";
+            }
+        }
+
+        function lvl4_submit() {
+            let label = document.getElementById("lvl4-label").innerText;
+            if (label === "Strong") {
+                completeLevel();
+                showSuccessFeedback("Secure Password Confirmed!", "Well done! Interactive password meters help users meet complex rules directly instead of generating frustration.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[4]++;
+                showErrorFeedback("Weak Password!", "The password does not meet all criteria. Make sure the strength indicator turns green.");
+            }
+        }
+
+        /* ── LEVEL 5 LOGIC ── */
+        function lvl5_submit() {
+            let f1 = document.getElementById("fds-1").value;
+            let f2 = document.getElementById("fds-2").value;
+            let f3 = document.getElementById("fds-3").value;
+            let f4 = document.getElementById("fds-4").value;
+            let f5 = document.getElementById("fds-5").value;
+
+            if (f1 === "" || f2 === "" || f3 === "" || f4 === "" || f5 === "") {
+                showErrorFeedback("Selections Incomplete", "Please assign feedback options to all scenarios.");
+                return;
+            }
+
+            let ok1 = f1 === "loading";   // submit assignment -> spinner/loading
+            let ok2 = f2 === "error";     // invalid email -> inline validation error
+            let ok3 = f3 === "dialog";    // delete syllabus module -> warning / confirmation dialog
+            let ok4 = f4 === "loading";   // wait quiz compute -> spinner/loading
+            let ok5 = f5 === "success";   // completes course payment -> success message toast
+
+            if (ok1 && ok2 && ok3 && ok4 && ok5) {
+                completeLevel();
+                showSuccessFeedback("Feedback Patterns Decided!", "Excellent UX mappings! Alignment of error boundaries and progress states ensures user spatial continuity.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[5]++;
+                showErrorFeedback("Feedback Misalignments", "Some matches are in conflict with usability practices. Check warning actions.");
+            }
+        }
+
+        /* ── SCOREBOARD & END VIEW ── */
+        function showEndScreen() {
+            document.getElementById("playing-screen").classList.remove("active");
+            document.getElementById("end-screen").classList.add("active");
+
+            let starsCount = 1;
+            if (state.score >= 45) {
+                starsCount = 3;
+            } else if (state.score >= 30) {
+                starsCount = 2;
+            }
+
+            let starsRow = document.getElementById("stars-row");
+            starsRow.innerHTML = "";
+            for (let i = 1; i <= 3; i++) {
+                let activeClass = i <= starsCount ? "active" : "";
+                starsRow.innerHTML += `<i class="ti ti-star-filled star-icon ${activeClass}"></i>`;
+            }
+
+            // Badge configuration
+            document.getElementById("final-score-text").innerText = "Final Score: " + state.score + " points";
+        }
+
+        function retrySimulation() {
+            state.score = 0;
+            state.maxUnlockedLevel = 1;
+            state.levelCompleted = [false, false, false, false, false, false];
+            state.hintUsed = [false, false, false, false, false, false];
+            state.mistakesCount = [0, 0, 0, 0, 0, 0];
+
+            document.getElementById("score-counter").innerText = "Score: 0";
+            document.getElementById("end-screen").classList.remove("active");
+            document.getElementById("playing-screen").classList.add("active");
+            loadLevel(1);
+        }
+
+        /* ── ACCORDION INTERACTION ── */
+        function toggleAccordion(idx) {
+            let body = document.getElementById("theory-body-" + idx);
+            let icon = body.previousElementSibling.querySelector("i");
+
+            if (body.classList.contains("active")) {
+                body.classList.remove("active");
+                icon.className = "ti ti-chevron-down";
+            } else {
+                body.classList.add("active");
+                icon.className = "ti ti-chevron-up";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

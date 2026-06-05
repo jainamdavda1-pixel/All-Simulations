@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 3.2 — Contextual Tools, Overlays & Inlays</title>
+
+    <!-- Typography & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+    <style>
+        :root {
+            --red-primary: #C0302B;
+            --red-hover: #A52520;
+            --red-light: #E8534E;
+            --red-dark: #8B1A16;
+            --red-pale: #FDECEA;
+            --red-border: rgba(192, 48, 43, 0.2);
+            --white: #FFFFFF;
+            --bg-light: #FAFAFA;
+            --bg-card: #FFFFFF;
+            --text-main: #2D2D2D;
+            --text-muted: #666666;
+            --border-color: rgba(192, 48, 43, 0.15);
+
+            --success-bg: #EDF7EE;
+            --success-text: #1B5E20;
+            --success-border: #A5D6A7;
+
+            --error-bg: #FDECEA;
+            --error-text: #7F1010;
+            --error-border: #FFCDD2;
+
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ── HEADER & TOP NAVIGATION ── */
+        header {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(192, 48, 43, 0.04);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red-primary);
+        }
+
+        .logo i {
+            font-size: 22px;
+        }
+
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-pill {
+            background-color: var(--red-pale);
+            color: var(--red-dark);
+            border: 1px solid var(--red-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── PROGRESS STEPPER ── */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .step-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .step-item.active .step-circle {
+            border-color: var(--red-primary);
+            background-color: var(--red-primary);
+            color: var(--white);
+        }
+
+        .step-item.active .step-label {
+            color: var(--red-primary);
+            font-weight: 600;
+        }
+
+        .step-item.completed .step-circle {
+            background-color: var(--red-pale);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+        }
+
+        .step-item.completed .step-label {
+            color: var(--text-main);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+        }
+
+        .step-line.completed {
+            background-color: var(--red-primary);
+        }
+
+        /* ── MAIN LAYOUT GRID ── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(192, 48, 43, 0.02);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--red-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .task-box {
+            background: var(--red-pale);
+            border-left: 4px solid var(--red-primary);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .task-box strong {
+            color: var(--red-dark);
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--red-primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--red-hover);
+        }
+
+        .btn-primary:disabled {
+            background-color: #E0E0E0;
+            color: #9E9E9E;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--red-primary);
+            border: 1px solid var(--red-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--red-pale);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* ── INTERACTIVE WORKSPACE PANELS ── */
+        .workspace-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workspace-tag {
+            font-size: 11px;
+            background-color: var(--red-pale);
+            color: var(--red-dark);
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid var(--red-border);
+        }
+
+        /* ── LEVEL-SPECIFIC UI ELEMENTS ── */
+
+        /* Level 1: Contextual Sorting */
+        .sorting-stage {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sort-items-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background-color: var(--bg-light);
+            border: 1.5px dashed var(--border-color);
+            border-radius: 10px;
+            min-height: 56px;
+        }
+
+        .draggable-action {
+            background-color: var(--white);
+            border: 1px solid var(--red-primary);
+            color: var(--red-dark);
+            font-weight: 500;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .draggable-action.dragging {
+            opacity: 0.5;
+        }
+
+        .sort-dropzone-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sort-bucket {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .sort-bucket-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sort-bucket-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 44px;
+            background-color: var(--bg-light);
+            border-radius: 6px;
+            padding: 6px;
+            transition: background-color 0.15s;
+        }
+
+        .sort-bucket-items.drag-over {
+            background-color: var(--red-pale);
+            border: 1px dashed var(--red-primary);
+        }
+
+        /* Level 2: Hover Tools Timed Inbox */
+        .timer-bar-container {
+            background-color: var(--border-color);
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: var(--red-primary);
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+
+        .inbox-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message-item {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            transition: background-color 0.12s;
+        }
+
+        .message-item:hover {
+            background-color: var(--red-pale);
+        }
+
+        .message-details {
+            flex: 1;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--red-dark);
+        }
+
+        .message-subject {
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .message-action-desc {
+            font-size: 10px;
+            color: var(--red-primary);
+            font-weight: 600;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .message-tools {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .message-item:hover .message-tools {
+            opacity: 1;
+        }
+
+        .tool-btn {
+            background-color: var(--white);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.1s;
+        }
+
+        .tool-btn:hover {
+            background-color: var(--red-primary);
+            color: var(--white);
+            border-color: var(--red-primary);
+        }
+
+        /* Level 3: Overlay Decision Sorting */
+        .decision-row {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .decision-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .decision-select {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            font-family: inherit;
+            min-width: 130px;
+        }
+
+        .decision-select:focus {
+            border-color: var(--red-primary);
+        }
+
+        /* Level 4: List Inlay accordion details */
+        .inlay-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            background-color: var(--white);
+        }
+
+        .inlay-header {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.12s;
+        }
+
+        .inlay-header:hover {
+            background-color: var(--red-pale);
+        }
+
+        .inlay-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .inlay-grade-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .grade-passed {
+            background-color: #EDF7EE;
+            color: #1B5E20;
+        }
+
+        .grade-resubmit {
+            background-color: var(--red-pale);
+            color: var(--red-primary);
+        }
+
+        .grade-progress {
+            background-color: #ECEFF1;
+            color: #37474F;
+        }
+
+        .inlay-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .inlay-chevron {
+            font-size: 13px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .inlay-item.open .inlay-chevron {
+            transform: rotate(90deg);
+        }
+
+        .inlay-body {
+            display: none;
+            padding: 14px 16px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-light);
+        }
+
+        .inlay-item.open .inlay-body {
+            display: block;
+        }
+
+        .inlay-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 12px;
+        }
+
+        .inlay-actions-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Level 5: Overlay vs Inlay Design Fix */
+        .fix-item {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .fix-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .fix-desc strong {
+            color: var(--red-dark);
+        }
+
+        /* ── FEEDBACK PANEL ── */
+        .feedback-panel {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .feedback-panel.success {
+            display: flex;
+            background-color: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success-text);
+        }
+
+        .feedback-panel.error {
+            display: flex;
+            background-color: var(--error-bg);
+            border-color: var(--error-border);
+            color: var(--error-text);
+        }
+
+        .feedback-panel i {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .feedback-content h5 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feedback-content p {
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        /* Hint box */
+        .hint-box {
+            display: none;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--red-primary);
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .hint-box.active {
+            display: flex;
+        }
+
+        .hint-box i {
+            color: var(--red-primary);
+            font-size: 16px;
+        }
+
+        /* ── SCREEN CONTROLS (INTRO & END) ── */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .intro-screen,
+        .end-screen {
+            text-align: center;
+            max-width: 580px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(192, 48, 43, 0.03);
+        }
+
+        .intro-screen h2,
+        .end-screen h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--red-dark);
+            margin-bottom: 12px;
+        }
+
+        .intro-screen p,
+        .end-screen p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .learn-bullet-list {
+            text-align: left;
+            margin: 18px 0;
+            padding-left: 20px;
+        }
+
+        .learn-bullet-list li {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        /* Star ratings */
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin: 16px 0;
+        }
+
+        .star-icon {
+            font-size: 28px;
+            color: #E0E0E0;
+        }
+
+        .star-icon.active {
+            color: #FFB300;
+        }
+
+        /* Badges */
+        .badge-award {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--red-pale);
+            border: 2px solid var(--red-primary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .badge-icon {
+            font-size: 48px;
+            color: var(--red-primary);
+            margin-bottom: 8px;
+        }
+
+        .badge-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red-dark);
+        }
+
+        .badge-level {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* ── THEORY ACCORDION (End Screen) ── */
+        .theory-accordion {
+            margin-top: 24px;
+            text-align: left;
+        }
+
+        .theory-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .theory-header {
+            background-color: var(--bg-light);
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .theory-header:hover {
+            background-color: var(--red-pale);
+        }
+
+        .theory-body {
+            display: none;
+            padding: 12px 14px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .theory-body.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Top header -->
+        <header>
+            <div class="logo">
+                <i class="ti ti-layers-intersect"></i>
+                <span>Simulation 3.2 — Contextual Tools & Overlays</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-pill" title="Score Points">
+                    <i class="ti ti-award"></i>
+                    <span id="score-counter">Score: 0</span>
+                </div>
+                <div class="stat-pill" title="Level Progress">
+                    <i class="ti ti-steps"></i>
+                    <span id="progress-indicator">L1 / L5</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ── SCREEN 1: INTRO SCREEN ── -->
+        <div id="intro-screen" class="screen active">
+            <div class="intro-screen">
+                <i class="ti ti-box"
+                    style="font-size: 52px; color: var(--red-primary); margin-bottom: 12px; display: inline-block;"></i>
+                <h2>Contextual Tools, Overlays & Inlays</h2>
+                <p>
+                    Clean interfaces reduce visual clutter by revealing tools in context. Learn when and how to deploy
+                    overlays versus in-page inlays:
+                </p>
+                <ul class="learn-bullet-list">
+                    <li><strong>Contextual & Hover Tools</strong>: Present actions exactly where and when the user needs
+                        them.</li>
+                    <li><strong>Overlays (Modals)</strong>: Bring focus to critical confirmation dialogs and isolated
+                        subtasks.</li>
+                    <li><strong>Inlays (Accordions)</strong>: Expand data directly in-page without forcing the user to
+                        leave their context.</li>
+                    <li><strong>Usability Tradeoffs</strong>: Master touch vs. mouse hover behaviors and modal design
+                        limits.</li>
+                </ul>
+                <p style="font-size: 12px; font-weight: 500; color: var(--red-primary);">
+                    Scoring: Correct: +10 pts | Mistake: -3 pts | Hint: -2 pts. Complete all levels to win a badge!
+                </p>
+                <button class="btn btn-primary" onclick="startSimulation()">Start Simulation</button>
+            </div>
+        </div>
+
+        <!-- ── SCREEN 2: PLAYING SCREEN ── -->
+        <div id="playing-screen" class="screen">
+
+            <!-- Progress Stepper -->
+            <div class="stepper">
+                <div class="step-item active" id="step-1" onclick="jumpToLevel(1)">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Identify Tools</div>
+                </div>
+                <div class="step-line" id="line-1"></div>
+                <div class="step-item" id="step-2" onclick="jumpToLevel(2)">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Hover Challenge</div>
+                </div>
+                <div class="step-line" id="line-2"></div>
+                <div class="step-item" id="step-3" onclick="jumpToLevel(3)">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Overlay Choice</div>
+                </div>
+                <div class="step-line" id="line-3"></div>
+                <div class="step-item" id="step-4" onclick="jumpToLevel(4)">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Inlay Expands</div>
+                </div>
+                <div class="step-line" id="line-4"></div>
+                <div class="step-item" id="step-5" onclick="jumpToLevel(5)">
+                    <div class="step-circle">5</div>
+                    <div class="step-label">UX Repair</div>
+                </div>
+            </div>
+
+            <!-- Main Workspace Grid -->
+            <div class="main-grid">
+
+                <!-- Left Column: Instructions & Level Info -->
+                <div>
+                    <div class="card">
+                        <div class="card-title">
+                            <span id="level-title-id">Level 1</span>: <span id="level-title-name">Identify Contextual
+                                Tools</span>
+                        </div>
+
+                        <div class="level-desc" id="level-description-text">
+                            Contextual tools keep layouts lean. Frequently accessed operations remain visible, while
+                            secondary items slide into hover menus or dropdown panels.
+                        </div>
+
+                        <div class="task-box" id="level-task-box">
+                            <!-- Dynamic task text here -->
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="revealHint()"><i class="ti ti-bulb"></i> Request
+                                Hint</button>
+                            <button class="btn btn-secondary" onclick="resetLevel()"><i class="ti ti-refresh"></i> Reset
+                                Level</button>
+                        </div>
+
+                        <!-- Inline hint drawer -->
+                        <div class="hint-box" id="hint-drawer">
+                            <i class="ti ti-info-circle"></i>
+                            <span id="hint-text">This is a level hint.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Sandbox Workspace -->
+                <div>
+                    <div class="card" style="min-height: 350px;">
+                        <div class="workspace-title">
+                            <span>Interactive Workspace</span>
+                            <span class="workspace-tag">Sandbox</span>
+                        </div>
+
+                        <!-- Dynamic Workspace content container -->
+                        <div id="sandbox-content">
+                            <!-- Dynamic content loaded via JS -->
+                        </div>
+
+                        <!-- Shared feedback panel inside the playing workspace -->
+                        <div class="feedback-panel" id="action-feedback">
+                            <i class="ti ti-circle-check" id="feedback-icon"></i>
+                            <div class="feedback-content">
+                                <h5 id="feedback-title">Title</h5>
+                                <p id="feedback-text">Detailed message feedback explaining usability guidelines.</p>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Action navigation -->
+                        <div
+                            style="margin-top: 24px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <button class="btn btn-primary" id="next-level-btn" onclick="goToNextLevel()" disabled>
+                                Next Level <i class="ti ti-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── SCREEN 3: END/SCOREBOARD SCREEN ── -->
+        <div id="end-screen" class="screen">
+            <div class="end-screen">
+                <i class="ti ti-trophy"
+                    style="font-size: 56px; color: var(--red-primary); margin-bottom: 12px; display: inline-block;"></i>
+                <h2>Simulation Completed!</h2>
+                <p>Here is your performance summary for Contextual Tools, Overlays & Inlays.</p>
+
+                <!-- Badge Award Box -->
+                <div class="badge-award">
+                    <i class="ti ti-award" id="earned-badge-icon" class="badge-icon"
+                        style="font-size: 48px; margin-bottom: 8px;"></i>
+                    <div class="badge-title" id="earned-badge-name">Overlay Expert</div>
+                    <div class="badge-level" id="earned-badge-level">Gold Tier</div>
+                </div>
+
+                <!-- Stars rating -->
+                <div class="stars-container" id="stars-row">
+                    <!-- Render stars dynamic -->
+                </div>
+
+                <p style="font-weight: 600; font-size: 16px; color: var(--text-main);" id="final-score-text">
+                    Final Score: 0 points
+                </p>
+
+                <button class="btn btn-primary" style="margin-top: 10px;" onclick="retrySimulation()">
+                    <i class="ti ti-refresh"></i> Retry Simulation
+                </button>
+
+                <!-- Clear Learning Summary Accordion -->
+                <div class="theory-accordion">
+                    <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--text-main);">What You Learned Summary:
+                    </h3>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(0)">
+                            1. Action Allocation (Always Visible vs Hover vs Dropdown)
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-0">
+                            High-frequency primary actions (like Reply) must be always visible. Common inline triggers
+                            (like Archive/Delete) can be contextual or hover tools to reduce visual clutter in list
+                            items. Low-frequency or administrative triggers belong in overflow menus or dropdowns.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(1)">
+                            2. Hover Tool Touch Constraints
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-1">
+                            While hover tools are clean and efficient for mouse pointers, they fail on touchscreen
+                            mobile interfaces. Touchscreen layouts must employ swiping gestures, inline toggle menus, or
+                            persistent select toggles to guarantee action accessibility.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(2)">
+                            3. Overlays (Modals) vs Full Page Redirects
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-2">
+                            Overlays capture total user focus for specific confirmations or localized adjustments (e.g.
+                            uploading profile pictures). Long-form entry (e.g., 20-field registration forms) or
+                            read-heavy documents must be rendered as full pages to maximize viewport space.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(3)">
+                            4. Inline Inlays (Accordions)
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-3">
+                            Inlays reveal data contextually inline by pushing other rows down. They avoid navigation
+                            page jumps and overlays, which is highly beneficial when users need to compare detail sheets
+                            between adjacent list items.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Interactive simulation script -->
+    <script>
+        // Game state
+        let state = {
+            currentLevel: 1,
+            score: 0,
+            maxUnlockedLevel: 1,
+            levelCompleted: [false, false, false, false, false, false], // 1-indexed
+            hintUsed: [false, false, false, false, false, false],
+            mistakesCount: [0, 0, 0, 0, 0, 0],
+            levelData: {
+                1: {
+                    title: "Identify Contextual Tools",
+                    desc: "Allocate list action items into their correct visibility placements to maintain clean, clutter-free layouts.",
+                    task: "Drag actions from the pool and place them into the correct zones: <br><strong>Reply</strong> in Always Visible, <strong>Archive & Delete</strong> in Hover Tools, and <strong>Print & Report Spam</strong> in Dropdown/Context Menu.",
+                    hint: "Primary actions (Reply) are high frequency. Common list items (Delete, Archive) appear on hover. Low frequency (Print, Spam) belong inside overflow menus."
+                },
+                2: {
+                    title: "Hover Tools Challenge (Timed)",
+                    desc: "Hover tools only appear when mouse cursor rolls over item boundaries. Clean this inbox in time!",
+                    task: "Clean your inbox in under <strong>20 seconds</strong>! Perform requested hover actions:<br>1. Delete 'Promo Alert', 2. Flag 'Project Update', 3. Archive 'Meeting Request', 4. Delete 'Spam Lottery'.",
+                    hint: "Hover over the message items in order. The hover actions (Archive, Delete, Flag) will appear on the right. Be quick! Clicking wrong tools deducts points."
+                },
+                3: {
+                    title: "Overlay Decision Challenge",
+                    desc: "Overlays focus attention, but overusing them causes dialog fatigue. Learn when to separate workflows.",
+                    task: "Classify all 4 UX scenarios by selecting the best layout method: <strong>Modal Overlay</strong> or <strong>Full Page Navigation</strong>. Submit once completed.",
+                    hint: "Short, focused tasks (deleting, uploading a picture) belong in overlays. Reading heavy text or filling long multi-field pages belongs in full pages."
+                },
+                4: {
+                    title: "Inlay Expansion Challenge",
+                    desc: "List inlays (accordions) slide open data directly inside lists without forcing page jumps or modal overlaps.",
+                    task: "Locate the student sheet marked <strong>Resubmit</strong> (Grade: Resubmit) by expanding details. Inside its inlay form, set Status to <strong>Under Review</strong> and click Save.",
+                    hint: "Expand the inlay for 'CSS Layouts' (Grade: Resubmit). In the status dropdown, choose 'Under Review' and click 'Save Status'. Do not expand or edit other students."
+                },
+                5: {
+                    title: "Overlay vs Inlay Design Fix",
+                    desc: "Correct design anti-patterns by matching them with optimized contextual overlay or inlay solutions.",
+                    task: "A messy UI has bad alignments. Review each scenario description below and select the correct replacement pattern from options. Click Submit once fixed.",
+                    hint: "Logouts belong in modals. Short lesson descriptions belong in tooltips. File actions belong in dropdowns. Accordions belong in list details. Long terms agreements belong in Modals."
+                }
+            }
+        };
+
+        // Start simulation
+        function startSimulation() {
+            document.getElementById("intro-screen").classList.remove("active");
+            document.getElementById("playing-screen").classList.add("active");
+            loadLevel(1);
+        }
+
+        // Load specific level
+        function loadLevel(lvlNum) {
+            state.currentLevel = lvlNum;
+
+            // Clear feedback and hints
+            hideFeedback();
+            document.getElementById("hint-drawer").classList.remove("active");
+            stopLevelTimer(); // Stop Level 2 timer if active
+
+            // Stepper updates
+            for (let i = 1; i <= 5; i++) {
+                let stepEl = document.getElementById("step-" + i);
+                let lineEl = document.getElementById("line-" + i);
+
+                stepEl.className = "step-item";
+                if (i < lvlNum || state.levelCompleted[i]) {
+                    stepEl.classList.add("completed");
+                }
+                if (i === lvlNum) {
+                    stepEl.classList.add("active");
+                }
+
+                if (lineEl) {
+                    lineEl.className = "step-line";
+                    if (i < lvlNum || state.levelCompleted[i]) {
+                        lineEl.classList.add("completed");
+                    }
+                }
+            }
+
+            // Navigation state
+            document.getElementById("progress-indicator").innerText = "L" + lvlNum + " / L5";
+            document.getElementById("level-title-id").innerText = "Level " + lvlNum;
+            document.getElementById("level-title-name").innerText = state.levelData[lvlNum].title;
+            document.getElementById("level-description-text").innerText = state.levelData[lvlNum].desc;
+            document.getElementById("level-task-box").innerHTML = state.levelData[lvlNum].task;
+
+            // Disable Next button initially unless level already completed
+            document.getElementById("next-level-btn").disabled = !state.levelCompleted[lvlNum];
+
+            // Render level workspace content
+            renderWorkspace(lvlNum);
+
+            // Start specific level triggers
+            if (lvlNum === 2) {
+                startLevel2Timer();
+            }
+        }
+
+        function jumpToLevel(lvlNum) {
+            if (lvlNum <= state.maxUnlockedLevel) {
+                loadLevel(lvlNum);
+            } else {
+                showErrorFeedback("Level Locked", "Complete preceding levels to unlock this challenge!");
+            }
+        }
+
+        function resetLevel() {
+            loadLevel(state.currentLevel);
+        }
+
+        function revealHint() {
+            let lvl = state.currentLevel;
+            if (!state.hintUsed[lvl] && !state.levelCompleted[lvl]) {
+                state.hintUsed[lvl] = true;
+                updateScore(-2);
+            }
+
+            let drawer = document.getElementById("hint-drawer");
+            document.getElementById("hint-text").innerText = state.levelData[lvl].hint;
+            drawer.classList.add("active");
+        }
+
+        function updateScore(amt) {
+            state.score += amt;
+            if (state.score < 0) state.score = 0;
+            document.getElementById("score-counter").innerText = "Score: " + state.score;
+        }
+
+        function showSuccessFeedback(title, msg) {
+            let panel = document.getElementById("action-feedback");
+            panel.className = "feedback-panel success";
+            document.getElementById("feedback-icon").className = "ti ti-circle-check";
+            document.getElementById("feedback-title").innerText = title;
+            document.getElementById("feedback-text").innerText = msg;
+        }
+
+        function showErrorFeedback(title, msg) {
+            let panel = document.getElementById("action-feedback");
+            panel.className = "feedback-panel error";
+            document.getElementById("feedback-icon").className = "ti ti-alert-circle";
+            document.getElementById("feedback-title").innerText = title;
+            document.getElementById("feedback-text").innerText = msg;
+        }
+
+        function hideFeedback() {
+            document.getElementById("action-feedback").className = "feedback-panel";
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < 5) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function completeLevel() {
+            let lvl = state.currentLevel;
+            if (!state.levelCompleted[lvl]) {
+                state.levelCompleted[lvl] = true;
+                updateScore(10);
+                if (lvl === state.maxUnlockedLevel && state.maxUnlockedLevel < 5) {
+                    state.maxUnlockedLevel++;
+                }
+            }
+            document.getElementById("next-level-btn").disabled = false;
+
+            document.getElementById("step-" + lvl).className = "step-item completed";
+            let lineEl = document.getElementById("line-" + lvl);
+            if (lineEl) lineEl.classList.add("completed");
+        }
+
+        // Render Workspace content
+        function renderWorkspace(lvl) {
+            let sandbox = document.getElementById("sandbox-content");
+            sandbox.innerHTML = "";
+
+            if (lvl === 1) {
+                sandbox.innerHTML = `
+        <div class="sorting-stage">
+          <div class="sort-items-pool" id="lvl1-pool">
+            <div class="draggable-action" draggable="true" id="act-reply" ondragstart="lvl1_dragStart(event)">
+              <i class="ti ti-arrow-back-up"></i> Reply
+            </div>
+            <div class="draggable-action" draggable="true" id="act-delete" ondragstart="lvl1_dragStart(event)">
+              <i class="ti ti-trash"></i> Delete
+            </div>
+            <div class="draggable-action" draggable="true" id="act-archive" ondragstart="lvl1_dragStart(event)">
+              <i class="ti ti-archive"></i> Archive
+            </div>
+            <div class="draggable-action" draggable="true" id="act-print" ondragstart="lvl1_dragStart(event)">
+              <i class="ti ti-printer"></i> Print Message
+            </div>
+            <div class="draggable-action" draggable="true" id="act-spam" ondragstart="lvl1_dragStart(event)">
+              <i class="ti ti-shield-alert"></i> Report Spam
+            </div>
+          </div>
+
+          <div class="sort-dropzone-row">
+            <div class="sort-bucket">
+              <div class="sort-bucket-title"><i class="ti ti-eye"></i> Always Visible (Primary Actions)</div>
+              <div class="sort-bucket-items" id="bucket-visible" ondragover="lvl1_dragOver(event)" ondragleave="lvl1_dragLeave(event)" ondrop="lvl1_drop(event)"></div>
+            </div>
+            <div class="sort-bucket">
+              <div class="sort-bucket-title"><i class="ti ti-pointer"></i> Hover Tools (Secondary, Contextual)</div>
+              <div class="sort-bucket-items" id="bucket-hover" ondragover="lvl1_dragOver(event)" ondragleave="lvl1_dragLeave(event)" ondrop="lvl1_drop(event)"></div>
+            </div>
+            <div class="sort-bucket">
+              <div class="sort-bucket-title"><i class="ti ti-dots-vertical"></i> Dropdown Overflow / Context Menu</div>
+              <div class="sort-bucket-items" id="bucket-dropdown" ondragover="lvl1_dragOver(event)" ondragleave="lvl1_dragLeave(event)" ondrop="lvl1_drop(event)"></div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="lvl1_check()">
+            Check Placement
+          </button>
+        </div>
+      `;
+            } else if (lvl === 2) {
+                sandbox.innerHTML = `
+        <div class="timer-bar-container">
+          <div class="timer-bar" id="lvl2-timer-bar"></div>
+        </div>
+        <div class="inbox-container">
+          <div class="message-item" id="m-1">
+            <div class="message-details">
+              <div class="message-sender">Marketing Co.</div>
+              <div class="message-subject">Promo Alert: Save 50% Today!</div>
+              <div class="message-action-desc">Goal: Delete this message</div>
+            </div>
+            <div class="message-tools">
+              <button class="tool-btn" onclick="lvl2_action('m-1', 'archive')" title="Archive"><i class="ti ti-archive"></i></button>
+              <button class="tool-btn" onclick="lvl2_action('m-1', 'flag')" title="Flag"><i class="ti ti-flag"></i></button>
+              <button class="tool-btn" onclick="lvl2_action('m-1', 'delete')" title="Delete"><i class="ti ti-trash"></i></button>
+            </div>
+          </div>
+
+          <div class="message-item" id="m-2">
+            <div class="message-details">
+              <div class="message-sender">Sarah Jenkins (Project Lead)</div>
+              <div class="message-subject">Project Status Update & Schedule</div>
+              <div class="message-action-desc">Goal: Flag this message</div>
+            </div>
+            <div class="message-tools">
+              <button class="tool-btn" onclick="lvl2_action('m-2', 'archive')" title="Archive"><i class="ti ti-archive"></i></button>
+              <button class="tool-btn" onclick="lvl2_action('m-2', 'flag')" title="Flag"><i class="ti ti-flag"></i></button>
+              <button class="tool-btn" onclick="lvl2_action('m-2', 'delete')" title="Delete"><i class="ti ti-trash"></i></button>
+            </div>
+          </div>
+
+          <div class="message-item" id="m-3">
+            <div class="message-details">
+              <div class="message-sender">Manager</div>
+              <div class="message-subject">Urgent Meeting Request</div>
+              <div class="message-action-desc">Goal: Archive this message</div>
+            </div>
+            <div class="message-tools">
+              <button class="tool-btn" onclick="lvl2_action('m-3', 'archive')" title="Archive"><i class="ti ti-archive"></i></button>
+              <button class="tool-btn" onclick="lvl2_action('m-3', 'flag')" title="Flag"><i class="ti ti-flag"></i></button>
+              <button class="tool-btn" onclick="lvl2_action('m-3', 'delete')" title="Delete"><i class="ti ti-trash"></i></button>
+            </div>
+          </div>
+
+          <div class="message-item" id="m-4">
+            <div class="message-details">
+              <div class="message-sender">Lottery Winner</div>
+              <div class="message-subject">Spam Lottery Win! Claim Cash Now!</div>
+              <div class="message-action-desc">Goal: Delete this message</div>
+            </div>
+            <div class="message-tools">
+              <button class="tool-btn" onclick="lvl2_action('m-4', 'archive')" title="Archive"><i class="ti ti-archive"></i></button>
+              <button class="tool-btn" onclick="lvl2_action('m-4', 'flag')" title="Flag"><i class="ti ti-flag"></i></button>
+              <button class="tool-btn" onclick="lvl2_action('m-4', 'delete')" title="Delete"><i class="ti ti-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      `;
+            } else if (lvl === 3) {
+                sandbox.innerHTML = `
+        <div class="decision-container">
+          <div class="decision-row">
+            <span class="decision-text">1. Confirm permanent deletion of a user profile</span>
+            <select class="decision-select" id="dec-1">
+              <option value="">Choose...</option>
+              <option value="overlay">Modal Overlay</option>
+              <option value="page">Full Page</option>
+            </select>
+          </div>
+          <div class="decision-row">
+            <span class="decision-text">2. Complete a 20-field new user onboarding form</span>
+            <select class="decision-select" id="dec-2">
+              <option value="">Choose...</option>
+              <option value="overlay">Modal Overlay</option>
+              <option value="page">Full Page</option>
+            </select>
+          </div>
+          <div class="decision-row">
+            <span class="decision-text">3. Upload a new profile picture and crop it</span>
+            <select class="decision-select" id="dec-3">
+              <option value="">Choose...</option>
+              <option value="overlay">Modal Overlay</option>
+              <option value="page">Full Page</option>
+            </select>
+          </div>
+          <div class="decision-row">
+            <span class="decision-text">4. Read a detailed 10-page financial sales report</span>
+            <select class="decision-select" id="dec-4">
+              <option value="">Choose...</option>
+              <option value="overlay">Modal Overlay</option>
+              <option value="page">Full Page</option>
+            </select>
+          </div>
+          
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="lvl3_check()">
+            Check Decisions
+          </button>
+        </div>
+      `;
+            } else if (lvl === 4) {
+                sandbox.innerHTML = `
+        <div class="inlay-list">
+          <div class="inlay-item" id="inlay-item-1">
+            <div class="inlay-header" onclick="lvl4_toggleInlay(1)">
+              <div class="inlay-title-group">
+                <span class="inlay-grade-badge grade-passed">Passed</span>
+                <span class="inlay-name">HTML Basics — Alice</span>
+              </div>
+              <i class="ti ti-chevron-right inlay-chevron"></i>
+            </div>
+            <div class="inlay-body">
+              <div class="inlay-text">Submission notes: Excellent code alignment, well commented semantic layouts.</div>
+              <div class="inlay-actions-row">
+                <span style="font-size:12px; font-weight:600; color:var(--text-muted);">Status locked: Passed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="inlay-item" id="inlay-item-2">
+            <div class="inlay-header" onclick="lvl4_toggleInlay(2)">
+              <div class="inlay-title-group">
+                <span class="inlay-grade-badge grade-resubmit" id="lvl4-badge-bob">Resubmit</span>
+                <span class="inlay-name">CSS Layouts — Bob</span>
+              </div>
+              <i class="ti ti-chevron-right inlay-chevron"></i>
+            </div>
+            <div class="inlay-body">
+              <div class="inlay-text">Submission notes: Float overlays broke. Recommend refactoring using CSS Grid and Flexbox.</div>
+              <div class="inlay-actions-row">
+                <label style="font-size:11px; font-weight:600; color:var(--text-muted); margin-right:4px;">Change Status:</label>
+                <select id="lvl4-status-bob" style="padding:4px; font-size:11px;">
+                  <option value="resubmit">Resubmit</option>
+                  <option value="under-review">Under Review</option>
+                  <option value="passed">Passed</option>
+                </select>
+                <button class="field-save-btn" style="padding:4px 8px; font-size:11px; margin-left:6px;" onclick="lvl4_saveBob()">
+                  Save Status
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="inlay-item" id="inlay-item-3">
+            <div class="inlay-header" onclick="lvl4_toggleInlay(3)">
+              <div class="inlay-title-group">
+                <span class="inlay-grade-badge grade-progress">In Progress</span>
+                <span class="inlay-name">JS Logic — Charlie</span>
+              </div>
+              <i class="ti ti-chevron-right inlay-chevron"></i>
+            </div>
+            <div class="inlay-body">
+              <div class="inlay-text">Submission notes: Student is editing variables, pending main test submissions.</div>
+              <div class="inlay-actions-row">
+                <span style="font-size:12px; font-weight:600; color:var(--text-muted);">Status locked: In Progress</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+            } else if (lvl === 5) {
+                sandbox.innerHTML = `
+        <div class="fix-container">
+          <div class="fix-item">
+            <div class="fix-desc">1. A logout confirmation trigger currently redirects users to a <strong>whole new webpage</strong>.</div>
+            <select class="decision-select" id="fix-1" style="width:100%;">
+              <option value="">Select better pattern...</option>
+              <option value="modal">Modal Overlay / Confirmation Dialog</option>
+              <option value="tooltip">Tooltip (Hover Explanations)</option>
+              <option value="inlay">List Inlay / Accordion Details</option>
+              <option value="dropdown">Dropdown Panel (Toolbar / Action menu)</option>
+            </select>
+          </div>
+
+          <div class="fix-item">
+            <div class="fix-desc">2. Clicking a lesson item in a sidebar list triggers a <strong>fullscreen overlay modal popup</strong> just to show a short 1-sentence description.</div>
+            <select class="decision-select" id="fix-2" style="width:100%;">
+              <option value="">Select better pattern...</option>
+              <option value="modal">Modal Overlay / Confirmation Dialog</option>
+              <option value="tooltip">Tooltip (Hover Explanations)</option>
+              <option value="inlay">List Inlay / Accordion Details</option>
+              <option value="dropdown">Dropdown Panel (Toolbar / Action menu)</option>
+            </select>
+          </div>
+
+          <div class="fix-item">
+            <div class="fix-desc">3. An action toolbar panel contains document properties and <strong>floats directly on top</strong> of editable body text, hiding content.</div>
+            <select class="decision-select" id="fix-3" style="width:100%;">
+              <option value="">Select better pattern...</option>
+              <option value="modal">Modal Overlay / Confirmation Dialog</option>
+              <option value="tooltip">Tooltip (Hover Explanations)</option>
+              <option value="inlay">List Inlay / Accordion Details</option>
+              <option value="dropdown">Dropdown Panel (Toolbar / Action menu)</option>
+            </select>
+          </div>
+
+          <div class="fix-item">
+            <div class="fix-desc">4. Hovering a card triggers a <strong>3-paragraph User Service Agreement</strong> inside a small 100px hover tooltip.</div>
+            <select class="decision-select" id="fix-4" style="width:100%;">
+              <option value="">Select better pattern...</option>
+              <option value="modal">Modal Overlay / Confirmation Dialog</option>
+              <option value="tooltip">Tooltip (Hover Explanations)</option>
+              <option value="inlay">List Inlay / Accordion Details</option>
+              <option value="dropdown">Dropdown Panel (Toolbar / Action menu)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px;" onclick="lvl5_check()">
+            Submit Redesign
+          </button>
+        </div>
+      `;
+            }
+        }
+
+        /* ── LEVEL 1 LOGIC ── */
+        let draggedEl = null;
+
+        function lvl1_dragStart(e) {
+            draggedEl = e.currentTarget;
+            e.dataTransfer.setData("text/plain", e.currentTarget.id);
+        }
+
+        function lvl1_dragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add("drag-over");
+        }
+
+        function lvl1_dragLeave(e) {
+            e.currentTarget.classList.remove("drag-over");
+        }
+
+        function lvl1_drop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove("drag-over");
+
+            if (draggedEl) {
+                e.currentTarget.appendChild(draggedEl);
+            }
+        }
+
+        function lvl1_check() {
+            let visibleBox = document.getElementById("bucket-visible");
+            let hoverBox = document.getElementById("bucket-hover");
+            let dropdownBox = document.getElementById("bucket-dropdown");
+
+            let replyOk = visibleBox.querySelector("#act-reply") !== null;
+            let archiveOk = hoverBox.querySelector("#act-archive") !== null;
+            let deleteOk = hoverBox.querySelector("#act-delete") !== null;
+            let printOk = dropdownBox.querySelector("#act-print") !== null;
+            let spamOk = dropdownBox.querySelector("#act-spam") !== null;
+
+            if (replyOk && archiveOk && deleteOk && printOk && spamOk) {
+                completeLevel();
+                showSuccessFeedback("Success!", "Excellent action mapping! Primary actions remain visible, secondary tasks show on hover, and rare items hide in dropdown lists.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[1]++;
+                showErrorFeedback("Incorrect Mappings", "Some actions are in inefficient locations. Review action frequencies and try sorting again!");
+            }
+        }
+
+        /* ── LEVEL 2 LOGIC ── */
+        let lvl2Timer = null;
+        let lvl2TimeLeft = 20; // seconds
+        let lvl2ActiveGoals = {
+            "m-1": false,
+            "m-2": false,
+            "m-3": false,
+            "m-4": false
+        };
+
+        function startLevel2Timer() {
+            lvl2TimeLeft = 20;
+            document.getElementById("lvl2-timer-bar").style.width = "100%";
+
+            lvl2Timer = setInterval(() => {
+                lvl2TimeLeft -= 0.1;
+                if (lvl2TimeLeft <= 0) {
+                    lvl2TimeLeft = 0;
+                    clearInterval(lvl2Timer);
+                    updateScore(-3);
+                    state.mistakesCount[2]++;
+                    showErrorFeedback("Time Expired!", "The countdown ended! Hover tools allow rapid workflow speeds but require user speed. Reset level to retry.");
+                }
+                document.getElementById("lvl2-timer-bar").style.width = (lvl2TimeLeft / 20 * 100) + "%";
+            }, 100);
+        }
+
+        function stopLevelTimer() {
+            if (lvl2Timer) {
+                clearInterval(lvl2Timer);
+                lvl2Timer = null;
+            }
+        }
+
+        function lvl2_action(msgId, action) {
+            if (state.levelCompleted[2]) return;
+
+            let isCorrect = false;
+            if (msgId === "m-1" && action === "delete") isCorrect = true;
+            if (msgId === "m-2" && action === "flag") isCorrect = true;
+            if (msgId === "m-3" && action === "archive") isCorrect = true;
+            if (msgId === "m-4" && action === "delete") isCorrect = true;
+
+            if (isCorrect) {
+                lvl2ActiveGoals[msgId] = true;
+                let el = document.getElementById(msgId);
+                el.style.opacity = "0.45";
+                el.style.backgroundColor = "#ECEFF1";
+                el.querySelector(".message-action-desc").innerText = "Completed!";
+                el.querySelector(".message-action-desc").style.color = "var(--success-text)";
+
+                // Check if all are done
+                let allDone = Object.values(lvl2ActiveGoals).every(v => v === true);
+                if (allDone) {
+                    stopLevelTimer();
+                    completeLevel();
+                    showSuccessFeedback("Success!", "Fantastic speed! Hover tools reduce inbox clutter, allowing fast mouse management, though touch alternatives are vital.");
+                }
+            } else {
+                updateScore(-3);
+                state.mistakesCount[2]++;
+                showErrorFeedback("Wrong Tool Selected!", "Incorrect action chosen for this message type. Hover and read targets carefully.");
+            }
+        }
+
+        /* ── LEVEL 3 LOGIC ── */
+        function lvl3_check() {
+            let dec1 = document.getElementById("dec-1").value;
+            let dec2 = document.getElementById("dec-2").value;
+            let dec3 = document.getElementById("dec-3").value;
+            let dec4 = document.getElementById("dec-4").value;
+
+            if (dec1 === "" || dec2 === "" || dec3 === "" || dec4 === "") {
+                showErrorFeedback("Incomplete Decisions", "Please choose a layout category for all 4 scenarios.");
+                return;
+            }
+
+            let ok1 = dec1 === "overlay"; // logout/delete confirmation -> modal
+            let ok2 = dec2 === "page";    // onboarding 20 fields -> full page
+            let ok3 = dec3 === "overlay"; // profile picture -> modal
+            let ok4 = dec4 === "page";    // 10 page sales report -> full page
+
+            if (ok1 && ok2 && ok3 && ok4) {
+                completeLevel();
+                showSuccessFeedback("Perfect Decisions!", "Superb. Modals capture total focus for quick subtasks. Full pages give space to long forms and documents.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[3]++;
+                showErrorFeedback("UX Alignment Error", "Some scenarios are paired with suboptimal layouts. Review the screen constraints.");
+            }
+        }
+
+        /* ── LEVEL 4 LOGIC ── */
+        let activeInlayId = null;
+
+        function lvl4_toggleInlay(id) {
+            // Check if other inlay is expanded
+            let item = document.getElementById("inlay-item-" + id);
+            let isOpen = item.classList.contains("open");
+
+            // Close any other
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById("inlay-item-" + i).classList.remove("open");
+            }
+
+            if (!isOpen) {
+                item.classList.add("open");
+                activeInlayId = id;
+            } else {
+                activeInlayId = null;
+            }
+            hideFeedback();
+        }
+
+        function lvl4_saveBob() {
+            let selectVal = document.getElementById("lvl4-status-bob").value;
+            if (selectVal === 'under-review') {
+                let badge = document.getElementById("lvl4-badge-bob");
+                badge.innerText = "Under Review";
+                badge.className = "inlay-grade-badge grade-progress";
+
+                completeLevel();
+                showSuccessFeedback("Success!", "Inlay Updated. List inlays (accordions) let administrators review submissions and toggle data states without losing list positioning.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[4]++;
+                showErrorFeedback("Incorrect State Selected", "You must change Bob's Grade status to 'Under Review' and click Save.");
+            }
+        }
+
+        /* ── LEVEL 5 LOGIC ── */
+        function lvl5_check() {
+            let f1 = document.getElementById("fix-1").value;
+            let f2 = document.getElementById("fix-2").value;
+            let f3 = document.getElementById("fix-3").value;
+            let f4 = document.getElementById("fix-4").value;
+
+            if (f1 === "" || f2 === "" || f3 === "" || f4 === "") {
+                showErrorFeedback("Selection Missing", "Please select a design fix layout for all 4 scenarios.");
+                return;
+            }
+
+            let ok1 = f1 === "modal";    // Logout confirmation -> Modal Overlay
+            let ok2 = f2 === "tooltip";  // 1-sentence lesson -> Tooltip
+            let ok3 = f3 === "dropdown"; // Toolbar blocking -> Dropdown
+            let ok4 = f4 === "modal";    // 3-paragraph agreement -> Modal Overlay
+
+            if (ok1 && ok2 && ok3 && ok4) {
+                completeLevel();
+                showSuccessFeedback("All UI Anti-Patterns Repaired!", "Sensational. You selected layout items matching correct data densities. Ready to finalize!");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[5]++;
+                showErrorFeedback("Usability Check Failed", "Some design selections are still cluttered. Assess screen space constraints.");
+            }
+        }
+
+        /* ── SCOREBOARD & END VIEW ── */
+        function showEndScreen() {
+            document.getElementById("playing-screen").classList.remove("active");
+            document.getElementById("end-screen").classList.add("active");
+
+            let starsCount = 1;
+            if (state.score >= 45) {
+                starsCount = 3;
+            } else if (state.score >= 30) {
+                starsCount = 2;
+            }
+
+            let starsRow = document.getElementById("stars-row");
+            starsRow.innerHTML = "";
+            for (let i = 1; i <= 3; i++) {
+                let activeClass = i <= starsCount ? "active" : "";
+                starsRow.innerHTML += `<i class="ti ti-star-filled star-icon ${activeClass}"></i>`;
+            }
+
+            // Badge mapping
+            let badgeIcon = "ti-award";
+            let badgeName = "Context Cleaner";
+            let badgeLevel = "Bronze Tier";
+
+            if (state.score >= 45) {
+                badgeIcon = "ti-stack-2";
+                badgeName = "Inlay Explorer";
+                badgeLevel = "Gold Tier (High Performance)";
+            } else if (state.score >= 30) {
+                badgeIcon = "ti-box-multiple";
+                badgeName = "Overlay Expert";
+                badgeLevel = "Silver Tier (Intermediate)";
+            }
+
+            document.getElementById("earned-badge-icon").className = "ti " + badgeIcon;
+            document.getElementById("earned-badge-name").innerText = badgeName;
+            document.getElementById("earned-badge-level").innerText = badgeLevel;
+            document.getElementById("final-score-text").innerText = "Final Score: " + state.score + " points";
+        }
+
+        function retrySimulation() {
+            state.score = 0;
+            state.maxUnlockedLevel = 1;
+            state.levelCompleted = [false, false, false, false, false, false];
+            state.hintUsed = [false, false, false, false, false, false];
+            state.mistakesCount = [0, 0, 0, 0, 0, 0];
+
+            document.getElementById("score-counter").innerText = "Score: 0";
+            document.getElementById("end-screen").classList.remove("active");
+            document.getElementById("playing-screen").classList.add("active");
+            loadLevel(1);
+        }
+
+        /* ── ACCORDION INTERACTION ── */
+        function toggleAccordion(idx) {
+            let body = document.getElementById("theory-body-" + idx);
+            let icon = body.previousElementSibling.querySelector("i");
+
+            if (body.classList.contains("active")) {
+                body.classList.remove("active");
+                icon.className = "ti ti-chevron-down";
+            } else {
+                body.classList.add("active");
+                icon.className = "ti ti-chevron-up";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

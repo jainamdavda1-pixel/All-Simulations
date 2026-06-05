@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 3.3 — Static & Dynamic Invitations & Transition Patterns</title>
+
+    <!-- Typography & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+    <style>
+        :root {
+            --red-primary: #C0302B;
+            --red-hover: #A52520;
+            --red-light: #E8534E;
+            --red-dark: #8B1A16;
+            --red-pale: #FDECEA;
+            --red-border: rgba(192, 48, 43, 0.2);
+            --white: #FFFFFF;
+            --bg-light: #FAFAFA;
+            --bg-card: #FFFFFF;
+            --text-main: #2D2D2D;
+            --text-muted: #666666;
+            --border-color: rgba(192, 48, 43, 0.15);
+
+            --success-bg: #EDF7EE;
+            --success-text: #1B5E20;
+            --success-border: #A5D6A7;
+
+            --error-bg: #FDECEA;
+            --error-text: #7F1010;
+            --error-border: #FFCDD2;
+
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ── HEADER & TOP NAVIGATION ── */
+        header {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(192, 48, 43, 0.04);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red-primary);
+        }
+
+        .logo i {
+            font-size: 22px;
+        }
+
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-pill {
+            background-color: var(--red-pale);
+            color: var(--red-dark);
+            border: 1px solid var(--red-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── PROGRESS STEPPER ── */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .step-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .step-item.active .step-circle {
+            border-color: var(--red-primary);
+            background-color: var(--red-primary);
+            color: var(--white);
+        }
+
+        .step-item.active .step-label {
+            color: var(--red-primary);
+            font-weight: 600;
+        }
+
+        .step-item.completed .step-circle {
+            background-color: var(--red-pale);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+        }
+
+        .step-item.completed .step-label {
+            color: var(--text-main);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+        }
+
+        .step-line.completed {
+            background-color: var(--red-primary);
+        }
+
+        /* ── MAIN LAYOUT GRID ── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(192, 48, 43, 0.02);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--red-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .task-box {
+            background: var(--red-pale);
+            border-left: 4px solid var(--red-primary);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .task-box strong {
+            color: var(--red-dark);
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--red-primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--red-hover);
+        }
+
+        .btn-primary:disabled {
+            background-color: #E0E0E0;
+            color: #9E9E9E;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--red-primary);
+            border: 1px solid var(--red-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--red-pale);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* ── INTERACTIVE WORKSPACE PANELS ── */
+        .workspace-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workspace-tag {
+            font-size: 11px;
+            background-color: var(--red-pale);
+            color: var(--red-dark);
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid var(--red-border);
+        }
+
+        /* ── LEVEL-SPECIFIC UI ELEMENTS ── */
+
+        /* Level 1: Static Invitations */
+        .layout-stub {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .layout-stub-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--red-dark);
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--bg-light);
+            padding-bottom: 4px;
+        }
+
+        .invitation-option-select {
+            width: 100%;
+            padding: 6px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        /* Empty state card classes */
+        .empty-state-card {
+            border: 1.5px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: var(--bg-light);
+        }
+
+        .empty-state-card i {
+            font-size: 32px;
+            color: var(--red-light);
+            margin-bottom: 6px;
+        }
+
+        .empty-state-card h5 {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .empty-state-card p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* Level 2: Dynamic Onboarding */
+        .mock-dashboard {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            position: relative;
+        }
+
+        .dash-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .dash-item {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+
+        .dash-item:hover {
+            border-color: var(--red-primary);
+        }
+
+        .tooltip-hint {
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--red-dark);
+            color: var(--white);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            z-index: 5;
+            display: none;
+        }
+
+        .tooltip-hint::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: var(--red-dark);
+        }
+
+        .dash-item.hint-active .tooltip-hint {
+            display: block;
+        }
+
+        /* Level 3: Affordance Finder */
+        .affordance-row {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .afford-preview {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Affordance Styles before fix */
+        .afford-bad-drag {
+            padding: 6px 12px;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-main);
+            width: 100%;
+        }
+
+        .afford-bad-link {
+            font-size: 13px;
+            color: var(--text-main);
+            cursor: default;
+        }
+
+        .afford-bad-disabled {
+            background-color: var(--red-primary);
+            color: var(--white);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+
+        .afford-bad-header {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            width: 100%;
+        }
+
+        /* Dynamic Style overlays after selection */
+        .afford-bad-drag.fixed {
+            cursor: grab;
+            border-color: var(--red-primary);
+        }
+
+        .afford-bad-link.fixed {
+            color: var(--red-primary);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .afford-bad-disabled.fixed {
+            background-color: #E0E0E0;
+            color: #9E9E9E;
+            cursor: not-allowed;
+        }
+
+        .afford-bad-header.fixed {
+            border-bottom: 1px dotted var(--red-primary);
+            cursor: text;
+        }
+
+        /* Level 4: Transition Patterns Lab */
+        .transition-stage {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transition-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            width: 160px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.35s ease-out;
+        }
+
+        /* Animations */
+        .anim-scale-in {
+            animation: animScaleIn 0.3s forwards;
+        }
+
+        @keyframes animScaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .anim-slide-in {
+            animation: animSlideIn 0.3s forwards;
+        }
+
+        @keyframes animSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .anim-expand {
+            animation: animExpand 0.3s forwards;
+        }
+
+        @keyframes animExpand {
+            from {
+                height: 0;
+                padding: 0;
+                overflow: hidden;
+                opacity: 0;
+            }
+
+            to {
+                height: auto;
+                opacity: 1;
+            }
+        }
+
+        .anim-fade-out {
+            animation: animFadeOut 0.3s forwards;
+        }
+
+        @keyframes animFadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+
+        .anim-spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--red-primary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Level 5: Repair Confusing Flow */
+        .flow-dropzone {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .flow-step-stub {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .flow-slot {
+            background-color: var(--bg-light);
+            border: 1.5px dashed var(--border-color);
+            min-height: 40px;
+            border-radius: 6px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .flow-slot.drag-over {
+            background-color: var(--red-pale);
+            border-color: var(--red-primary);
+        }
+
+        .flow-draggable-item {
+            background-color: var(--red-pale);
+            border: 1px solid var(--red-primary);
+            color: var(--red-dark);
+            font-weight: 500;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .flow-draggable-item.dragging {
+            opacity: 0.5;
+        }
+
+        /* ── FEEDBACK PANEL ── */
+        .feedback-panel {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .feedback-panel.success {
+            display: flex;
+            background-color: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success-text);
+        }
+
+        .feedback-panel.error {
+            display: flex;
+            background-color: var(--error-bg);
+            border-color: var(--error-border);
+            color: var(--error-text);
+        }
+
+        .feedback-panel i {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .feedback-content h5 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feedback-content p {
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        /* Hint box */
+        .hint-box {
+            display: none;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--red-primary);
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .hint-box.active {
+            display: flex;
+        }
+
+        .hint-box i {
+            color: var(--red-primary);
+            font-size: 16px;
+        }
+
+        /* ── SCREEN CONTROLS (INTRO & END) ── */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .intro-screen,
+        .end-screen {
+            text-align: center;
+            max-width: 580px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(192, 48, 43, 0.03);
+        }
+
+        .intro-screen h2,
+        .end-screen h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--red-dark);
+            margin-bottom: 12px;
+        }
+
+        .intro-screen p,
+        .end-screen p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .learn-bullet-list {
+            text-align: left;
+            margin: 18px 0;
+            padding-left: 20px;
+        }
+
+        .learn-bullet-list li {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        /* Star ratings */
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin: 16px 0;
+        }
+
+        .star-icon {
+            font-size: 28px;
+            color: #E0E0E0;
+        }
+
+        .star-icon.active {
+            color: #FFB300;
+        }
+
+        /* Badges */
+        .badge-award {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--red-pale);
+            border: 2px solid var(--red-primary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .badge-icon {
+            font-size: 48px;
+            color: var(--red-primary);
+            margin-bottom: 8px;
+        }
+
+        .badge-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red-dark);
+        }
+
+        .badge-level {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* ── THEORY ACCORDION (End Screen) ── */
+        .theory-accordion {
+            margin-top: 24px;
+            text-align: left;
+        }
+
+        .theory-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .theory-header {
+            background-color: var(--bg-light);
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .theory-header:hover {
+            background-color: var(--red-pale);
+        }
+
+        .theory-body {
+            display: none;
+            padding: 12px 14px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .theory-body.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Top header -->
+        <header>
+            <div class="logo">
+                <i class="ti ti-rotate-dot"></i>
+                <span>Simulation 3.3 — Invitations & Transitions</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-pill" title="Score Points">
+                    <i class="ti ti-award"></i>
+                    <span id="score-counter">Score: 0</span>
+                </div>
+                <div class="stat-pill" title="Level Progress">
+                    <i class="ti ti-steps"></i>
+                    <span id="progress-indicator">L1 / L5</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ── SCREEN 1: INTRO SCREEN ── -->
+        <div id="intro-screen" class="screen active">
+            <div class="intro-screen">
+                <i class="ti ti-sparkles"
+                    style="font-size: 52px; color: var(--red-primary); margin-bottom: 12px; display: inline-block;"></i>
+                <h2>Static & Dynamic Invitations & Transitions</h2>
+                <p>
+                    Guide users smoothly through actions. Invitations prompt interactions, while transitions maintain
+                    spatial context:
+                </p>
+                <ul class="learn-bullet-list">
+                    <li><strong>Static Invitations</strong>: Always-visible layout empty states and input placeholders
+                        that prompt tasks.</li>
+                    <li><strong>Dynamic Invitations</strong>: Tooltips and onboarding helpers that trigger contextually
+                        on action.</li>
+                    <li><strong>Affordance</strong>: Styling elements to clearly signal how they are used (buttons vs
+                        links vs grids).</li>
+                    <li><strong>Transition Patterns</strong>: Moving smoothly between states (scale, slide, height
+                        change, loaders) to prevent context loss.</li>
+                </ul>
+                <p style="font-size: 12px; font-weight: 500; color: var(--red-primary);">
+                    Scoring: Correct: +10 pts | Mistake: -3 pts | Hint: -2 pts. Complete all levels to win a badge!
+                </p>
+                <button class="btn btn-primary" onclick="startSimulation()">Start Simulation</button>
+            </div>
+        </div>
+
+        <!-- ── SCREEN 2: PLAYING SCREEN ── -->
+        <div id="playing-screen" class="screen">
+
+            <!-- Progress Stepper -->
+            <div class="stepper">
+                <div class="step-item active" id="step-1" onclick="jumpToLevel(1)">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Static Invites</div>
+                </div>
+                <div class="step-line" id="line-1"></div>
+                <div class="step-item" id="step-2" onclick="jumpToLevel(2)">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Dynamic Hints</div>
+                </div>
+                <div class="step-line" id="line-2"></div>
+                <div class="step-item" id="step-3" onclick="jumpToLevel(3)">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Affordances</div>
+                </div>
+                <div class="step-line" id="line-3"></div>
+                <div class="step-item" id="step-4" onclick="jumpToLevel(4)">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Transitions</div>
+                </div>
+                <div class="step-line" id="line-4"></div>
+                <div class="step-item" id="step-5" onclick="jumpToLevel(5)">
+                    <div class="step-circle">5</div>
+                    <div class="step-label">Flow Repair</div>
+                </div>
+            </div>
+
+            <!-- Main Workspace Grid -->
+            <div class="main-grid">
+
+                <!-- Left Column: Instructions & Level Info -->
+                <div>
+                    <div class="card">
+                        <div class="card-title">
+                            <span id="level-title-id">Level 1</span>: <span id="level-title-name">Static Invitation
+                                Challenge</span>
+                        </div>
+
+                        <div class="level-desc" id="level-description-text">
+                            Static invitations cue users before any engagement starts. Placeholders and empty-state CTAs
+                            guide layouts.
+                        </div>
+
+                        <div class="task-box" id="level-task-box">
+                            <!-- Dynamic task text here -->
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="revealHint()"><i class="ti ti-bulb"></i> Request
+                                Hint</button>
+                            <button class="btn btn-secondary" onclick="resetLevel()"><i class="ti ti-refresh"></i> Reset
+                                Level</button>
+                        </div>
+
+                        <!-- Inline hint drawer -->
+                        <div class="hint-box" id="hint-drawer">
+                            <i class="ti ti-info-circle"></i>
+                            <span id="hint-text">This is a level hint.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Sandbox Workspace -->
+                <div>
+                    <div class="card" style="min-height: 350px;">
+                        <div class="workspace-title">
+                            <span>Interactive Workspace</span>
+                            <span class="workspace-tag">Sandbox</span>
+                        </div>
+
+                        <!-- Dynamic Workspace content container -->
+                        <div id="sandbox-content">
+                            <!-- Dynamic content loaded via JS -->
+                        </div>
+
+                        <!-- Shared feedback panel inside the playing workspace -->
+                        <div class="feedback-panel" id="action-feedback">
+                            <i class="ti ti-circle-check" id="feedback-icon"></i>
+                            <div class="feedback-content">
+                                <h5 id="feedback-title">Title</h5>
+                                <p id="feedback-text">Detailed message feedback explaining usability guidelines.</p>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Action navigation -->
+                        <div
+                            style="margin-top: 24px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <button class="btn btn-primary" id="next-level-btn" onclick="goToNextLevel()" disabled>
+                                Next Level <i class="ti ti-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── SCREEN 3: END/SCOREBOARD SCREEN ── -->
+        <div id="end-screen" class="screen">
+            <div class="end-screen">
+                <i class="ti ti-trophy"
+                    style="font-size: 56px; color: var(--red-primary); margin-bottom: 12px; display: inline-block;"></i>
+                <h2>Simulation Completed!</h2>
+                <p>Here is your performance summary for Invitations & Transitions.</p>
+
+                <!-- Badge Award Box -->
+                <div class="badge-award">
+                    <i class="ti ti-award" id="earned-badge-icon" class="badge-icon"
+                        style="font-size: 48px; margin-bottom: 8px;"></i>
+                    <div class="badge-title" id="earned-badge-name">Transition Thinker</div>
+                    <div class="badge-level" id="earned-badge-level">Gold Tier</div>
+                </div>
+
+                <!-- Stars rating -->
+                <div class="stars-container" id="stars-row">
+                    <!-- Render stars dynamic -->
+                </div>
+
+                <p style="font-weight: 600; font-size: 16px; color: var(--text-main);" id="final-score-text">
+                    Final Score: 0 points
+                </p>
+
+                <button class="btn btn-primary" style="margin-top: 10px;" onclick="retrySimulation()">
+                    <i class="ti ti-refresh"></i> Retry Simulation
+                </button>
+
+                <!-- Clear Learning Summary Accordion -->
+                <div class="theory-accordion">
+                    <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--text-main);">What You Learned Summary:
+                    </h3>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(0)">
+                            1. Static Invitations (Empty States)
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-0">
+                            Empty states are prime real estate. Rather than leaving pages blank, static invitations
+                            (e.g. uploader dropzones and search placeholders) show users exactly how to fill details.
+                            This provides direction and eliminates onboarding friction.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(1)">
+                            2. Dynamic Invitations (Visual Overload)
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-1">
+                            Dynamic invitations trigger contextually (on hover or field focus). Showing multiple guides
+                            simultaneously causes visual fatigue. Stagger onboarding hints sequentially to ensure
+                            cognitive ease.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(2)">
+                            3. Establishing Clear Affordances
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-2">
+                            Affordances convey an item's interactivity. Underlined text triggers click expectations,
+                            grab icons signify draggable assets, and low-opacity grayed shapes inform disabled states.
+                            Consistency ensures interfaces behave exactly as they look.
+                        </div>
+                    </div>
+
+                    <div class="theory-item">
+                        <div class="theory-header" onclick="toggleAccordion(3)">
+                            4. Transition Continuity Patterns
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="theory-body" id="theory-body-3">
+                            State animations are not decorative—they preserve spatial context. Modals scale open to
+                            capture focal attention, rows slide out to signal card removals, and horizontal slides
+                            direct step changes. Animation timing should stay under 0.4s.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Interactive simulation script -->
+    <script>
+        // Game state
+        let state = {
+            currentLevel: 1,
+            score: 0,
+            maxUnlockedLevel: 1,
+            levelCompleted: [false, false, false, false, false, false], // 1-indexed
+            hintUsed: [false, false, false, false, false, false],
+            mistakesCount: [0, 0, 0, 0, 0, 0],
+            levelData: {
+                1: {
+                    title: "Static Invitation Challenge",
+                    desc: "Empty mock screens need structural static invitations to request user action. Avoid generic empty screens.",
+                    task: "Select the correct design layouts for empty states:<br>1. Course module empty uploader, 2. Search box placeholder, 3. Empty list dashboard. Click Verify Layout.",
+                    hint: "Empty uploader needs a dashed drag zone with clear instructions. Search needs a descriptive placeholder. Lists need a big call-to-action uploader button."
+                },
+                2: {
+                    title: "Dynamic Invitation Challenge",
+                    desc: "Dynamic hints guide users contextually. Placing all of them at once causes visual overload.",
+                    task: "Simulate an onboarding flow. Click the dashboard items to toggle onboarding tooltips. Configure exactly <strong>New Project</strong> and <strong>Enter Project Name</strong> to show tooltips. Do not activate A and B simultaneously.",
+                    hint: "Click the New Project and Name input boxes to activate tooltips. Keep Export PDF and Advanced Options tooltips hidden. Click Verify Hints."
+                },
+                3: {
+                    title: "Affordance Finder",
+                    desc: "UI elements must suggest their behavior. Click on each element to open selection menus and fix its affordance styles.",
+                    task: "Identify and repair 4 elements with poor affordance: 1. Draggable row, 2. Text link, 3. Disabled button, 4. Editable header. Select the style fix for each.",
+                    hint: "Draggable elements need cursor:grab and borders. Clickable links need underline and red colors. Disabled buttons need low opacity gray shapes. Editable headers need pencil icons."
+                },
+                4: {
+                    title: "Transition Pattern Lab",
+                    desc: "Match action contexts with their correct spatial transition animations to ensure fluid user continuity.",
+                    task: "Match actions with transitions: 1. Modal Open (Scale & Fade), 2. Expand Syllabus (Height Expand), 3. Remove Card (Fade Out & Shrink), 4. Form Step (Horizontal Slide), 5. Processing (Spinner Loader). Click Test to check, then Submit.",
+                    hint: "Modals expand from center (scale & fade). Deleting items collapses list height (fade out & shrink). Page switches slide horizontally."
+                },
+                5: {
+                    title: "Repair a Confusing Flow",
+                    desc: "Reposition transition stages and static invites to repair a jarring checkout flow.",
+                    task: "Drag remedy elements to correct slots: Slot 1: Static Invitation (Uploader), Slot 2: Height transition (Advanced), Slot 3: Linear transition (Step change), Slot 4: Loading feedback (Spinner), Slot 5: Success toast (Fade In). Submit repaired flow.",
+                    hint: "Drag the remedy cards into matching order: 1. Dashed Uploader, 2. Slide Transition, 3. Expand Height, 4. Loading Spinner, 5. Success Toast. Click Submit once sorted."
+                }
+            }
+        };
+
+        // Start simulation
+        function startSimulation() {
+            document.getElementById("intro-screen").classList.remove("active");
+            document.getElementById("playing-screen").classList.add("active");
+            loadLevel(1);
+        }
+
+        // Load specific level
+        function loadLevel(lvlNum) {
+            state.currentLevel = lvlNum;
+
+            // Clear feedback and hints
+            hideFeedback();
+            document.getElementById("hint-drawer").classList.remove("active");
+
+            // Stepper updates
+            for (let i = 1; i <= 5; i++) {
+                let stepEl = document.getElementById("step-" + i);
+                let lineEl = document.getElementById("line-" + i);
+
+                stepEl.className = "step-item";
+                if (i < lvlNum || state.levelCompleted[i]) {
+                    stepEl.classList.add("completed");
+                }
+                if (i === lvlNum) {
+                    stepEl.classList.add("active");
+                }
+
+                if (lineEl) {
+                    lineEl.className = "step-line";
+                    if (i < lvlNum || state.levelCompleted[i]) {
+                        lineEl.classList.add("completed");
+                    }
+                }
+            }
+
+            // Navigation state
+            document.getElementById("progress-indicator").innerText = "L" + lvlNum + " / L5";
+            document.getElementById("level-title-id").innerText = "Level " + lvlNum;
+            document.getElementById("level-title-name").innerText = state.levelData[lvlNum].title;
+            document.getElementById("level-description-text").innerText = state.levelData[lvlNum].desc;
+            document.getElementById("level-task-box").innerHTML = state.levelData[lvlNum].task;
+
+            // Disable Next button initially unless level already completed
+            document.getElementById("next-level-btn").disabled = !state.levelCompleted[lvlNum];
+
+            // Render level workspace content
+            renderWorkspace(lvlNum);
+        }
+
+        function jumpToLevel(lvlNum) {
+            if (lvlNum <= state.maxUnlockedLevel) {
+                loadLevel(lvlNum);
+            } else {
+                showErrorFeedback("Level Locked", "Complete preceding levels to unlock this challenge!");
+            }
+        }
+
+        function resetLevel() {
+            loadLevel(state.currentLevel);
+        }
+
+        function revealHint() {
+            let lvl = state.currentLevel;
+            if (!state.hintUsed[lvl] && !state.levelCompleted[lvl]) {
+                state.hintUsed[lvl] = true;
+                updateScore(-2);
+            }
+
+            let drawer = document.getElementById("hint-drawer");
+            document.getElementById("hint-text").innerText = state.levelData[lvl].hint;
+            drawer.classList.add("active");
+        }
+
+        function updateScore(amt) {
+            state.score += amt;
+            if (state.score < 0) state.score = 0;
+            document.getElementById("score-counter").innerText = "Score: " + state.score;
+        }
+
+        function showSuccessFeedback(title, msg) {
+            let panel = document.getElementById("action-feedback");
+            panel.className = "feedback-panel success";
+            document.getElementById("feedback-icon").className = "ti ti-circle-check";
+            document.getElementById("feedback-title").innerText = title;
+            document.getElementById("feedback-text").innerText = msg;
+        }
+
+        function showErrorFeedback(title, msg) {
+            let panel = document.getElementById("action-feedback");
+            panel.className = "feedback-panel error";
+            document.getElementById("feedback-icon").className = "ti ti-alert-circle";
+            document.getElementById("feedback-title").innerText = title;
+            document.getElementById("feedback-text").innerText = msg;
+        }
+
+        function hideFeedback() {
+            document.getElementById("action-feedback").className = "feedback-panel";
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < 5) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function completeLevel() {
+            let lvl = state.currentLevel;
+            if (!state.levelCompleted[lvl]) {
+                state.levelCompleted[lvl] = true;
+                updateScore(10);
+                if (lvl === state.maxUnlockedLevel && state.maxUnlockedLevel < 5) {
+                    state.maxUnlockedLevel++;
+                }
+            }
+            document.getElementById("next-level-btn").disabled = false;
+
+            document.getElementById("step-" + lvl).className = "step-item completed";
+            let lineEl = document.getElementById("line-" + lvl);
+            if (lineEl) lineEl.classList.add("completed");
+        }
+
+        // Render workspace content
+        function renderWorkspace(lvl) {
+            let sandbox = document.getElementById("sandbox-content");
+            sandbox.innerHTML = "";
+
+            if (lvl === 1) {
+                sandbox.innerHTML = `
+        <div class="static-stage">
+          <div class="layout-stub">
+            <div class="layout-stub-header">1. Empty syllabus file uploader area</div>
+            <select class="invitation-option-select" id="stub-uploader" onchange="lvl1_renderPreview()">
+              <option value="">Choose layout...</option>
+              <option value="bad">Simple uploader button "Upload File"</option>
+              <option value="good">Dashed drop box with file icon and text "Drag & drop syllabus here, or browse"</option>
+            </select>
+            <div id="preview-uploader" style="margin-top:8px;"></div>
+          </div>
+
+          <div class="layout-stub">
+            <div class="layout-stub-header">2. Dashboard Search Input Box</div>
+            <select class="invitation-option-select" id="stub-search" onchange="lvl1_renderPreview()">
+              <option value="">Choose layout...</option>
+              <option value="bad">Blank text input input field</option>
+              <option value="good">Text input containing "Search files, classes, or student grades..." placeholder</option>
+            </select>
+            <div id="preview-search" style="margin-top:8px;"></div>
+          </div>
+
+          <div class="layout-stub">
+            <div class="layout-stub-header">3. Empty list dashboard</div>
+            <select class="invitation-option-select" id="stub-empty" onchange="lvl1_renderPreview()">
+              <option value="">Choose layout...</option>
+              <option value="bad">Small gray text on top right saying "0 items found"</option>
+              <option value="good">Centered empty-state illustration card with "Create Your First Course Module" CTA button</option>
+            </select>
+            <div id="preview-empty" style="margin-top:8px;"></div>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="lvl1_submit()">
+            Verify Layout
+          </button>
+        </div>
+      `;
+            } else if (lvl === 2) {
+                sandbox.innerHTML = `
+        <div class="mock-dashboard">
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px; text-align:center;">Click items to toggle tooltips</div>
+          <div class="dash-row">
+            <div class="dash-item" id="dash-new" onclick="lvl2_toggleHint('dash-new')">
+              New Project
+              <div class="tooltip-hint">Click here to start a new workspace</div>
+            </div>
+            <div class="dash-item" id="dash-export" onclick="lvl2_toggleHint('dash-export')">
+              Export PDF
+              <div class="tooltip-hint">Download project records as PDF</div>
+            </div>
+          </div>
+          <div class="dash-row">
+            <div class="dash-item" id="dash-input" onclick="lvl2_toggleHint('dash-input')" style="padding:4px 8px;">
+              <input type="text" placeholder="Project Name" style="width:100%; font-size:11px; padding:2px;" disabled>
+              <div class="tooltip-hint" style="bottom:130%">Provide an easily recognizable workspace name</div>
+            </div>
+            <div class="dash-item" id="dash-advanced" onclick="lvl2_toggleHint('dash-advanced')">
+              Advanced Settings
+              <div class="tooltip-hint">Toggle advanced API hooks</div>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="lvl2_submit()">
+            Verify Hints
+          </button>
+        </div>
+      `;
+            } else if (lvl === 3) {
+                sandbox.innerHTML = `
+        <div class="affordance-stage">
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px; text-align:center;">Click items to modify their affordance styling</div>
+          
+          <div class="affordance-row" id="aff-row-1" onclick="lvl3_selectAff(1)">
+            <div class="afford-preview">
+              <div class="afford-bad-drag" id="aff-1">
+                <span>Advanced Layouts Module</span>
+              </div>
+            </div>
+            <select class="decision-select" id="aff-sel-1" style="display:none;" onchange="lvl3_applyAff(1)">
+              <option value="">Modify Style...</option>
+              <option value="no">Leave flat text</option>
+              <option value="yes">Add grip icon [::] and set cursor:grab</option>
+            </select>
+          </div>
+
+          <div class="affordance-row" id="aff-row-2" onclick="lvl3_selectAff(2)">
+            <div class="afford-preview">
+              <span class="afford-bad-link" id="aff-2">View Syllabus PDF</span>
+            </div>
+            <select class="decision-select" id="aff-sel-2" style="display:none;" onchange="lvl3_applyAff(2)">
+              <option value="">Modify Style...</option>
+              <option value="no">Leave black plain text</option>
+              <option value="yes">Add underline, red accent color, and cursor:pointer</option>
+            </select>
+          </div>
+
+          <div class="affordance-row" id="aff-row-3" onclick="lvl3_selectAff(3)">
+            <div class="afford-preview">
+              <button class="afford-bad-disabled" id="aff-3">Locked Lesson</button>
+            </div>
+            <select class="decision-select" id="aff-sel-3" style="display:none;" onchange="lvl3_applyAff(3)">
+              <option value="">Modify Style...</option>
+              <option value="no">Leave fully active red button</option>
+              <option value="yes">Gray out background and change cursor to not-allowed</option>
+            </select>
+          </div>
+
+          <div class="affordance-row" id="aff-row-4" onclick="lvl3_selectAff(4)">
+            <div class="afford-preview">
+              <h4 class="afford-bad-header" id="aff-4">Course Description Header</h4>
+            </div>
+            <select class="decision-select" id="aff-sel-4" style="display:none;" onchange="lvl3_applyAff(4)">
+              <option value="">Modify Style...</option>
+              <option value="no">Leave flat text heading</option>
+              <option value="yes">Add dotted bottom border, cursor:text, and pencil icon</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="lvl3_submit()">
+            Verify Affordances
+          </button>
+        </div>
+      `;
+            } else if (lvl === 4) {
+                sandbox.innerHTML = `
+        <div class="transition-tester">
+          <div class="decision-row">
+            <span class="decision-text">1. Open Modal Overlay</span>
+            <select class="decision-select" id="tran-1" onchange="lvl4_runTransition(1)">
+              <option value="">Select Anim...</option>
+              <option value="scale">Scale & Fade (draw attention)</option>
+              <option value="slide">Horizontal Slide (page step)</option>
+              <option value="expand">Height Expand (list inlay)</option>
+              <option value="spinner">Spinner Loader (system task)</option>
+            </select>
+          </div>
+          <div class="decision-row">
+            <span class="decision-text">2. Complete Form Step</span>
+            <select class="decision-select" id="tran-2" onchange="lvl4_runTransition(2)">
+              <option value="">Select Anim...</option>
+              <option value="scale">Scale & Fade (draw attention)</option>
+              <option value="slide">Horizontal Slide (page step)</option>
+              <option value="expand">Height Expand (list inlay)</option>
+              <option value="spinner">Spinner Loader (system task)</option>
+            </select>
+          </div>
+          <div class="decision-row">
+            <span class="decision-text">3. Expand Syllabus Inlay</span>
+            <select class="decision-select" id="tran-3" onchange="lvl4_runTransition(3)">
+              <option value="">Select Anim...</option>
+              <option value="scale">Scale & Fade (draw attention)</option>
+              <option value="slide">Horizontal Slide (page step)</option>
+              <option value="expand">Height Expand (list inlay)</option>
+              <option value="spinner">Spinner Loader (system task)</option>
+            </select>
+          </div>
+          <div class="decision-row">
+            <span class="decision-text">4. Processing Form Submit</span>
+            <select class="decision-select" id="tran-4" onchange="lvl4_runTransition(4)">
+              <option value="">Select Anim...</option>
+              <option value="scale">Scale & Fade (draw attention)</option>
+              <option value="slide">Horizontal Slide (page step)</option>
+              <option value="expand">Height Expand (list inlay)</option>
+              <option value="spinner">Spinner Loader (system task)</option>
+            </select>
+          </div>
+
+          <div class="transition-stage" id="lvl4-stage">
+            <div class="transition-card" id="lvl4-card">Preview Card</div>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="lvl4_submit()">
+            Verify Transitions
+          </button>
+        </div>
+      `;
+            } else if (lvl === 5) {
+                sandbox.innerHTML = `
+        <div class="flow-repair-container">
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px; text-align:center;">Drag remedy items into the flow steps</div>
+          
+          <div class="sort-items-pool" id="lvl5-remedies" style="margin-bottom:14px;">
+            <div class="flow-draggable-item" draggable="true" id="rem-uploader" ondragstart="lvl5_dragStart(event)">Dashed border uploader invitation</div>
+            <div class="flow-draggable-item" draggable="true" id="rem-slide" ondragstart="lvl5_dragStart(event)">Slide horizontally transition</div>
+            <div class="flow-draggable-item" draggable="true" id="rem-expand" ondragstart="lvl5_dragStart(event)">Expand height transition</div>
+            <div class="flow-draggable-item" draggable="true" id="rem-spinner" ondragstart="lvl5_dragStart(event)">Spinner loading feedback</div>
+            <div class="flow-draggable-item" draggable="true" id="rem-toast" ondragstart="lvl5_dragStart(event)">Fade In toast success feedback</div>
+          </div>
+
+          <div class="flow-dropzone">
+            <div class="flow-step-stub">Step 1: Empty state file dropzone needs:</div>
+            <div class="flow-slot" id="slot-1" ondragover="lvl5_dragOver(event)" ondragleave="lvl5_dragLeave(event)" ondrop="lvl5_drop(event)"></div>
+          </div>
+
+          <div class="flow-dropzone">
+            <div class="flow-step-stub">Step 2: Linear form step change needs:</div>
+            <div class="flow-slot" id="slot-2" ondragover="lvl5_dragOver(event)" ondragleave="lvl5_dragLeave(event)" ondrop="lvl5_drop(event)"></div>
+          </div>
+
+          <div class="flow-dropzone">
+            <div class="flow-step-stub">Step 3: Advanced options layout expand needs:</div>
+            <div class="flow-slot" id="slot-3" ondragover="lvl5_dragOver(event)" ondragleave="lvl5_dragLeave(event)" ondrop="lvl5_drop(event)"></div>
+          </div>
+
+          <div class="flow-dropzone">
+            <div class="flow-step-stub">Step 4: Button click to system process uploader needs:</div>
+            <div class="flow-slot" id="slot-4" ondragover="lvl5_dragOver(event)" ondragleave="lvl5_dragLeave(event)" ondrop="lvl5_drop(event)"></div>
+          </div>
+
+          <div class="flow-dropzone">
+            <div class="flow-step-stub">Step 5: Completion confirmation message needs:</div>
+            <div class="flow-slot" id="slot-5" ondragover="lvl5_dragOver(event)" ondragleave="lvl5_dragLeave(event)" ondrop="lvl5_drop(event)"></div>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px;" onclick="lvl5_submit()">
+            Submit Repaired Flow
+          </button>
+        </div>
+      `;
+            }
+        }
+
+        /* ── LEVEL 1 LOGIC ── */
+        function lvl1_renderPreview() {
+            let up = document.getElementById("stub-uploader").value;
+            let sh = document.getElementById("stub-search").value;
+            let em = document.getElementById("stub-empty").value;
+
+            let upPrev = document.getElementById("preview-uploader");
+            let shPrev = document.getElementById("preview-search");
+            let emPrev = document.getElementById("preview-empty");
+
+            if (up === 'good') {
+                upPrev.innerHTML = `
+        <div class="empty-state-card" style="padding:10px;">
+          <i class="ti ti-cloud-upload" style="font-size:20px;"></i>
+          <p style="margin:0; font-size:10px;">Drag & drop syllabus here, or browse</p>
+        </div>
+      `;
+            } else if (up === 'bad') {
+                upPrev.innerHTML = `<button class="btn btn-secondary" style="width:100%; padding:6px; font-size:10px;">Upload File</button>`;
+            } else {
+                upPrev.innerHTML = "";
+            }
+
+            if (sh === 'good') {
+                shPrev.innerHTML = `<input type="text" placeholder="Search files, classes, or student grades..." style="width:100%; padding:6px; font-size:11px; border:1px solid var(--border-color); border-radius:4px;" disabled>`;
+            } else if (sh === 'bad') {
+                shPrev.innerHTML = `<input type="text" style="width:100%; padding:6px; font-size:11px; border:1px solid var(--border-color); border-radius:4px;" disabled>`;
+            } else {
+                shPrev.innerHTML = "";
+            }
+
+            if (em === 'good') {
+                emPrev.innerHTML = `
+        <div class="empty-state-card">
+          <i class="ti ti-notes"></i>
+          <h5>No modules created yet</h5>
+          <p>Begin by creating your first instructional module.</p>
+          <button class="btn btn-primary" style="padding:4px 10px; font-size:10px;" disabled>Create First Module</button>
+        </div>
+      `;
+            } else if (em === 'bad') {
+                emPrev.innerHTML = `<div style="text-align:right; font-size:10px; color:var(--text-muted);">0 items found</div>`;
+            } else {
+                emPrev.innerHTML = "";
+            }
+        }
+
+        function lvl1_submit() {
+            let up = document.getElementById("stub-uploader").value;
+            let sh = document.getElementById("stub-search").value;
+            let em = document.getElementById("stub-empty").value;
+
+            if (up === "" || sh === "" || em === "") {
+                showErrorFeedback("Selection Incomplete", "Please assign static invitations for all 3 areas.");
+                return;
+            }
+
+            if (up === "good" && sh === "good" && em === "good") {
+                completeLevel();
+                showSuccessFeedback("Static Invitations Placed!", "Superb. Placeholders, uploader dropzones, and empty-state action buttons guide users layout navigation.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[1]++;
+                showErrorFeedback("Confusing Screens", "Some screens remain blank or non-intuitive. Static visual invitations need to tell users what to do.");
+            }
+        }
+
+        /* ── LEVEL 2 LOGIC ── */
+        let activeHints = {
+            "dash-new": false,
+            "dash-export": false,
+            "dash-input": false,
+            "dash-advanced": false
+        };
+
+        function lvl2_toggleHint(id) {
+            activeHints[id] = !activeHints[id];
+            let el = document.getElementById(id);
+            if (activeHints[id]) {
+                el.classList.add("hint-active");
+            } else {
+                el.classList.remove("hint-active");
+            }
+            hideFeedback();
+        }
+
+        function lvl2_submit() {
+            let newOk = activeHints["dash-new"] === true;
+            let inputOk = activeHints["dash-input"] === true;
+            let expOk = activeHints["dash-export"] === false;
+            let advOk = activeHints["dash-advanced"] === false;
+
+            if (newOk && inputOk && expOk && advOk) {
+                completeLevel();
+                showSuccessFeedback("Onboarding Flow Configured!", "Terrific. Staggering dynamic onboarding hints prevents popup exhaustion while guiding critical actions.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[2]++;
+                showErrorFeedback("Onboarding Clutter!", "Visual overload warning! Tooltips should only target main paths to prevent banner fatigue.");
+            }
+        }
+
+        /* ── LEVEL 3 LOGIC ── */
+        let activeAffId = null;
+
+        function lvl3_selectAff(id) {
+            if (activeAffId) {
+                document.getElementById("aff-sel-" + activeAffId).style.display = "none";
+            }
+            document.getElementById("aff-sel-" + id).style.display = "block";
+            activeAffId = id;
+            hideFeedback();
+        }
+
+        function lvl3_applyAff(id) {
+            let selVal = document.getElementById("aff-sel-" + id).value;
+            let previewEl = document.getElementById("aff-" + id);
+
+            if (selVal === 'yes') {
+                previewEl.classList.add("fixed");
+
+                // Update UI elements dynamic
+                if (id === 1) {
+                    previewEl.innerHTML = `<i class="ti ti-grip-vertical" style="margin-right:6px; color:var(--text-muted);"></i> <span>Advanced Layouts Module</span>`;
+                } else if (id === 4) {
+                    previewEl.innerHTML = `<span>Course Description Header</span> <i class="ti ti-pencil" style="font-size:11px; margin-left:4px; color:var(--red-primary);"></i>`;
+                }
+            } else {
+                previewEl.classList.remove("fixed");
+                if (id === 1) {
+                    previewEl.innerHTML = `<span>Advanced Layouts Module</span>`;
+                } else if (id === 4) {
+                    previewEl.innerHTML = `Course Description Header`;
+                }
+            }
+            document.getElementById("aff-sel-" + id).style.display = "none";
+            activeAffId = null;
+        }
+
+        function lvl3_submit() {
+            let s1 = document.getElementById("aff-sel-1").value === 'yes' || document.getElementById("aff-1").classList.contains("fixed");
+            let s2 = document.getElementById("aff-sel-2").value === 'yes' || document.getElementById("aff-2").classList.contains("fixed");
+            let s3 = document.getElementById("aff-sel-3").value === 'yes' || document.getElementById("aff-3").classList.contains("fixed");
+            let s4 = document.getElementById("aff-sel-4").value === 'yes' || document.getElementById("aff-4").classList.contains("fixed");
+
+            if (s1 && s2 && s3 && s4) {
+                completeLevel();
+                showSuccessFeedback("Visual Affordances Restored!", "Great design eyes. When elements look like how they behave, users don't need instructions.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[3]++;
+                showErrorFeedback("Affordance Ambiguity", "Some elements still look static or confuse click intentions. Review visual hints.");
+            }
+        }
+
+        /* ── LEVEL 4 LOGIC ── */
+        function lvl4_runTransition(id) {
+            let sel = document.getElementById("tran-" + id).value;
+            let card = document.getElementById("lvl4-card");
+            let stage = document.getElementById("lvl4-stage");
+
+            // Clear animations
+            card.className = "transition-card";
+            stage.innerHTML = "";
+            stage.appendChild(card);
+
+            if (sel === 'scale') {
+                card.classList.add("anim-scale-in");
+                card.innerText = "Modal Scale In";
+            } else if (sel === 'slide') {
+                card.classList.add("anim-slide-in");
+                card.innerText = "Horizontal Slide";
+            } else if (sel === 'expand') {
+                card.classList.add("anim-expand");
+                card.innerText = "Height Expand";
+            } else if (sel === 'spinner') {
+                let spinner = document.createElement("div");
+                spinner.className = "anim-spinner";
+                stage.appendChild(spinner);
+                card.style.display = "none";
+            } else {
+                card.innerText = "Preview Card";
+                card.style.display = "block";
+            }
+            hideFeedback();
+        }
+
+        function lvl4_submit() {
+            let t1 = document.getElementById("tran-1").value;
+            let t2 = document.getElementById("tran-2").value;
+            let t3 = document.getElementById("tran-3").value;
+            let t4 = document.getElementById("tran-4").value;
+
+            if (t1 === "" || t2 === "" || t3 === "" || t4 === "") {
+                showErrorFeedback("Selection Missing", "Please select a transition animation for all 4 actions.");
+                return;
+            }
+
+            let ok1 = t1 === "scale";   // Modal -> Scale
+            let ok2 = t2 === "slide";   // Step form -> Slide
+            let ok3 = t3 === "expand";  // Inlay -> Expand
+            let ok4 = t4 === "spinner"; // Loading -> Spinner
+
+            if (ok1 && ok2 && ok3 && ok4) {
+                completeLevel();
+                showSuccessFeedback("Transitions Matched!", "Perfect. Transition patterns establish logical spatial connections between layouts.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[4]++;
+                showErrorFeedback("Abrupt Changes!", "Some matches trigger confusing transitions. Think of step directions.");
+            }
+        }
+
+        /* ── LEVEL 5 LOGIC ── */
+        let draggedRemedy = null;
+
+        function lvl5_dragStart(e) {
+            draggedRemedy = e.currentTarget;
+            e.dataTransfer.setData("text/plain", e.currentTarget.id);
+        }
+
+        function lvl5_dragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add("drag-over");
+        }
+
+        function lvl5_dragLeave(e) {
+            e.currentTarget.classList.remove("drag-over");
+        }
+
+        function lvl5_drop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove("drag-over");
+
+            if (draggedRemedy) {
+                // Check if slot has children, send back to pool
+                let slot = e.currentTarget;
+                if (slot.children.length > 0) {
+                    document.getElementById("lvl5-remedies").appendChild(slot.children[0]);
+                }
+                slot.appendChild(draggedRemedy);
+            }
+        }
+
+        function lvl5_submit() {
+            let s1 = document.getElementById("slot-1");
+            let s2 = document.getElementById("slot-2");
+            let s3 = document.getElementById("slot-3");
+            let s4 = document.getElementById("slot-4");
+            let s5 = document.getElementById("slot-5");
+
+            let r1 = s1.firstElementChild ? s1.firstElementChild.id : "";
+            let r2 = s2.firstElementChild ? s2.firstElementChild.id : "";
+            let r3 = s3.firstElementChild ? s3.firstElementChild.id : "";
+            let r4 = s4.firstElementChild ? s4.firstElementChild.id : "";
+            let r5 = s5.firstElementChild ? s5.firstElementChild.id : "";
+
+            let ok1 = r1 === "rem-uploader";
+            let ok2 = r2 === "rem-slide";
+            let ok3 = r3 === "rem-expand";
+            let ok4 = r4 === "rem-spinner";
+            let ok5 = r5 === "rem-toast";
+
+            if (ok1 && ok2 && ok3 && ok4 && ok5) {
+                completeLevel();
+                showSuccessFeedback("Flow Repaired!", "Sensational. The flow is now smooth. Static invitations invite upload, linear screens slide, loader triggers, and toast fades.");
+            } else {
+                updateScore(-3);
+                state.mistakesCount[5]++;
+                showErrorFeedback("Jarring Flow", "Checkout flow feels bugged. Check the sequence.");
+            }
+        }
+
+        /* ── SCOREBOARD & END VIEW ── */
+        function showEndScreen() {
+            document.getElementById("playing-screen").classList.remove("active");
+            document.getElementById("end-screen").classList.add("active");
+
+            let starsCount = 1;
+            if (state.score >= 45) {
+                starsCount = 3;
+            } else if (state.score >= 30) {
+                starsCount = 2;
+            }
+
+            let starsRow = document.getElementById("stars-row");
+            starsRow.innerHTML = "";
+            for (let i = 1; i <= 3; i++) {
+                let activeClass = i <= starsCount ? "active" : "";
+                starsRow.innerHTML += `<i class="ti ti-star-filled star-icon ${activeClass}"></i>`;
+            }
+
+            // Badge mapping
+            let badgeIcon = "ti-award";
+            let badgeName = "Invitation Designer";
+            let badgeLevel = "Bronze Tier";
+
+            if (state.score >= 45) {
+                badgeIcon = "ti-comet";
+                badgeName = "Flow Fixer";
+                badgeLevel = "Gold Tier (High Performance)";
+            } else if (state.score >= 30) {
+                badgeIcon = "ti-exchange";
+                badgeName = "Transition Thinker";
+                badgeLevel = "Silver Tier (Intermediate)";
+            }
+
+            document.getElementById("earned-badge-icon").className = "ti " + badgeIcon;
+            document.getElementById("earned-badge-name").innerText = badgeName;
+            document.getElementById("earned-badge-level").innerText = badgeLevel;
+            document.getElementById("final-score-text").innerText = "Final Score: " + state.score + " points";
+        }
+
+        function retrySimulation() {
+            state.score = 0;
+            state.maxUnlockedLevel = 1;
+            state.levelCompleted = [false, false, false, false, false, false];
+            state.hintUsed = [false, false, false, false, false, false];
+            state.mistakesCount = [0, 0, 0, 0, 0, 0];
+
+            document.getElementById("score-counter").innerText = "Score: 0";
+            document.getElementById("end-screen").classList.remove("active");
+            document.getElementById("playing-screen").classList.add("active");
+            loadLevel(1);
+        }
+
+        /* ── ACCORDION INTERACTION ── */
+        function toggleAccordion(idx) {
+            let body = document.getElementById("theory-body-" + idx);
+            let icon = body.previousElementSibling.querySelector("i");
+
+            if (body.classList.contains("active")) {
+                body.classList.remove("active");
+                icon.className = "ti ti-chevron-down";
+            } else {
+                body.classList.add("active");
+                icon.className = "ti ti-chevron-up";
+            }
+        }
+    </script>
+
+</body>
+
+</html>
