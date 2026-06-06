@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 5.4 — Mobile Navigation Patterns</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FFF5F5;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --warning-color: #F59E0B;
+            --warning-light: #FEF3C7;
+            --info-color: #3B82F6;
+            --info-light: #EFF6FF;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Sandbox */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 620px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mobile Mockup */
+        .mobile-mockup {
+            width: 320px;
+            height: 540px;
+            border: 12px solid #1E1E24;
+            border-radius: 36px;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-status-bar {
+            height: 24px;
+            background-color: var(--somaiya-red-hover);
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .mobile-status-icons {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .mobile-app-bar {
+            height: 48px;
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mobile-screen-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: var(--white);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Bottom Tab Bar */
+        .mobile-bottom-nav {
+            height: 52px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--light-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            user-select: none;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--somaiya-red);
+            font-weight: bold;
+        }
+
+        /* Contextual Navigation */
+        .context-link-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            margin: 4px;
+        }
+
+        /* Level 3: Interaction Match */
+        .gesture-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+        }
+
+        /* Level 4: Primary vs Secondary Actions */
+        .lecture-detail-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 12px;
+        }
+
+        .dropdown-menu-mock {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--white);
+            box-shadow: var(--shadow-md);
+            padding: 4px;
+            position: absolute;
+            right: 12px;
+            top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 110px;
+            z-index: 50;
+        }
+
+        .dropdown-item-mock {
+            font-size: 0.7rem;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .dropdown-item-mock:hover {
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+        }
+
+        /* Level 5: In Content Messages */
+        .in-content-alert {
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #D1D5DB;
+            background-color: #F3F4F6;
+            color: #374151;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Feedback Panel */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            border-color: #CBD5E1;
+            color: #CBD5E1;
+            cursor: not-allowed;
+            background-color: var(--white);
+        }
+
+        /* Hint Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 5: Pattern with Mobile Interface Design</p>
+                </div>
+            </div>
+            <div class="subtopic-badge">
+                5.4 Patterns for Navigation
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <h2 id="level-title">Level 1: Global Navigation</h2>
+                <p id="level-desc">Loading instructions...</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                        style="vertical-align: middle; margin-right: 4px;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Navigation Workspace</h3>
+                <p id="sandbox-desc">Configure the mockup screen to test mobile navigation components.</p>
+            </div>
+
+            <div class="sandbox-body">
+                <div class="mobile-mockup" id="mobile-mockup-frame">
+                    <div class="mobile-status-bar">
+                        <span>College LTE</span>
+                        <span>12:15 PM</span>
+                        <div class="mobile-status-icons">🔋 89%</div>
+                    </div>
+                    <div class="mobile-app-bar" id="mobile-app-bar-title">
+                        Global Navigation
+                    </div>
+                    <div class="mobile-screen-content" id="mobile-screen-body">
+                        <!-- Dynamic Content -->
+                    </div>
+                    <div class="mobile-bottom-nav id-bottom-nav hidden" id="l1-bottom-nav">
+                        <div class="bottom-nav-item active">🏠<span>Home</span></div>
+                        <div class="bottom-nav-item">📚<span>Modules</span></div>
+                        <div class="bottom-nav-item">📊<span>Progress</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback-panel" id="feedback-panel">
+                <strong id="feedback-title">Feedback Title</strong>
+                <p id="feedback-text">Feedback text goes here.</p>
+            </div>
+
+            <div class="educational-explanation" id="educational-explanation">
+                <strong>💡 UI Design Principle:</strong>
+                <span id="educational-explanation-text">Design explanation goes here.</span>
+            </div>
+
+            <div class="controls-row">
+                <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">&larr; Prev</button>
+                <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Restart</button>
+                <button class="btn-action" id="btn-submit-action" onclick="validateLevel()">Submit</button>
+                <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next &rarr;</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>📖 UI Design Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            levelAnswers: {},
+            l2SelectedCount: 0,
+            l2Complete: false,
+            l4Prioritized: false,
+            l4MenuOpen: false
+        };
+
+        const levelData = {
+            1: {
+                title: "Level 1: Global Navigation",
+                desc: "On small viewports, standard global links must stay immediately available without taking over content space. Select the best layout pattern.",
+                hint: "Select 'Bottom Tab Navigation Bar (3-5 items)' in the mockup selector to enable clean global traversal.",
+                explanation: "Global Navigation anchors user state. In mobile, bottom tabs provide thumb-friendly access to high-priority categories, while secondary actions are tucked into side drawer menus."
+            },
+            2: {
+                title: "Level 2: Contextual Navigation",
+                desc: "Prevent dead-end screens! Link related subtopics contextually so students can move horizontally based on what they are currently reading.",
+                hint: "Check all three contextual choices (Previous Topic, Next Topic, and Subtopic Quiz) inside the menu options, then click the 'Next Topic' button.",
+                explanation: "Contextual Navigation guides the reader's journey. Rather than returning up to lists, inline links (e.g., 'Next Lecture' or 'Related Test') maintain user workflow focus."
+            },
+            3: {
+                title: "Level 3: User Interaction Gestures",
+                desc: "Match basic user interface actions to native mobile touch and swipe gestures.",
+                hint: "Assign: 1. Pull Down -> Refresh feed; 2. Swipe -> Move slides; 3. Long Press -> Show options menu; 4. Single Tap -> Open module.",
+                explanation: "Gestures reduce visual clutter by mapping common actions directly to muscle memory. However, actions must remain discoverable or provide standard visual signposts."
+            },
+            4: {
+                title: "Level 4: Separating Secondary Actions",
+                desc: "Ensure primary buttons stand out clearly. Avoid cluttering list rows with multiple competing buttons.",
+                hint: "Enable 'Group secondary options' in the layout controllers. This leaves 'Start Quiz' as the primary action and collapses 'Share' and 'Download' under a triple-dot menu.",
+                explanation: "Visual focus prevents choice paralysis. Primary actions demand clear visual cues (solid red buttons), while low-priority secondary actions are moved into action sheets or dropdown menus."
+            },
+            5: {
+                title: "Level 5: In-Content Messages",
+                desc: "Inline notifications should express severity using standardized color coding (Success, Warning, Error, Info).",
+                hint: "Assign: Success -> Green; Warning -> Yellow; Error -> Red; Info -> Blue.",
+                explanation: "In-content messages give feedback without breaking workflow focus. Standardized color schemas (green success, yellow caution, red alert, blue info) trigger immediate recognition."
+            }
+        };
+
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        function loadLevel(num) {
+            state.currentLevel = num;
+
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+            document.getElementById('l1-bottom-nav').classList.add('hidden');
+
+            const prevBtn = document.getElementById('btn-prev-level');
+            const nextBtn = document.getElementById('btn-next-level');
+            if (prevBtn) {
+                prevBtn.classList.remove('hidden');
+                prevBtn.disabled = (num === 1);
+            }
+            if (nextBtn) {
+                nextBtn.classList.remove('hidden');
+                nextBtn.disabled = false;
+                nextBtn.className = "btn-outline";
+            }
+
+            const progressPercent = (num / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercent + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${num} of 5`;
+
+            document.getElementById('level-title').innerText = levelData[num].title;
+            document.getElementById('level-desc').innerText = levelData[num].desc;
+
+            const body = document.getElementById('mobile-screen-body');
+            body.innerHTML = '';
+
+            if (num === 1) {
+                renderLevel1(body);
+            } else if (num === 2) {
+                renderLevel2(body);
+            } else if (num === 3) {
+                renderLevel3(body);
+            } else if (num === 4) {
+                renderLevel4(body);
+            } else if (num === 5) {
+                renderLevel5(body);
+            }
+        }
+
+        function showHintModal() {
+            document.getElementById('hint-text').innerText = levelData[state.currentLevel].hint;
+            document.getElementById('hint-modal').style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        /* LEVEL 1: GLOBAL NAV */
+        function renderLevel1(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Main Dashboard";
+            state.levelAnswers = { type: '' };
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:12px; color:var(--text-muted);">Choose the correct layout element to implement Global App Navigation:</p>
+            
+            <select class="pattern-select" id="l1-sel-nav" onchange="toggleL1Nav(this.value)">
+                <option value="">-- Choose Option --</option>
+                <option value="tabs">Bottom Tab Navigation Bar (3-5 items)</option>
+                <option value="links">Stacked Text Links (List menu)</option>
+            </select>
+
+            <div style="border:1px solid var(--border-color); border-radius:8px; padding:12px; font-size:0.75rem; margin-top:20px; flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                <p>Mock Page View: Home Screen Contents</p>
+            </div>
+        `;
+        }
+
+        function toggleL1Nav(val) {
+            state.levelAnswers.type = val;
+            const nav = document.getElementById('l1-bottom-nav');
+            if (val === 'tabs') {
+                nav.classList.remove('hidden');
+            } else {
+                nav.classList.add('hidden');
+            }
+        }
+
+        function validateLevel1() {
+            if (state.levelAnswers.type === 'tabs') {
+                showFeedback(true, "Global Navigation Satisfied!", "Correct! A Bottom Tab Bar keeps navigation actions instantly accessible at the base of the screen without taking up header space.");
+            } else {
+                showFeedback(false, "Poor Navigation Choice", "Incorrect. Stacked text links clutter the page layout. Mobile apps require persistent thumb-reachable components (Bottom Tab Bar) for global navigation.");
+            }
+        }
+
+        /* LEVEL 2: CONTEXTUAL NAV */
+        function renderLevel2(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Lecture 5.4 Page";
+            state.l2SelectedCount = 0;
+            state.l2Complete = false;
+
+            container.innerHTML = `
+            <div style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:6px; margin-bottom:12px; background:var(--somaiya-red-light); font-size:0.75rem;">
+                <p style="font-weight:bold; margin-bottom:4px; color:var(--somaiya-red);">🛠️ Enable Contextual Buttons:</p>
+                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="chk-l2-prev" onchange="toggleL2Links()"> Previous Subtopic Link</label>
+                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="chk-l2-next" onchange="toggleL2Links()"> Next Subtopic Link</label>
+                <label style="display:block;"><input type="checkbox" id="chk-l2-quiz" onchange="toggleL2Links()"> Practice Subtopic Quiz Link</label>
+            </div>
+
+            <div style="border:1px solid var(--border-color); border-radius:8px; padding:10px; font-size:0.75rem; flex-grow:1; display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                    <h4 style="font-weight:bold; margin-bottom:6px;">Mobile Navigation Patterns</h4>
+                    <p style="font-size:0.7rem; color:var(--text-muted);">This subtopic explores global menus, drawers, inline highlights, and message banners.</p>
+                </div>
+
+                <div id="l2-contextual-buttons-area" style="border-top:1px solid var(--border-color); padding-top:8px; display:flex; flex-wrap:wrap; justify-content:center;">
+                    <!-- Rendered contextual links -->
+                </div>
+            </div>
+        `;
+        }
+
+        function toggleL2Links() {
+            const prev = document.getElementById('chk-l2-prev').checked;
+            const next = document.getElementById('chk-l2-next').checked;
+            const quiz = document.getElementById('chk-l2-quiz').checked;
+
+            const area = document.getElementById('l2-contextual-buttons-area');
+            area.innerHTML = '';
+
+            let count = 0;
+            if (prev) {
+                count++;
+                area.innerHTML += `<div class="context-link-btn" onclick="clickL2Link('prev')">&lt; Back to 5.3</div>`;
+            }
+            if (next) {
+                count++;
+                area.innerHTML += `<div class="context-link-btn" style="border-color:var(--somaiya-red); color:var(--somaiya-red);" onclick="clickL2Link('next')">Go to 5.5 &gt;</div>`;
+            }
+            if (quiz) {
+                count++;
+                area.innerHTML += `<div class="context-link-btn" style="background-color:var(--somaiya-red); color:var(--white); border:none;" onclick="clickL2Link('quiz')">Take Quiz</div>`;
+            }
+
+            state.l2SelectedCount = count;
+        }
+
+        function clickL2Link(type) {
+            if (type === 'next' && state.l2SelectedCount === 3) {
+                state.l2Complete = true;
+                alert("Syllabus view advanced. Heading to 5.5.");
+            }
+        }
+
+        function validateLevel2() {
+            if (state.l2SelectedCount === 3) {
+                if (state.l2Complete) {
+                    showFeedback(true, "Contextual Flow Configured!", "Terrific layout choice! Inline links provide natural next steps, avoiding screen dead-ends.");
+                } else {
+                    showFeedback(false, "Verify horizontal navigation", "Contextual buttons active. Now, click 'Go to 5.5 >' in the mockup content area to verify progress.");
+                }
+            } else {
+                showFeedback(false, "Unconfigured flow", "A reader finishing this article is stuck. Enable all three contextual links (Previous, Next, and Quiz) to proceed.");
+            }
+        }
+
+        /* LEVEL 3: GESTURE MATCH */
+        function renderLevel3(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Gestures Database";
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:10px; color:var(--text-muted);">Assign the correct touch gesture to its interface action:</p>
+
+            <div class="gesture-item">
+                <span>1. Refresh student grades log feed</span>
+                <select class="drill-trigger-select" id="l3-sel-1">
+                    <option value="">-- Choose --</option>
+                    <option value="pull">Pull Down</option>
+                    <option value="swipe">Swipe Left/Right</option>
+                    <option value="press">Long Press</option>
+                    <option value="tap">Single Tap</option>
+                </select>
+            </div>
+
+            <div class="gesture-item">
+                <span>2. Open a syllabus chapter details page</span>
+                <select class="drill-trigger-select" id="l3-sel-2">
+                    <option value="">-- Choose --</option>
+                    <option value="pull">Pull Down</option>
+                    <option value="swipe">Swipe Left/Right</option>
+                    <option value="press">Long Press</option>
+                    <option value="tap">Single Tap</option>
+                </select>
+            </div>
+
+            <div class="gesture-item">
+                <span>3. Move sideways to slide banners</span>
+                <select class="drill-trigger-select" id="l3-sel-3">
+                    <option value="">-- Choose --</option>
+                    <option value="pull">Pull Down</option>
+                    <option value="swipe">Swipe Left/Right</option>
+                    <option value="press">Long Press</option>
+                    <option value="tap">Single Tap</option>
+                </select>
+            </div>
+
+            <div class="gesture-item" style="margin-bottom:0;">
+                <span>4. View settings context menu for a row</span>
+                <select class="drill-trigger-select" id="l3-sel-4">
+                    <option value="">-- Choose --</option>
+                    <option value="pull">Pull Down</option>
+                    <option value="swipe">Swipe Left/Right</option>
+                    <option value="press">Long Press</option>
+                    <option value="tap">Single Tap</option>
+                </select>
+            </div>
+        `;
+        }
+
+        function validateLevel3() {
+            const g1 = document.getElementById('l3-sel-1').value;
+            const g2 = document.getElementById('l3-sel-2').value;
+            const g3 = document.getElementById('l3-sel-3').value;
+            const g4 = document.getElementById('l3-sel-4').value;
+
+            if (!g1 || !g2 || !g3 || !g4) {
+                showFeedback(false, "Unmatched Gestures", "Please select a gesture for all four actions.");
+                return;
+            }
+
+            if (g1 === 'pull' && g2 === 'tap' && g3 === 'swipe' && g4 === 'press') {
+                showFeedback(true, "Gestures Mapped!", "Excellent mapping! Tap launches items, swipe navigates panels horizontally, pull down triggers updates, and long press reveals hidden inline context selectors.");
+            } else {
+                showFeedback(false, "Gesture Mismatch", "Incorrect settings. Feed updates require Pull Down. Direct navigation uses Single Tap. Horizontal shifts use Swipe. Option menus use Long Press.");
+            }
+        }
+
+        /* LEVEL 4: SECONDARY ACTIONS */
+        function renderLevel4(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Lecture Actions";
+            state.l4Prioritized = false;
+            state.l4MenuOpen = false;
+
+            container.innerHTML = `
+            <div style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:6px; margin-bottom:12px; background:var(--somaiya-red-light); font-size:0.75rem;">
+                <label><input type="checkbox" id="chk-l4-prioritize" onchange="toggleL4Priority(this.checked)"> Group secondary options (clean layout)</label>
+            </div>
+
+            <div class="lecture-detail-card" style="position:relative;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <span style="font-size:0.75rem; font-weight:600;">Subtopic 5.4 Lecture</span>
+                        <p style="font-size:0.65rem; color:var(--text-muted); margin-top:2px;">Format: Video + Slides (45 mins)</p>
+                    </div>
+                    <span id="l4-dots-btn" style="cursor:pointer; display:none;" onclick="toggleL4Menu()">⋮</span>
+                </div>
+
+                <div id="l4-buttons-row" style="display:flex; gap:6px; margin-top:12px; flex-wrap:wrap;">
+                    <button class="btn-action" style="padding:6px 12px; font-size:0.7rem;">Start Lecture</button>
+                    <button class="btn-outline id-secondary-btn" style="padding:6px 12px; font-size:0.7rem;">Share PDF</button>
+                    <button class="btn-outline id-secondary-btn" style="padding:6px 12px; font-size:0.7rem;">Download</button>
+                </div>
+
+                <div class="dropdown-menu-mock" id="l4-menu-box" style="display:none;">
+                    <div class="dropdown-item-mock" onclick="alert('PDF Shared')">Share PDF</div>
+                    <div class="dropdown-item-mock" onclick="alert('Slides Downloaded')">Download</div>
+                </div>
+            </div>
+        `;
+        }
+
+        function toggleL4Priority(checked) {
+            state.l4Prioritized = checked;
+            const dots = document.getElementById('l4-dots-btn');
+            const secondaryBtns = document.querySelectorAll('.id-secondary-btn');
+            const menuBox = document.getElementById('l4-menu-box');
+
+            if (checked) {
+                dots.style.display = 'block';
+                secondaryBtns.forEach(btn => btn.style.display = 'none');
+            } else {
+                dots.style.display = 'none';
+                secondaryBtns.forEach(btn => btn.style.display = 'inline-block');
+                menuBox.style.display = 'none';
+                state.l4MenuOpen = false;
+            }
+        }
+
+        function toggleL4Menu() {
+            state.l4MenuOpen = !state.l4MenuOpen;
+            document.getElementById('l4-menu-box').style.display = state.l4MenuOpen ? 'flex' : 'none';
+        }
+
+        function validateLevel4() {
+            if (state.l4Prioritized) {
+                showFeedback(true, "Actions Sorted!", "Excellent layout! Solid primary red buttons guide the main objective (Start Lecture), while secondary options are grouped under a clear menu, minimizing distraction.");
+            } else {
+                showFeedback(false, "Cluttered Action Row", "Failure. Giving equivalent visual weight to 'Start', 'Share', and 'Download' causes visual clutter. Enable the 'Group secondary options' checkbox.");
+            }
+        }
+
+        /* LEVEL 5: IN-CONTENT MESSAGES */
+        function renderLevel5(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Notification Hub";
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:10px; color:var(--text-muted);">Assign the correct severity type to each in-content message:</p>
+
+            <div class="in-content-alert" id="alert-1">
+                <span>✔️ Module 5 completed successfully.</span>
+                <select class="drill-trigger-select" style="margin-left:auto;" id="l5-sel-1" onchange="styleL5Alert(1, this.value)">
+                    <option value="">-- Style --</option>
+                    <option value="success">Success (Green)</option>
+                    <option value="warning">Warning (Yellow)</option>
+                    <option value="error">Error (Red)</option>
+                    <option value="info">Info (Blue)</option>
+                </select>
+            </div>
+
+            <div class="in-content-alert" id="alert-2">
+                <span>⚠️ Database servers down in 5 mins.</span>
+                <select class="drill-trigger-select" style="margin-left:auto;" id="l5-sel-2" onchange="styleL5Alert(2, this.value)">
+                    <option value="">-- Style --</option>
+                    <option value="success">Success (Green)</option>
+                    <option value="warning">Warning (Yellow)</option>
+                    <option value="error">Error (Red)</option>
+                    <option value="info">Info (Blue)</option>
+                </select>
+            </div>
+
+            <div class="in-content-alert" id="alert-3">
+                <span>❌ Failed to sync progress tracker.</span>
+                <select class="drill-trigger-select" style="margin-left:auto;" id="l5-sel-3" onchange="styleL5Alert(3, this.value)">
+                    <option value="">-- Style --</option>
+                    <option value="success">Success (Green)</option>
+                    <option value="warning">Warning (Yellow)</option>
+                    <option value="error">Error (Red)</option>
+                    <option value="info">Info (Blue)</option>
+                </select>
+            </div>
+
+            <div class="in-content-alert" id="alert-4" style="margin-bottom:0;">
+                <span>ℹ️ New course guidelines are active.</span>
+                <select class="drill-trigger-select" style="margin-left:auto;" id="l5-sel-4" onchange="styleL5Alert(4, this.value)">
+                    <option value="">-- Style --</option>
+                    <option value="success">Success (Green)</option>
+                    <option value="warning">Warning (Yellow)</option>
+                    <option value="error">Error (Red)</option>
+                    <option value="info">Info (Blue)</option>
+                </select>
+            </div>
+        `;
+        }
+
+        function styleL5Alert(num, type) {
+            const alertBox = document.getElementById(`alert-${num}`);
+            if (!alertBox) return;
+
+            // Clear existing styles
+            alertBox.style.backgroundColor = '';
+            alertBox.style.borderColor = '';
+            alertBox.style.color = '';
+
+            if (type === 'success') {
+                alertBox.style.backgroundColor = 'var(--success-light)';
+                alertBox.style.borderColor = 'var(--success-color)';
+                alertBox.style.color = '#065F46';
+            } else if (type === 'warning') {
+                alertBox.style.backgroundColor = 'var(--warning-light)';
+                alertBox.style.borderColor = 'var(--warning-color)';
+                alertBox.style.color = '#92400E';
+            } else if (type === 'error') {
+                alertBox.style.backgroundColor = 'var(--danger-light)';
+                alertBox.style.borderColor = 'var(--danger-color)';
+                alertBox.style.color = '#991B1B';
+            } else if (type === 'info') {
+                alertBox.style.backgroundColor = 'var(--info-light)';
+                alertBox.style.borderColor = 'var(--info-color)';
+                alertBox.style.color = '#1E40AF';
+            }
+        }
+
+        function validateLevel5() {
+            const a1 = document.getElementById('l5-sel-1').value;
+            const a2 = document.getElementById('l5-sel-2').value;
+            const a3 = document.getElementById('l5-sel-3').value;
+            const a4 = document.getElementById('l5-sel-4').value;
+
+            if (!a1 || !a2 || !a3 || !a4) {
+                showFeedback(false, "Unconfigured Alerts", "Please assign the correct color styles to all in-content messages.");
+                return;
+            }
+
+            if (a1 === 'success' && a2 === 'warning' && a3 === 'error' && a4 === 'info') {
+                showFeedback(true, "Alert Styles Approved!", "Fabulous work! Inline messages keep notifications centered inside the reader's view. Applying proper colors ensures immediate comprehension of severity.");
+            } else {
+                showFeedback(false, "Color Match Failure", "Incorrect alert styling. Check severity mappings: 1 is Success (Green); 2 is Warning (Yellow); 3 is Error (Red); 4 is Info (Blue).");
+            }
+        }
+
+        /* GLOBAL SIMULATION HANDLERS */
+        function validateLevel() {
+            if (state.currentLevel === 1) validateLevel1();
+            else if (state.currentLevel === 2) validateLevel2();
+            else if (state.currentLevel === 3) validateLevel3();
+            else if (state.currentLevel === 4) validateLevel4();
+            else if (state.currentLevel === 5) validateLevel5();
+        }
+
+        function showFeedback(isSuccess, title, msg) {
+            const panel = document.getElementById('feedback-panel');
+            const fTitle = document.getElementById('feedback-title');
+            const fText = document.getElementById('feedback-text');
+            const eduPanel = document.getElementById('educational-explanation');
+            const eduText = document.getElementById('educational-explanation-text');
+
+            panel.className = "feedback-panel " + (isSuccess ? "success" : "error");
+            fTitle.innerText = title;
+            fText.innerText = msg;
+            panel.style.display = 'block';
+
+            if (isSuccess) {
+                eduText.innerText = levelData[state.currentLevel].explanation;
+                eduPanel.style.display = 'block';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                const nextBtn = document.getElementById('btn-next-level');
+                if (nextBtn) {
+                    nextBtn.className = "btn-action";
+                }
+            } else {
+                eduPanel.style.display = 'none';
+            }
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                const container = document.getElementById('mobile-screen-body');
+                container.innerHTML = `
+                <div class="final-screen">
+                    <span class="celebrate-icon">🎓</span>
+                    <h3>Simulation Complete!</h3>
+                    <p style="font-size:0.8rem;">You have mastered Subtopic 5.4: Patterns for Navigation. You understand global navigation, inline connections, touch gestures, action grouping, and message alerts.</p>
+                </div>
+            `;
+                document.getElementById('level-title').innerText = "All Levels Complete";
+                document.getElementById('level-desc').innerText = "Congratulations! You have completed the interactive laboratory module on mobile navigation patterns.";
+                document.getElementById('feedback-panel').style.display = 'none';
+                document.getElementById('educational-explanation').style.display = 'none';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                document.getElementById('btn-next-level').classList.add('hidden');
+                document.getElementById('btn-prev-level').classList.add('hidden');
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+    </script>
+</body>
+
+</html>

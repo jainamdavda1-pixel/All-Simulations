@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 5.1 — Managing Mobile Components: Display, Control and Confirmation</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FFF5F5;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --warning-color: #F59E0B;
+            --warning-light: #FEF3C7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Sandbox & Mobile Frame */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 620px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Workspace Panel Structure (No phone bezel, notch, or status bar) */
+        .workspace-panel {
+            width: 100%;
+            max-width: 600px;
+            min-height: 520px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            height: 48px;
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: var(--white);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Level Specific Layout Styles */
+        .scenario-card {
+            border: 1px solid var(--border-color);
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 0.82rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .scenario-card strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--somaiya-red);
+        }
+
+        .pattern-select {
+            width: 100%;
+            padding: 6px;
+            margin-top: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            background-color: var(--light-bg);
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Infinite List Feed */
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .feed-item {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.8rem;
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feed-item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .feed-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--somaiya-red-border);
+            color: var(--somaiya-red);
+            font-weight: bold;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feed-name {
+            font-weight: 600;
+        }
+
+        .feed-loading {
+            text-align: center;
+            padding: 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--somaiya-red);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        /* Component Select Level 3 */
+        .mock-component {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mock-component.selected {
+            border-color: var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+        }
+
+        .mock-component-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        /* Carousel Grid render */
+        .rendered-carousel {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: none;
+        }
+
+        .carousel-card {
+            flex: 0 0 120px;
+            height: 70px;
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 4px;
+        }
+
+        /* Film strip render */
+        .rendered-film-strip {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .film-box {
+            flex: 0 0 50px;
+            height: 50px;
+            background-color: #DDD;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Slideshow render */
+        .rendered-slideshow {
+            height: 120px;
+            background-color: #E2E8F0;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+            position: relative;
+        }
+
+        .slide-nav {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            top: 45%;
+            left: 8px;
+            right: 8px;
+        }
+
+        .slide-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+
+        /* Level 4: Fisheye and Map */
+        .fisheye-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 4px 0;
+        }
+
+        .fisheye-item {
+            padding: 8px;
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            transition: transform 0.1s ease, font-size 0.1s ease, background-color 0.2s;
+            cursor: pointer;
+            transform-origin: left center;
+        }
+
+        .fisheye-item:hover {
+            background-color: var(--somaiya-red-light);
+            border-color: var(--somaiya-red);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .map-canvas-container {
+            width: 100%;
+            height: 180px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: auto;
+            position: relative;
+            cursor: grab;
+            background-color: #F8FAFC;
+        }
+
+        .map-large-area {
+            width: 600px;
+            height: 400px;
+            background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+            background-size: 10px 10px;
+            position: relative;
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--somaiya-red);
+            border: 2px solid var(--white);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .map-marker-label {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            background-color: var(--text-dark);
+            color: var(--white);
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        /* Level 5 Select/Confirmation */
+        .flow-builder-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .flow-builder-option input {
+            accent-color: var(--somaiya-red);
+            cursor: pointer;
+        }
+
+        .form-select-group {
+            margin-bottom: 12px;
+        }
+
+        .form-select-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .custom-select-trigger {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            background-color: var(--light-bg);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Feedback and educational panel */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            border-color: #CBD5E1;
+            color: #CBD5E1;
+            cursor: not-allowed;
+            background-color: var(--white);
+        }
+
+        /* Modal overlay for Hints */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        /* Final screen */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .nav-sim-btn {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-sim-btn:hover {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 5: Pattern with Mobile Interface Design</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="simulation-5.2.html" class="nav-sim-btn">Next Subtopic &rarr;</a>
+                <div class="subtopic-badge">
+                    5.1 Managing Mobile Components
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Left Column: Guidelines & Progress -->
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <h2 id="level-title">Level 1: Vertical vs Thumbnail</h2>
+                <p id="level-desc">Loading instructions...</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                        style="vertical-align: middle; margin-right: 4px;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Column: Interactive Simulator Sandbox -->
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Mobile Interface Board</h3>
+                <p id="sandbox-desc">Complete the mobile component tasks inside the screen container.</p>
+            </div>
+
+            <div class="sandbox-body">
+                <!-- Flat Workspace Panel -->
+                <div class="workspace-panel" id="workspace-panel-frame">
+                    <div class="panel-header" id="mobile-app-bar-title">
+                        Faculty Portal
+                    </div>
+                    <div class="panel-body" id="mobile-screen-body">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback & Explanations -->
+            <div class="feedback-panel" id="feedback-panel">
+                <strong id="feedback-title">Feedback Title</strong>
+                <p id="feedback-text">Feedback text goes here.</p>
+            </div>
+
+            <div class="educational-explanation" id="educational-explanation">
+                <strong>💡 UI Design Principle:</strong>
+                <span id="educational-explanation-text">Design explanation goes here.</span>
+            </div>
+
+            <!-- Level Actions -->
+            <div class="controls-row">
+                <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">&larr; Prev</button>
+                <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Restart</button>
+                <button class="btn-action" id="btn-submit-action" onclick="validateLevel()">Submit</button>
+                <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next &rarr;</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>📖 UI Design Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            levelAnswers: {},
+            fisheyeTargets: { kulkarni: false, pathak: false },
+            mapTargets: { ITBlock: false, Auditorium: false },
+            confirmSafetyLevel5: {
+                reviews: false,
+                confirmDialog: false,
+                successBanner: false
+            },
+            l5Step: 1,
+            selectedSem: '',
+            selectedCourse: '',
+            withdrawalSubmitted: false
+        };
+
+        const levelData = {
+            1: {
+                title: "Level 1: Multi-Scenario List Allocation",
+                desc: "Match five content types to their corresponding optimal list pattern. A single incorrect mapping fails validation.",
+                hint: "Select layout types: Syllabus -> Vertical, Photos -> Thumbnail, Banners -> Carousel, Keyframes -> Film Strip, Zoom Poster -> Slideshow.",
+                explanation: "Layout constraints rule structure. Long text uses Vertical lists. Grid photos use Thumbnail lists. Horizontal swipes use Carousel grids. Preview sequences use Film strips. Center focus zooms use Slideshows."
+            },
+            2: {
+                title: "Level 2: Latency & Page Size Optimization",
+                desc: "Select the correct pagination models and load page sizes (items/request) to prevent bottlenecks under a high-latency 2G/3G network.",
+                hint: "ISBN search: Pagination + 10 items. Social updates: Infinite + 25 items. Archive: Pagination + 10 items.",
+                explanation: "High-latency parameters demand data thrift. Large items/request values (like 100+) block the single UI thread, making small pagination subsets mandatory for precise index catalog search."
+            },
+            3: {
+                title: "Level 3: Component Parameter Grid",
+                desc: "Configure the internal properties (width, snap, wraps) to correctly generate the target visual sliders.",
+                hint: "Slot 1 (Carousel Banners): itemWidth=80%, snap=yes, wraps=yes. Slot 2 (Film Preview): itemWidth=60px, snap=no, wraps=no. Slot 3 (Slideshow Detail): itemWidth=100%, snap=yes, wraps=no.",
+                explanation: "Visual parameters define component physics. Carousel grids snap elements horizontally but wrap pages. Film strips allow fluid, continuous sliding of thumbnail clips. Slideshows isolate one 100% width slide."
+            },
+            4: {
+                title: "Level 4: Spatial Search & Double Panning Map",
+                desc: "Locate and click HOD Amit Kulkarni and Dean Smita Pathak using the Fisheye directory. Drag the canvas to find and click IT Block AND Auditorium.",
+                hint: "Fisheye: hover/tap Amit Kulkarni and Smita Pathak. Map: drag/scroll to find and click the red IT Block AND red Auditorium markers.",
+                explanation: "Extended canvases support multi-coordinate panning. Fisheye zoom scales small clickable targets to make high-density selection simple on constrained display viewports."
+            },
+            5: {
+                title: "Level 5: Destructive Actions confirmation logic",
+                desc: "Build a secure course withdrawal flow. Destructive actions require multiple verification safety checks to prevent database accidental deletions.",
+                hint: "Enable all three safety options (Review screen, Dialog prompt, Success page), then trigger a registration withdrawal flow.",
+                explanation: "Irreversible actions demand high friction. Safe transaction designs include review checkpoints, alert confirmations, and final success cards to guarantee user intent."
+            }
+        };
+
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        function loadLevel(num) {
+            state.currentLevel = num;
+
+            // UI resetting
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+
+            const prevBtn = document.getElementById('btn-prev-level');
+            const nextBtn = document.getElementById('btn-next-level');
+            if (prevBtn) {
+                prevBtn.classList.remove('hidden');
+                prevBtn.disabled = (num === 1);
+            }
+            if (nextBtn) {
+                nextBtn.classList.remove('hidden');
+                nextBtn.disabled = false;
+                nextBtn.className = "btn-outline";
+            }
+
+            const progressPercent = (num / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercent + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${num} of 5`;
+
+            document.getElementById('level-title').innerText = levelData[num].title;
+            document.getElementById('level-desc').innerText = levelData[num].desc;
+
+            const body = document.getElementById('mobile-screen-body');
+            body.innerHTML = '';
+
+            if (num === 1) {
+                renderLevel1(body);
+            } else if (num === 2) {
+                renderLevel2(body);
+            } else if (num === 3) {
+                renderLevel3(body);
+            } else if (num === 4) {
+                renderLevel4(body);
+            } else if (num === 5) {
+                renderLevel5(body);
+            }
+        }
+
+        function showHintModal() {
+            document.getElementById('hint-text').innerText = levelData[state.currentLevel].hint;
+            document.getElementById('hint-modal').style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        /* LEVEL 1: MULTI-SCENARIO LIST ALLOCATION */
+        function renderLevel1(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "College Content Match";
+
+            container.innerHTML = `
+            <p style="font-size: 0.8rem; margin-bottom: 12px; color: var(--text-muted);">Match all five layout options correctly:</p>
+            
+            <div class="scenario-card">
+                <strong>Scenario A: Course Syllabus Catalog</strong>
+                <p style="font-size:0.7rem; color:var(--text-muted);">Dense hierarchy showing chapter reading titles.</p>
+                <select class="pattern-select" id="level1-sel-a">
+                    <option value="">-- Select Layout --</option>
+                    <option value="vertical">Vertical List (Text-heavy Rows)</option>
+                    <option value="thumbnail">Thumbnail List (Image Grid)</option>
+                    <option value="carousel">Carousel Grid (Horizontal Banners)</option>
+                    <option value="filmstrip">Film Strip (Quick scroll frames)</option>
+                    <option value="slideshow">Slideshow (Isolated details)</option>
+                </select>
+            </div>
+
+            <div class="scenario-card">
+                <strong>Scenario B: Tech-Fest Presentation Photos</strong>
+                <p style="font-size:0.7rem; color:var(--text-muted);">A grid browsing layout showing high-res student project galleries.</p>
+                <select class="pattern-select" id="level1-sel-b">
+                    <option value="">-- Select Layout --</option>
+                    <option value="vertical">Vertical List (Text-heavy Rows)</option>
+                    <option value="thumbnail">Thumbnail List (Image Grid)</option>
+                    <option value="carousel">Carousel Grid (Horizontal Banners)</option>
+                    <option value="filmstrip">Film Strip (Quick scroll frames)</option>
+                    <option value="slideshow">Slideshow (Isolated details)</option>
+                </select>
+            </div>
+
+            <div class="scenario-card">
+                <strong>Scenario C: Lecture Promotion Slide Banners</strong>
+                <p style="font-size:0.7rem; color:var(--text-muted);">Swipeable horizontally-aligned module banners.</p>
+                <select class="pattern-select" id="level1-sel-c">
+                    <option value="">-- Select Layout --</option>
+                    <option value="vertical">Vertical List (Text-heavy Rows)</option>
+                    <option value="thumbnail">Thumbnail List (Image Grid)</option>
+                    <option value="carousel">Carousel Grid (Horizontal Banners)</option>
+                    <option value="filmstrip">Film Strip (Quick scroll frames)</option>
+                    <option value="slideshow">Slideshow (Isolated details)</option>
+                </select>
+            </div>
+
+            <div class="scenario-card">
+                <strong>Scenario D: Lecture Video Keyframe Previews</strong>
+                <p style="font-size:0.7rem; color:var(--text-muted);">A row of compact video screenshots for scrubbing.</p>
+                <select class="pattern-select" id="level1-sel-d">
+                    <option value="">-- Select Layout --</option>
+                    <option value="vertical">Vertical List (Text-heavy Rows)</option>
+                    <option value="thumbnail">Thumbnail List (Image Grid)</option>
+                    <option value="carousel">Carousel Grid (Horizontal Banners)</option>
+                    <option value="filmstrip">Film Strip (Quick scroll frames)</option>
+                    <option value="slideshow">Slideshow (Isolated details)</option>
+                </select>
+            </div>
+
+            <div class="scenario-card">
+                <strong>Scenario E: Single Focused Poster Image</strong>
+                <p style="font-size:0.7rem; color:var(--text-muted);">Viewing one research poster filling the screen width.</p>
+                <select class="pattern-select" id="level1-sel-e">
+                    <option value="">-- Select Layout --</option>
+                    <option value="vertical">Vertical List (Text-heavy Rows)</option>
+                    <option value="thumbnail">Thumbnail List (Image Grid)</option>
+                    <option value="carousel">Carousel Grid (Horizontal Banners)</option>
+                    <option value="filmstrip">Film Strip (Quick scroll frames)</option>
+                    <option value="slideshow">Slideshow (Isolated details)</option>
+                </select>
+            </div>
+        `;
+        }
+
+        function validateLevel1() {
+            const selA = document.getElementById('level1-sel-a').value;
+            const selB = document.getElementById('level1-sel-b').value;
+            const selC = document.getElementById('level1-sel-c').value;
+            const selD = document.getElementById('level1-sel-d').value;
+            const selE = document.getElementById('level1-sel-e').value;
+
+            if (!selA || !selB || !selC || !selD || !selE) {
+                showFeedback(false, "Incomplete Selection", "Please match all five scenarios.");
+                return;
+            }
+
+            if (selA === 'vertical' && selB === 'thumbnail' && selC === 'carousel' && selD === 'filmstrip' && selE === 'slideshow') {
+                showFeedback(true, "All Matches Confirmed!", "Excellent! You matched them correctly. Text cataloging uses Vertical; project photos use Thumbnail; module swipes use Carousel; video frames use Film Strip; single focus images use Slideshow.");
+            } else {
+                showFeedback(false, "Layout Mismatch", "Incorrect configurations found. Review layout constraints: Vertical handles text-only, Thumbnail grid structures gallery squares, Carousel snaps wide panels, Film Strip offers narrow horizontal preview strips, and Slideshow isolates single views.");
+            }
+        }
+
+        /* LEVEL 2: LATENCY & PAGE SIZE OPTIMIZATION */
+        function renderLevel2(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Search & Feed Performance";
+
+            container.innerHTML = `
+            <div style="border:1px solid var(--border-color); border-radius:8px; padding:8px; margin-bottom:12px; max-height:140px; overflow-y:auto;" id="level2-feed-box" onscroll="handleL2Scroll()">
+                <div class="feed-container" id="level2-feed-items">
+                    <div class="feed-item">
+                        <div class="feed-item-header">
+                            <div class="feed-avatar">C</div>
+                            <span class="feed-name">Robotics Club</span>
+                        </div>
+                        <p style="font-size:0.72rem;">Excited to launch our new autonomous bot demo tomorrow at the courtyard!</p>
+                    </div>
+                </div>
+                <div class="feed-loading" id="level2-feed-loading">
+                    <span class="spinner"></span>Loading feed items...
+                </div>
+            </div>
+
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Assign navigation patterns and select optimal page size under high latency:</p>
+
+            <div class="scenario-card" style="padding:6px; margin-bottom:8px;">
+                <span style="font-size:0.72rem; font-weight:600;">1. Library Catalog search by ISBN (10k items, 3G data)</span>
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                    <select class="pattern-select" style="margin:0; padding:4px; flex:1;" id="level2-sel-1">
+                        <option value="">-- Layout --</option>
+                        <option value="infinite">Infinite List</option>
+                        <option value="pagination">Pagination</option>
+                    </select>
+                    <select class="pattern-select" style="margin:0; padding:4px; flex:1;" id="level2-size-1">
+                        <option value="">-- Page Size --</option>
+                        <option value="10">10 items/page</option>
+                        <option value="50">50 items/page</option>
+                        <option value="250">250 items/page</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="scenario-card" style="padding:6px; margin-bottom:8px;">
+                <span style="font-size:0.72rem; font-weight:600;">2. Student Social Updates Feed (Passive scroll)</span>
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                    <select class="pattern-select" style="margin:0; padding:4px; flex:1;" id="level2-sel-2">
+                        <option value="">-- Layout --</option>
+                        <option value="infinite">Infinite List</option>
+                        <option value="pagination">Pagination</option>
+                    </select>
+                    <select class="pattern-select" style="margin:0; padding:4px; flex:1;" id="level2-size-2">
+                        <option value="">-- Page Size --</option>
+                        <option value="25">25 items/page</option>
+                        <option value="100">100 items/page</option>
+                        <option value="500">500 items/page</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="scenario-card" style="padding:6px; margin-bottom:0;">
+                <span style="font-size:0.72rem; font-weight:600;">3. Retrieve Marks PDF Archive (Goal-directed search)</span>
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                    <select class="pattern-select" style="margin:0; padding:4px; flex:1;" id="level2-sel-3">
+                        <option value="">-- Layout --</option>
+                        <option value="infinite">Infinite List</option>
+                        <option value="pagination">Pagination</option>
+                    </select>
+                    <select class="pattern-select" style="margin:0; padding:4px; flex:1;" id="level2-size-3">
+                        <option value="">-- Page Size --</option>
+                        <option value="10">10 items/page</option>
+                        <option value="100">100 items/page</option>
+                    </select>
+                </div>
+            </div>
+        `;
+        }
+
+        let isL2Loading = false;
+        function handleL2Scroll() {
+            const box = document.getElementById('level2-feed-box');
+            if (box.scrollHeight - box.scrollTop <= box.clientHeight + 10 && !isL2Loading) {
+                isL2Loading = true;
+                const loader = document.getElementById('level2-feed-loading');
+                loader.style.display = 'block';
+                setTimeout(() => {
+                    const items = document.getElementById('level2-feed-items');
+                    const newItem = document.createElement('div');
+                    newItem.className = 'feed-item';
+                    newItem.innerHTML = `
+                    <div class="feed-item-header">
+                        <div class="feed-avatar">L</div>
+                        <span class="feed-name">Library Portal</span>
+                    </div>
+                    <p style="font-size:0.72rem;">New research books on Deep Learning have been added to the physical catalog stacks.</p>
+                `;
+                    items.appendChild(newItem);
+                    loader.style.display = 'none';
+                    isL2Loading = false;
+                }, 1000);
+            }
+        }
+
+        function validateLevel2() {
+            const s1 = document.getElementById('level2-sel-1').value;
+            const z1 = document.getElementById('level2-size-1').value;
+            const s2 = document.getElementById('level2-sel-2').value;
+            const z2 = document.getElementById('level2-size-2').value;
+            const s3 = document.getElementById('level2-sel-3').value;
+            const z3 = document.getElementById('level2-size-3').value;
+
+            if (!s1 || !z1 || !s2 || !z2 || !s3 || !z3) {
+                showFeedback(false, "Incomplete Classification", "Please choose both patterns and page size parameters.");
+                return;
+            }
+
+            if (s1 === 'pagination' && z1 === '10' && s2 === 'infinite' && z2 === '25' && s3 === 'pagination' && z3 === '10') {
+                showFeedback(true, "Optimization Approved!", "Awesome! Pagination with small page size (10) limits download weight under high network latency. Infinite scroll with moderate size (25) is ideal for social feeds.");
+            } else {
+                showFeedback(false, "Optimization Failed", "Critical error: High items-per-page (like 100+ or 250) on mobile under high latency blocks browser rendering and triggers performance bottlenecks. Target archives require Pagination with small limits (10).");
+            }
+        }
+
+        /* LEVEL 3: COMPONENT PARAMETER GRID */
+        function renderLevel3(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Visual Component Grid";
+            state.levelAnswers = { 1: {}, 2: {}, 3: {} };
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:8px; color:var(--text-muted);">Match layout parameters to the correct mobile display components:</p>
+
+            <div class="mock-component" id="l3-slot-1" onclick="cycleL3Slot(1)" style="text-align:left;">
+                <div class="mock-component-title">Slot A: itemWidth=80%, snapPoints=yes, pageWrap=yes</div>
+                <div style="font-size:0.7rem; color:var(--somaiya-red); font-weight:bold;" id="l3-text-1">[ Tap to Assign Component ]</div>
+                <div id="l3-render-1" style="margin-top:4px;"></div>
+            </div>
+
+            <div class="mock-component" id="l3-slot-2" onclick="cycleL3Slot(2)" style="text-align:left;">
+                <div class="mock-component-title">Slot B: itemWidth=60px, snapPoints=no, pageWrap=no</div>
+                <div style="font-size:0.7rem; color:var(--somaiya-red); font-weight:bold;" id="l3-text-2">[ Tap to Assign Component ]</div>
+                <div id="l3-render-2" style="margin-top:4px;"></div>
+            </div>
+
+            <div class="mock-component" id="l3-slot-3" onclick="cycleL3Slot(3)" style="text-align:left;">
+                <div class="mock-component-title">Slot C: itemWidth=100%, snapPoints=yes, pageWrap=no</div>
+                <div style="font-size:0.7rem; color:var(--somaiya-red); font-weight:bold;" id="l3-text-3">[ Tap to Assign Component ]</div>
+                <div id="l3-render-3" style="margin-top:4px;"></div>
+            </div>
+        `;
+        }
+
+        function cycleL3Slot(slotNum) {
+            const current = state.levelAnswers[slotNum].type || '';
+            let next = '';
+            if (current === '') next = 'carousel';
+            else if (current === 'carousel') next = 'filmstrip';
+            else if (current === 'filmstrip') next = 'slideshow';
+            else next = '';
+
+            state.levelAnswers[slotNum].type = next;
+
+            const textEl = document.getElementById(`l3-text-${slotNum}`);
+            const renderEl = document.getElementById(`l3-render-${slotNum}`);
+            const slotEl = document.getElementById(`l3-slot-${slotNum}`);
+
+            if (next === '') {
+                slotEl.classList.remove('selected');
+                textEl.innerText = "[ Tap to Assign Component ]";
+                renderEl.innerHTML = '';
+            } else if (next === 'carousel') {
+                slotEl.classList.add('selected');
+                textEl.innerText = "Carousel Grid Assigned";
+                renderEl.innerHTML = `
+                <div class="rendered-carousel">
+                    <div class="carousel-card">IIT Bombay Tie-up</div>
+                    <div class="carousel-card">Sports Fest 2026</div>
+                </div>
+            `;
+            } else if (next === 'filmstrip') {
+                slotEl.classList.add('selected');
+                textEl.innerText = "Film Strip Assigned";
+                renderEl.innerHTML = `
+                <div class="rendered-film-strip">
+                    <div class="film-box">f1</div>
+                    <div class="film-box">f2</div>
+                    <div class="film-box">f3</div>
+                </div>
+            `;
+            } else if (next === 'slideshow') {
+                slotEl.classList.add('selected');
+                textEl.innerText = "Slideshow Assigned";
+                renderEl.innerHTML = `
+                <div class="rendered-slideshow">
+                    <div style="font-size:0.65rem; text-align:center; color:var(--text-dark);">Slide 1: Innovation Lab</div>
+                    <div class="slide-nav">
+                        <button class="slide-btn" onclick="event.stopPropagation()">&lt;</button>
+                        <button class="slide-btn" onclick="event.stopPropagation()">&gt;</button>
+                    </div>
+                </div>
+            `;
+            }
+        }
+
+        function validateLevel3() {
+            const a1 = state.levelAnswers[1].type;
+            const a2 = state.levelAnswers[2].type;
+            const a3 = state.levelAnswers[3].type;
+
+            if (!a1 || !a2 || !a3) {
+                showFeedback(false, "Slots Empty", "Please assign all three components.");
+                return;
+            }
+
+            if (a1 === 'carousel' && a2 === 'filmstrip' && a3 === 'slideshow') {
+                showFeedback(true, "Parameters Confirmed!", "Perfect! Carousel grids snap wide modules and wrap. Film strips show tiny adjacent frames with continuous panning. Slideshows span 100% width, showing one slide at a time.");
+            } else {
+                showFeedback(false, "Parameter Mismatch", "Mismatch. Slot A (itemWidth 80% with pageWrap) matches Carousel. Slot B (itemWidth 60px with no snap) matches Film Strip. Slot C (itemWidth 100% with snap) matches Slideshow.");
+            }
+        }
+
+        /* LEVEL 4: SPATIAL SEARCH & DOUBLE PANNING MAP */
+        function renderLevel4(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Double Spatial Search";
+            state.fisheyeTargets = { kulkarni: false, pathak: false };
+            state.mapTargets = { ITBlock: false, Auditorium: false };
+
+            container.innerHTML = `
+            <div style="display:flex; border-bottom:1px solid var(--border-color); margin-bottom:8px;">
+                <button id="l4-btn-tab1" onclick="switchL4Tab(1)" style="flex:1; padding:6px; border:none; background:var(--somaiya-red); color:var(--white); font-size:0.75rem; font-weight:600; cursor:pointer;">Faculty List (Fisheye)</button>
+                <button id="l4-btn-tab2" onclick="switchL4Tab(2)" style="flex:1; padding:6px; border:none; background:var(--light-bg); color:var(--text-dark); font-size:0.75rem; font-weight:600; cursor:pointer;">Campus Map (Infinite Area)</button>
+            </div>
+
+            <!-- TAB 1: FISHEYE -->
+            <div id="l4-tab1-content">
+                <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:6px;">Select BOTH <strong>Dr. Amit Kulkarni</strong> AND <strong>Prof. Smita Pathak</strong>:</p>
+                <div class="fisheye-list" id="l4-fisheye-container" onmouseleave="resetFisheye()">
+                    <div class="fisheye-item" onmouseenter="focusFisheye(0)" onclick="selectFaculty('Dr. Amit Kulkarni')">Dr. Amit Kulkarni - HOD COMPS</div>
+                    <div class="fisheye-item" onmouseenter="focusFisheye(1)" onclick="selectFaculty('Prof. Smita Pathak')">Prof. Smita Pathak - Dean R&D</div>
+                    <div class="fisheye-item" onmouseenter="focusFisheye(2)" onclick="selectFaculty('Dr. Rajesh Patil')">Dr. Rajesh Patil - Associate Prof</div>
+                    <div class="fisheye-item" onmouseenter="focusFisheye(3)" onclick="selectFaculty('Prof. Neha Sawant')">Prof. Neha Sawant - Asst. Registrar</div>
+                </div>
+                <div style="font-size:0.7rem; margin-top:8px; line-height:1.4;">
+                    <span id="l4-t1-status" style="color:var(--danger-color); font-weight:bold;">Kulkarni: ❌ | Pathak: ❌</span>
+                </div>
+            </div>
+
+            <!-- TAB 2: MAP -->
+            <div id="l4-tab2-content" class="hidden">
+                <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:6px;">Drag spatial map and click BOTH red markers for <strong>Auditorium</strong> AND <strong>IT Block</strong>:</p>
+                <div class="map-canvas-container" id="l4-map-container">
+                    <div class="map-large-area">
+                        <div class="map-marker" style="top:50px; left:60px;" onclick="clickMapMarker('Auditorium')">
+                            <span class="map-marker-label">Auditorium</span>
+                        </div>
+                        <div class="map-marker" style="top:290px; left:250px;" onclick="clickMapMarker('IT Block')">
+                            <span class="map-marker-label">🎯 IT Block</span>
+                        </div>
+                        <div class="map-marker" style="top:190px; left:80px;" onclick="clickMapMarker('Library')">
+                            <span class="map-marker-label">Main Library</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size:0.7rem; margin-top:8px;">
+                    <span id="l4-t2-status" style="color:var(--danger-color); font-weight:bold;">Auditorium: ❌ | IT Block: ❌</span>
+                </div>
+            </div>
+        `;
+        }
+
+        function switchL4Tab(tabNum) {
+            const t1 = document.getElementById('l4-tab1-content');
+            const t2 = document.getElementById('l4-tab2-content');
+            const b1 = document.getElementById('l4-btn-tab1');
+            const b2 = document.getElementById('l4-btn-tab2');
+
+            if (tabNum === 1) {
+                t1.classList.remove('hidden');
+                t2.classList.add('hidden');
+                b1.style.background = 'var(--somaiya-red)';
+                b1.style.color = 'var(--white)';
+                b2.style.background = 'var(--light-bg)';
+                b2.style.color = 'var(--text-dark)';
+            } else {
+                t1.classList.add('hidden');
+                t2.classList.remove('hidden');
+                b1.style.background = 'var(--light-bg)';
+                b1.style.color = 'var(--text-dark)';
+                b2.style.background = 'var(--somaiya-red)';
+                b2.style.color = 'var(--white)';
+            }
+        }
+
+        function focusFisheye(index) {
+            const items = document.querySelectorAll('.fisheye-item');
+            items.forEach((item, idx) => {
+                let scale = 1;
+                let opacity = 0.7;
+                if (idx === index) {
+                    scale = 1.25;
+                    opacity = 1;
+                    item.style.backgroundColor = 'var(--somaiya-red-light)';
+                } else if (Math.abs(idx - index) === 1) {
+                    scale = 1.1;
+                    opacity = 0.9;
+                    item.style.backgroundColor = 'var(--white)';
+                } else {
+                    scale = 0.9;
+                    opacity = 0.6;
+                    item.style.backgroundColor = 'var(--white)';
+                }
+                item.style.transform = `scale(${scale})`;
+                item.style.opacity = opacity;
+            });
+        }
+
+        function resetFisheye() {
+            const items = document.querySelectorAll('.fisheye-item');
+            items.forEach(item => {
+                item.style.transform = 'scale(1)';
+                item.style.opacity = 1;
+                item.style.backgroundColor = 'var(--light-bg)';
+            });
+        }
+
+        function selectFaculty(name) {
+            if (name === 'Dr. Amit Kulkarni') state.fisheyeTargets.kulkarni = true;
+            if (name === 'Prof. Smita Pathak') state.fisheyeTargets.pathak = true;
+
+            const statusEl = document.getElementById('l4-t1-status');
+            const k = state.fisheyeTargets.kulkarni ? '✔️' : '❌';
+            const p = state.fisheyeTargets.pathak ? '✔️' : '❌';
+            statusEl.innerText = `Kulkarni: ${k} | Pathak: ${p}`;
+            if (state.fisheyeTargets.kulkarni && state.fisheyeTargets.pathak) {
+                statusEl.style.color = 'var(--success-color)';
+            }
+        }
+
+        function clickMapMarker(name) {
+            if (name === 'Auditorium') state.mapTargets.Auditorium = true;
+            if (name === 'IT Block') state.mapTargets.ITBlock = true;
+
+            const statusEl = document.getElementById('l4-t2-status');
+            const a = state.mapTargets.Auditorium ? '✔️' : '❌';
+            const it = state.mapTargets.ITBlock ? '✔️' : '❌';
+            statusEl.innerText = `Auditorium: ${a} | IT Block: ${it}`;
+            if (state.mapTargets.Auditorium && state.mapTargets.ITBlock) {
+                statusEl.style.color = 'var(--success-color)';
+            }
+        }
+
+        function validateLevel4() {
+            if (state.fisheyeTargets.kulkarni && state.fisheyeTargets.pathak && state.mapTargets.Auditorium && state.mapTargets.ITBlock) {
+                showFeedback(true, "Spatial Canvases Mastered!", "Incredible job! Fisheye zooming focuses targets in dense rows, and Infinite Areas map coordinates for multi-coordinate pan exploration.");
+            } else {
+                let errors = [];
+                if (!state.fisheyeTargets.kulkarni || !state.fisheyeTargets.pathak) errors.push("Locate both Kulkarni and Pathak in the directory.");
+                if (!state.mapTargets.Auditorium || !state.mapTargets.ITBlock) errors.push("Find and click both Auditorium and IT Block on the map.");
+                showFeedback(false, "Goal Pending", errors.join(" "));
+            }
+        }
+
+        /* LEVEL 5: DESTRUCTIVE ACTIONS CONFIRMATION LOGIC */
+        function renderLevel5(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Destructive Course Withdrawal";
+            state.l5Step = 1;
+            state.confirmSafetyLevel5 = { reviews: false, confirmDialog: false, successBanner: false };
+            state.withdrawalSubmitted = false;
+
+            container.innerHTML = `
+            <div style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:8px; margin-bottom:12px; background:var(--somaiya-red-light);">
+                <div style="font-size:0.75rem; font-weight:bold; margin-bottom:6px; color:var(--somaiya-red);">🛠️ Enable Required Security Safeguards:</div>
+                <label class="flow-builder-option">
+                    <input type="checkbox" id="chk-review" onchange="toggleL5Guards()"> Enable Withdrawal Review Screen
+                </label>
+                <label class="flow-builder-option">
+                    <input type="checkbox" id="chk-dialog" onchange="toggleL5Guards()"> Enable Destructive Modal Dialog
+                </label>
+                <label class="flow-builder-option">
+                    <input type="checkbox" id="chk-banner" onchange="toggleL5Guards()"> Enable Success Confirmation Page
+                </label>
+            </div>
+
+            <!-- Dynamic Mobile Page Container -->
+            <div id="l5-screen-container" style="flex-grow:1; display:flex; flex-direction:column; justify-content:space-between; min-height:160px; border:1px solid var(--border-color); padding:10px; border-radius:8px;">
+                <!-- Loaded step content here -->
+            </div>
+        `;
+
+            toggleL5Guards(); // render form
+        }
+
+        function toggleL5Guards() {
+            state.confirmSafetyLevel5.reviews = document.getElementById('chk-review').checked;
+            state.confirmSafetyLevel5.confirmDialog = document.getElementById('chk-dialog').checked;
+            state.confirmSafetyLevel5.successBanner = document.getElementById('chk-banner').checked;
+
+            renderL5Step();
+        }
+
+        function renderL5Step() {
+            const container = document.getElementById('l5-screen-container');
+            if (!container) return;
+
+            if (state.l5Step === 1) {
+                container.innerHTML = `
+                <div>
+                    <p style="font-size:0.75rem; margin-bottom:8px; font-weight:700; color:var(--danger-color);">⚠️ Destructive Course Action</p>
+                    <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:8px;">This will completely withdraw you from Neural Networks. Academic records will be deleted.</p>
+                </div>
+                <button class="btn-action" style="padding:8px; font-size:0.8rem; width:100%; margin-top:8px; background-color:var(--danger-color);" onclick="submitL5Form()">
+                    Request Course Withdrawal
+                </button>
+            `;
+            } else if (state.l5Step === 2) {
+                container.innerHTML = `
+                <div>
+                    <p style="font-size:0.75rem; margin-bottom:8px; font-weight:700; color:var(--somaiya-red);">Review Deletion Parameters</p>
+                    <div style="border:1px solid var(--border-color); border-radius:6px; padding:6px; font-size:0.7rem; background:#FEF2F2; margin-bottom:8px; border-color:var(--danger-color);">
+                        <p><strong>Action:</strong> Permanent Withdrawal</p>
+                        <p><strong>Course:</strong> Neural Networks (COMPS)</p>
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-outline" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="state.l5Step = 1; renderL5Step();">Cancel</button>
+                    <button class="btn-action" style="padding:4px 8px; font-size:0.7rem; flex:1; background-color:var(--danger-color);" onclick="confirmL5Form()">Confirm Deletion</button>
+                </div>
+            `;
+            } else if (state.l5Step === 3) {
+                container.innerHTML = `
+                <div style="text-align:center; padding:10px 0; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                    <span style="font-size:2.5rem; color:var(--danger-color);">🗑️</span>
+                    <h4 style="font-size:0.85rem; font-weight:bold; margin-top:8px; color:var(--danger-color);">Withdrawal Successful</h4>
+                    <p style="font-size:0.65rem; color:var(--text-muted); margin-top:4px;">Records deleted. Semester stats updated.</p>
+                </div>
+                <button class="btn-outline" style="padding:4px; font-size:0.75rem;" onclick="resetL5State()">Restart Flow</button>
+            `;
+            }
+        }
+
+        function submitL5Form() {
+            if (!state.confirmSafetyLevel5.reviews) {
+                // Immediate deletion attempt with zero feedback
+                alert("Database Error: Cannot perform destructive transaction without Review Screen verification. Operation rolled back.");
+                resetL5State();
+                return;
+            }
+
+            // Go to review screen
+            state.l5Step = 2;
+            renderL5Step();
+        }
+
+        function confirmL5Form() {
+            if (!state.confirmSafetyLevel5.confirmDialog) {
+                alert("Database Error: Irreversible transaction blocked. Missing modal confirmation safeguard. Operation rolled back.");
+                resetL5State();
+                return;
+            }
+
+            const confirmVal = confirm("⚠️ WARNING: This action cannot be undone. Are you sure you want to withdraw and delete records?");
+            if (confirmVal) {
+                if (!state.confirmSafetyLevel5.successBanner) {
+                    alert("Database warning: Transaction succeeded but missing success notification banner. Course withdrawn.");
+                    resetL5State();
+                } else {
+                    state.l5Step = 3;
+                    state.withdrawalSubmitted = true;
+                    renderL5Step();
+                }
+            } else {
+                resetL5State();
+            }
+        }
+
+        function resetL5State() {
+            state.l5Step = 1;
+            state.withdrawalSubmitted = false;
+            renderL5Step();
+        }
+
+        function validateLevel5() {
+            if (state.confirmSafetyLevel5.reviews && state.confirmSafetyLevel5.confirmDialog && state.confirmSafetyLevel5.successBanner) {
+                if (state.withdrawalSubmitted) {
+                    showFeedback(true, "Transaction Safety Standards Met!", "Success! You configured an advanced safety verification flow. Destructive database edits require reviews, dialog alerts, and success pages to protect users.");
+                } else {
+                    showFeedback(false, "Run the Flow", "Safety checkboxes enabled. Now request withdrawal and complete the steps to delete the course record.");
+                }
+            } else {
+                showFeedback(false, "Security Failure", "Critical Error: Allowing course deletion without all 3 safety safeguards (Review Screen, Modal Dialog, Success Banner) results in data loss. Enable them and test again.");
+            }
+        }
+
+        /* GLOBAL SIMULATION HANDLERS */
+        function validateLevel() {
+            if (state.currentLevel === 1) {
+                validateLevel1();
+            } else if (state.currentLevel === 2) {
+                validateLevel2();
+            } else if (state.currentLevel === 3) {
+                validateLevel3();
+            } else if (state.currentLevel === 4) {
+                validateLevel4();
+            } else if (state.currentLevel === 5) {
+                validateLevel5();
+            }
+        }
+
+        function showFeedback(isSuccess, title, msg) {
+            const panel = document.getElementById('feedback-panel');
+            const fTitle = document.getElementById('feedback-title');
+            const fText = document.getElementById('feedback-text');
+            const eduPanel = document.getElementById('educational-explanation');
+            const eduText = document.getElementById('educational-explanation-text');
+
+            panel.className = "feedback-panel " + (isSuccess ? "success" : "error");
+            fTitle.innerText = title;
+            fText.innerText = msg;
+            panel.style.display = 'block';
+
+            if (isSuccess) {
+                eduText.innerText = levelData[state.currentLevel].explanation;
+                eduPanel.style.display = 'block';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                const nextBtn = document.getElementById('btn-next-level');
+                if (nextBtn) {
+                    nextBtn.className = "btn-action";
+                }
+            } else {
+                eduPanel.style.display = 'none';
+            }
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                const container = document.getElementById('mobile-screen-body');
+                container.innerHTML = `
+                <div class="final-screen">
+                    <span class="celebrate-icon">🎓</span>
+                    <h3>Simulation Complete!</h3>
+                    <p style="font-size:0.8rem;">You have mastered Subtopic 5.1: Managing Mobile Components. You solved advanced list allocation, latency tuning, visual grids, spatial maps, and transaction safety validation.</p>
+                </div>
+            `;
+                document.getElementById('level-title').innerText = "All Levels Complete";
+                document.getElementById('level-desc').innerText = "Congratulations! You have completed the interactive laboratory module on mobile components display, control, and confirmation.";
+                document.getElementById('feedback-panel').style.display = 'none';
+                document.getElementById('educational-explanation').style.display = 'none';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                document.getElementById('btn-next-level').classList.add('hidden');
+                document.getElementById('btn-prev-level').classList.add('hidden');
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+    </script>
+</body>
+
+</html>

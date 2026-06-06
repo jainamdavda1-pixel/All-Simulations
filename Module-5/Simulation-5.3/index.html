@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 5.3 — Labels, Indicators and Information Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FFF5F5;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --warning-color: #F59E0B;
+            --warning-light: #FEF3C7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Sandbox */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 620px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mobile Mockup Frame */
+        .mobile-mockup {
+            width: 320px;
+            height: 540px;
+            border: 12px solid #1E1E24;
+            border-radius: 36px;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-status-bar {
+            height: 24px;
+            background-color: var(--somaiya-red-hover);
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .mobile-status-icons {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .mobile-app-bar {
+            height: 48px;
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mobile-screen-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: var(--white);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Level 1: Labels */
+        .l1-dashboard-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Level 2: Ordered Data */
+        .order-btn-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .order-btn {
+            flex: 1;
+            padding: 6px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .order-btn.active {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-color: var(--somaiya-red);
+        }
+
+        .data-list-item {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 0.72rem;
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--white);
+            transition: transform 0.3s ease;
+        }
+
+        /* Level 3: Avatars and Tooltips */
+        .avatar-placeholder {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #CBD5E1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .comment-row {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tooltip-trigger {
+            cursor: pointer;
+            display: inline-flex;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        .custom-tooltip-box {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--text-dark);
+            color: var(--white);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            white-space: nowrap;
+            display: none;
+            z-index: 50;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tooltip-trigger:hover .custom-tooltip-box {
+            display: block;
+        }
+
+        /* Level 4: Loaders */
+        .loader-screen {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+        }
+
+        /* Level 5: Stop Control */
+        .upload-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            background-color: var(--white);
+            margin: auto 0;
+        }
+
+        .upload-bar-bg {
+            height: 8px;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .upload-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 0%;
+            transition: width 0.2s linear;
+        }
+
+        /* Feedback Panel */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            border-color: #CBD5E1;
+            color: #CBD5E1;
+            cursor: not-allowed;
+            background-color: var(--white);
+        }
+
+        /* Hint Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 5: Pattern with Mobile Interface Design</p>
+                </div>
+            </div>
+            <div class="subtopic-badge">
+                5.3 Labels, Indicators & Information Control
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <h2 id="level-title">Level 1: Unlabeled Indicators</h2>
+                <p id="level-desc">Loading instructions...</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                        style="vertical-align: middle; margin-right: 4px;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Labels & Info Workspace</h3>
+                <p id="sandbox-desc">Resolve state feedback issues inside the mobile mockup.</p>
+            </div>
+
+            <div class="sandbox-body">
+                <div class="mobile-mockup" id="mobile-mockup-frame">
+                    <div class="mobile-status-bar">
+                        <span>College LTE</span>
+                        <span>12:10 PM</span>
+                        <div class="mobile-status-icons">🔋 92%</div>
+                    </div>
+                    <div class="mobile-app-bar" id="mobile-app-bar-title">
+                        Grades Dashboard
+                    </div>
+                    <div class="mobile-screen-content" id="mobile-screen-body">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback-panel" id="feedback-panel">
+                <strong id="feedback-title">Feedback Title</strong>
+                <p id="feedback-text">Feedback text goes here.</p>
+            </div>
+
+            <div class="educational-explanation" id="educational-explanation">
+                <strong>💡 UI Design Principle:</strong>
+                <span id="educational-explanation-text">Design explanation goes here.</span>
+            </div>
+
+            <div class="controls-row">
+                <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">&larr; Prev</button>
+                <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Restart</button>
+                <button class="btn-action" id="btn-submit-action" onclick="validateLevel()">Submit</button>
+                <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next &rarr;</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>📖 UI Design Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            levelAnswers: {},
+            currentSort: '',
+            l3Settings: {
+                avatars: false,
+                tooltips: false
+            },
+            l4State: 'idle', // idle, loading, error, synced
+            l5State: 'uploading', // uploading, halted, stopped, complete
+            l5Percent: 0,
+            l5Interval: null,
+            l5ControlsAdded: false
+        };
+
+        const levelData = {
+            1: {
+                title: "Level 1: Labels & Indicators",
+                desc: "Showing only raw color dots or icons confuses users. Attach appropriate status labels to clear up ambiguity.",
+                hint: "Select: Green -> 'Completed'; Orange -> 'In Progress'; Grey Lock -> 'Locked'; Blue Star -> 'New'.",
+                explanation: "Visual indicators (colored badges, status lights) need complementary text labels. Color-only coding creates accessibility issues (like colorblindness) and triggers cognitive confusion."
+            },
+            2: {
+                title: "Level 2: Ordered Data Control",
+                desc: "Messy layouts force users to scan every line. Provide sorting filters (Date, Grade, Alphabetical) to support intent.",
+                hint: "Click the 'Sort by Grade' filter button inside the phone frame, and click the 'Sort by Due Date' button, verifying that rows reorder accordingly.",
+                explanation: "Sorting controls allow users to slice information. For deadline tasks, date order is primary. For grade reviews, priority or score ordering reduces search effort."
+            },
+            3: {
+                title: "Level 3: Avatar and Tooltips",
+                desc: "Avatars humanize lists by aiding identity recognition, while tooltips supply inline definitions without cluttering the screen.",
+                hint: "Enable 'Inject Avatars & Tooltips' in the dashboard menu. Then, hover or tap the small question mark icon to show details.",
+                explanation: "Avatars aid immediate face-recognition, humanizing communications. Tooltips solve visual density limits by tucking supplementary descriptions away until triggered by tap or hover."
+            },
+            4: {
+                title: "Level 4: Wait, Reload and Synch",
+                desc: "Manage expectations. Users must know if data is loading, syncing, or has failed to load due to connection dropouts.",
+                hint: "Click 'Load Course Data'. When it fails, choose the 'Reload Button' pattern. Once loaded, click the Sync button to run and select 'Synch Spinner'.",
+                explanation: "Wait indicators confirm the system is working. Reload handles retrieval failures gracefully, and Sync icons show background data validation without lockups."
+            },
+            5: {
+                title: "Level 5: Stop Control and Recovery",
+                desc: "Long asynchronous processes require escape controls so users can halt or recover tasks when networks drop.",
+                hint: "Enable the 'Halt Controls' checkmark in the dashboard. When the upload stalls at 40%, click the 'Retry' button to recover the sync.",
+                explanation: "Users demand system control. Long uploads or updates need a visible Stop/Cancel option to release resources, and a Retry option to resume without lost progress."
+            }
+        };
+
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        function loadLevel(num) {
+            state.currentLevel = num;
+
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+
+            const prevBtn = document.getElementById('btn-prev-level');
+            const nextBtn = document.getElementById('btn-next-level');
+            if (prevBtn) {
+                prevBtn.classList.remove('hidden');
+                prevBtn.disabled = (num === 1);
+            }
+            if (nextBtn) {
+                nextBtn.classList.remove('hidden');
+                nextBtn.disabled = false;
+                nextBtn.className = "btn-outline";
+            }
+
+            const progressPercent = (num / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercent + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${num} of 5`;
+
+            document.getElementById('level-title').innerText = levelData[num].title;
+            document.getElementById('level-desc').innerText = levelData[num].desc;
+
+            const body = document.getElementById('mobile-screen-body');
+            body.innerHTML = '';
+
+            if (num === 1) {
+                renderLevel1(body);
+            } else if (num === 2) {
+                renderLevel2(body);
+            } else if (num === 3) {
+                renderLevel3(body);
+            } else if (num === 4) {
+                renderLevel4(body);
+            } else if (num === 5) {
+                renderLevel5(body);
+            }
+        }
+
+        function showHintModal() {
+            document.getElementById('hint-text').innerText = levelData[state.currentLevel].hint;
+            document.getElementById('hint-modal').style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        /* LEVEL 1: LABELS & INDICATORS */
+        function renderLevel1(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Grade Logs";
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:10px; color:var(--text-muted);">Assign the correct label explanation to the indicator:</p>
+            
+            <div class="l1-dashboard-row">
+                <span>Quiz 1: HCI Basics <span class="indicator-dot" style="background-color:var(--success-color); vertical-align:middle; margin-left:4px;"></span></span>
+                <select class="pattern-select" style="width:110px; margin-top:0;" id="l1-opt-1">
+                    <option value="">-- Choose --</option>
+                    <option value="completed">Completed</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="locked">Locked</option>
+                    <option value="new">New Topic</option>
+                </select>
+            </div>
+
+            <div class="l1-dashboard-row">
+                <span>Lab 2: User Personas <span class="indicator-dot" style="background-color:var(--warning-color); vertical-align:middle; margin-left:4px;"></span></span>
+                <select class="pattern-select" style="width:110px; margin-top:0;" id="l1-opt-2">
+                    <option value="">-- Choose --</option>
+                    <option value="completed">Completed</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="locked">Locked</option>
+                    <option value="new">New Topic</option>
+                </select>
+            </div>
+
+            <div class="l1-dashboard-row">
+                <span>Lab 3: Figma Prototyping <span style="font-size:0.8rem; margin-left:4px; vertical-align:middle;">🔒</span></span>
+                <select class="pattern-select" style="width:110px; margin-top:0;" id="l1-opt-3">
+                    <option value="">-- Choose --</option>
+                    <option value="completed">Completed</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="locked">Locked</option>
+                    <option value="new">New Topic</option>
+                </select>
+            </div>
+
+            <div class="l1-dashboard-row">
+                <span>Quiz 4: Mobile Heuristics <span style="font-size:0.8rem; margin-left:4px; vertical-align:middle;">⭐</span></span>
+                <select class="pattern-select" style="width:110px; margin-top:0;" id="l1-opt-4">
+                    <option value="">-- Choose --</option>
+                    <option value="completed">Completed</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="locked">Locked</option>
+                    <option value="new">New Topic</option>
+                </select>
+            </div>
+        `;
+        }
+
+        function validateLevel1() {
+            const o1 = document.getElementById('l1-opt-1').value;
+            const o2 = document.getElementById('l1-opt-2').value;
+            const o3 = document.getElementById('l1-opt-3').value;
+            const o4 = document.getElementById('l1-opt-4').value;
+
+            if (!o1 || !o2 || !o3 || !o4) {
+                showFeedback(false, "Unlabeled States", "Please assign a label translation to every indicator badge.");
+                return;
+            }
+
+            if (o1 === 'completed' && o2 === 'in-progress' && o3 === 'locked' && o4 === 'new') {
+                showFeedback(true, "Labels Clarified!", "Great! Visual signals are now clear. Supplementing indicators with textual labels ensures the layout is accessible to colorblind and novice users alike.");
+            } else {
+                showFeedback(false, "Incorrect Affordance", "Status label mismatch. Green dot is Completed, Yellow is In Progress, Lock is Locked, and Star is New.");
+            }
+        }
+
+        /* LEVEL 2: ORDERED DATA */
+        const quizList = [
+            { name: "Quiz A: App Layouts", grade: 85, due: "2026-06-12" },
+            { name: "Quiz B: Color Contrast", grade: 60, due: "2026-06-08" },
+            { name: "Quiz C: Menu Navigation", grade: 95, due: "2026-06-20" }
+        ];
+
+        function renderLevel2(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Quiz Attempts";
+            state.currentSort = '';
+
+            container.innerHTML = `
+            <div class="order-btn-row">
+                <button class="order-btn" id="btn-sort-date" onclick="sortL2Data('date')">Due Date</button>
+                <button class="order-btn" id="btn-sort-grade" onclick="sortL2Data('grade')">Grade (High)</button>
+            </div>
+            <div id="l2-data-list">
+                <!-- Sorted rows go here -->
+            </div>
+        `;
+            renderL2Rows(quizList);
+        }
+
+        function renderL2Rows(list) {
+            const listDiv = document.getElementById('l2-data-list');
+            listDiv.innerHTML = '';
+            list.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'data-list-item';
+                div.innerHTML = `
+                <span>${item.name}</span>
+                <span style="font-weight:600;">Grade: ${item.grade}% | Due: ${item.due.slice(5)}</span>
+            `;
+                listDiv.appendChild(div);
+            });
+        }
+
+        function sortL2Data(type) {
+            state.currentSort = type;
+            document.getElementById('btn-sort-date').classList.remove('active');
+            document.getElementById('btn-sort-grade').classList.remove('active');
+
+            let sorted = [...quizList];
+            if (type === 'date') {
+                document.getElementById('btn-sort-date').classList.add('active');
+                sorted.sort((a, b) => new Date(a.due) - new Date(b.due));
+            } else {
+                document.getElementById('btn-sort-grade').classList.add('active');
+                sorted.sort((a, b) => b.grade - a.grade);
+            }
+            renderL2Rows(sorted);
+        }
+
+        function validateLevel2() {
+            if (state.currentSort === 'grade') {
+                showFeedback(true, "Sort Validated!", "Correct! Sorting by grade groups top scores at the top. Providing sorted data controls reduces user scanning efforts from O(N) to O(1) for high-interest points.");
+            } else {
+                showFeedback(false, "Try Filters", "Please click the 'Grade (High)' filter button to reorder attempts by highest score to complete the task.");
+            }
+        }
+
+        /* LEVEL 3: AVATAR AND TOOLTIPS */
+        function renderLevel3(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Feedback board";
+            state.l3Settings = { avatars: false, tooltips: false };
+
+            container.innerHTML = `
+            <div style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:6px; margin-bottom:12px; background:var(--somaiya-red-light); font-size:0.75rem;">
+                <label><input type="checkbox" id="chk-l3-assets" onchange="toggleL3Assets()"> Inject Avatars & Tooltips</label>
+            </div>
+
+            <div class="comment-row">
+                <div id="l3-avatar-1" class="avatar-placeholder">SP</div>
+                <div>
+                    <span style="font-weight:600; font-size:0.75rem;">Prof. Smita P.</span>
+                    <span class="tooltip-trigger" id="l3-tip-1" style="display:none;">?
+                        <span class="custom-tooltip-box">Dean Research & Development</span>
+                    </span>
+                    <p style="font-size:0.7rem; color:var(--text-muted);">Please review the Heuristic guidelines pdf before submitting lab 3.</p>
+                </div>
+            </div>
+
+            <div class="comment-row" style="border-bottom:none;">
+                <div id="l3-avatar-2" class="avatar-placeholder">AK</div>
+                <div>
+                    <span style="font-weight:600; font-size:0.75rem;">Dr. Amit K.</span>
+                    <span class="tooltip-trigger" id="l3-tip-2" style="display:none;">?
+                        <span class="custom-tooltip-box">Head of Computer Dept.</span>
+                    </span>
+                    <p style="font-size:0.7rem; color:var(--text-muted);">Ensure compliance with accessibility color ratios.</p>
+                </div>
+            </div>
+        `;
+        }
+
+        function toggleL3Assets() {
+            const checked = document.getElementById('chk-l3-assets').checked;
+            state.l3Settings.avatars = checked;
+            state.l3Settings.tooltips = checked;
+
+            const a1 = document.getElementById('l3-avatar-1');
+            const a2 = document.getElementById('l3-avatar-2');
+            const t1 = document.getElementById('l3-tip-1');
+            const t2 = document.getElementById('l3-tip-2');
+
+            if (checked) {
+                a1.innerHTML = '👩‍🏫';
+                a1.style.backgroundColor = 'var(--somaiya-red-light)';
+                a2.innerHTML = '👨‍🏫';
+                a2.style.backgroundColor = 'var(--somaiya-red-light)';
+                t1.style.display = 'inline-flex';
+                t2.style.display = 'inline-flex';
+            } else {
+                a1.innerHTML = 'SP';
+                a1.style.backgroundColor = '#CBD5E1';
+                a2.innerHTML = 'AK';
+                a2.style.backgroundColor = '#CBD5E1';
+                t1.style.display = 'none';
+                t2.style.display = 'none';
+            }
+        }
+
+        function validateLevel3() {
+            if (state.l3Settings.avatars && state.l3Settings.tooltips) {
+                showFeedback(true, "Avatars and Tooltips Active!", "Perfect! Avatars speed up sender identification through facial recall. Tooltips hide long text titles behind simple hover/tap question marks, maintaining a clean mobile card UI.");
+            } else {
+                showFeedback(false, "Unlabeled Feed", "Click the 'Inject Avatars & Tooltips' checkbox in the College controls to make discussion participants recognizable and provide roles info.");
+            }
+        }
+
+        /* LEVEL 4: WAIT, RELOAD & SYNCH */
+        function renderLevel4(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Data Synch Panel";
+            state.l4State = 'idle';
+
+            container.innerHTML = `
+            <div class="loader-screen" id="l4-content">
+                <p style="font-size:0.8rem; margin-bottom:12px;">Click below to load grades from Somaiya cloud node.</p>
+                <button class="btn-action" style="padding:6px 12px; font-size:0.75rem;" onclick="triggerL4Load()">Load Course Data</button>
+            </div>
+        `;
+        }
+
+        function triggerL4Load() {
+            const content = document.getElementById('l4-content');
+            state.l4State = 'loading';
+            content.innerHTML = `
+            <span class="spinner" style="width:24px; height:24px; border-width:3px; margin-bottom:12px;"></span>
+            <p style="font-size:0.75rem;">Connecting to College server stack...</p>
+        `;
+
+            // Simulate network failure
+            setTimeout(() => {
+                state.l4State = 'error';
+                content.innerHTML = `
+                <span style="font-size:2rem; color:var(--danger-color);">⚠️</span>
+                <p style="font-size:0.75rem; color:var(--danger-color); margin-top:8px;">Network connection failed. Time out.</p>
+                
+                <p style="font-size:0.7rem; margin-top:12px;">Choose recovery pattern to fix the connection UI:</p>
+                <select class="pattern-select" style="width:160px; margin: 8px auto;" id="l4-sel-recovery" onchange="applyL4Recovery(this.value)">
+                    <option value="">-- Choose Recovery --</option>
+                    <option value="reload">Reload Button (Retry download)</option>
+                    <option value="ignore">Ignore (Keep error screen)</option>
+                </select>
+            `;
+            }, 1200);
+        }
+
+        function applyL4Recovery(val) {
+            if (val === 'reload') {
+                const content = document.getElementById('l4-content');
+                content.innerHTML = `
+                <button class="btn-outline" style="padding:6px 12px; font-size:0.75rem;" onclick="reconnectL4()">🔄 Reload Content</button>
+            `;
+            }
+        }
+
+        function reconnectL4() {
+            const content = document.getElementById('l4-content');
+            content.innerHTML = `
+            <span class="spinner" style="width:24px; height:24px; border-width:3px; margin-bottom:12px;"></span>
+            <p style="font-size:0.75rem;">Loading grades data...</p>
+        `;
+            setTimeout(() => {
+                state.l4State = 'synced';
+                content.innerHTML = `
+                <div style="text-align:left; width:100%; font-size:0.75rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid var(--border-color); padding-bottom:4px;">
+                        <strong>Grades Loaded successfully</strong>
+                        <span onclick="triggerSyncSpinner()" style="cursor:pointer;" title="Synch Data">🔄 Sync</span>
+                    </div>
+                    <div id="l4-sync-notice" style="display:none; color:var(--success-color); font-size:0.68rem; margin-bottom:6px;">
+                        <span class="spinner" style="width:10px; height:10px; border-width:1px;"></span> Syncing database cache...
+                    </div>
+                    <p>HCI Lab 1: A+</p>
+                    <p>Heuristics Quiz: B+</p>
+                </div>
+            `;
+            }, 1200);
+        }
+
+        function triggerSyncSpinner() {
+            const notice = document.getElementById('l4-sync-notice');
+            notice.style.display = 'block';
+            setTimeout(() => {
+                notice.innerHTML = '✔️ Cache verified in sync.';
+            }, 1200);
+        }
+
+        function validateLevel4() {
+            if (state.l4State === 'synced') {
+                showFeedback(true, "Network Feedback Active!", "Excellent validation! You handled server loading states using spinner wait indicators, implemented a Reload recovery path, and triggered synchronization state loops.");
+            } else {
+                showFeedback(false, "Connection Halted", "The connection has timed out. Select the correct 'Reload Button' option in the selector to refresh content and resolve the crash state.");
+            }
+        }
+
+        /* LEVEL 5: STOP CONTROL */
+        function renderLevel5(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Submission Manager";
+            state.l5State = 'uploading';
+            state.l5Percent = 0;
+            state.l5ControlsAdded = false;
+            clearInterval(state.l5Interval);
+
+            container.innerHTML = `
+            <div style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:6px; margin-bottom:12px; background:var(--somaiya-red-light); font-size:0.75rem;">
+                <label><input type="checkbox" id="chk-l5-controls" onchange="toggleL5Controls(this.checked)"> Add Stop/Retry Control Interface</label>
+            </div>
+
+            <div class="upload-card">
+                <p style="font-weight:600; font-size:0.75rem;">Uploading: TermProject_V3.zip</p>
+                <div class="upload-bar-bg">
+                    <div class="upload-bar-fill" id="l5-progress-bar"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-muted); margin-bottom:8px;">
+                    <span id="l5-percent-text">0% Completed</span>
+                    <span id="l5-speed-text">4.2 MB/s</span>
+                </div>
+
+                <!-- Stop/Retry buttons loaded here -->
+                <div id="l5-buttons-container" style="display:flex; gap:6px;">
+                    <!-- Added dynamically -->
+                </div>
+            </div>
+        `;
+
+            startL5Upload();
+        }
+
+        function toggleL5Controls(checked) {
+            state.l5ControlsAdded = checked;
+            const btnContainer = document.getElementById('l5-buttons-container');
+            if (checked) {
+                btnContainer.innerHTML = `
+                <button class="btn-outline" style="flex:1; padding:4px 8px; font-size:0.7rem; border-color:var(--danger-color); color:var(--danger-color);" onclick="stopL5Upload()">Stop Upload</button>
+                <button class="btn-action" style="flex:1; padding:4px 8px; font-size:0.7rem; display:none;" id="l5-btn-retry" onclick="resumeL5Upload()">Retry</button>
+            `;
+            } else {
+                btnContainer.innerHTML = '';
+            }
+        }
+
+        function startL5Upload() {
+            state.l5Interval = setInterval(() => {
+                if (state.l5State === 'uploading') {
+                    state.l5Percent += 5;
+                    if (state.l5Percent >= 40) {
+                        // Force a network stall
+                        state.l5Percent = 40;
+                        state.l5State = 'halted';
+                        document.getElementById('l5-speed-text').innerText = "0.0 KB/s - Halted";
+                        document.getElementById('l5-speed-text').style.color = "var(--danger-color)";
+
+                        if (state.l5ControlsAdded) {
+                            const retryBtn = document.getElementById('l5-btn-retry');
+                            if (retryBtn) retryBtn.style.display = 'inline-block';
+                        }
+                    }
+                    updateL5Progress();
+                }
+            }, 300);
+        }
+
+        function updateL5Progress() {
+            const bar = document.getElementById('l5-progress-bar');
+            const text = document.getElementById('l5-percent-text');
+            if (bar) bar.style.width = state.l5Percent + '%';
+            if (text) text.innerText = state.l5Percent + '% Completed';
+        }
+
+        function stopL5Upload() {
+            clearInterval(state.l5Interval);
+            state.l5State = 'stopped';
+            document.getElementById('l5-speed-text').innerText = "Upload Canceled";
+            document.getElementById('l5-speed-text').style.color = "var(--danger-color)";
+        }
+
+        function resumeL5Upload() {
+            state.l5State = 'uploading';
+            document.getElementById('l5-speed-text').innerText = "4.5 MB/s";
+            document.getElementById('l5-speed-text').style.color = "var(--text-muted)";
+            const retryBtn = document.getElementById('l5-btn-retry');
+            if (retryBtn) retryBtn.style.display = 'none';
+
+            clearInterval(state.l5Interval);
+            state.l5Interval = setInterval(() => {
+                if (state.l5State === 'uploading') {
+                    state.l5Percent += 10;
+                    if (state.l5Percent >= 100) {
+                        state.l5Percent = 100;
+                        state.l5State = 'complete';
+                        clearInterval(state.l5Interval);
+                        document.getElementById('l5-speed-text').innerText = "Upload Completed successfully!";
+                        document.getElementById('l5-speed-text').style.color = "var(--success-color)";
+                    }
+                    updateL5Progress();
+                }
+            }, 200);
+        }
+
+        function validateLevel5() {
+            if (state.l5ControlsAdded) {
+                if (state.l5State === 'complete') {
+                    showFeedback(true, "Process Control Satisfied!", "Incredible progress! By adding a Stop and Retry system, you protect users from locked states when communication pipelines fail. This establishes critical feedback trust.");
+                } else {
+                    showFeedback(false, "Upload Stalled", "The progress bar has stalled at 40% due to network latency. Click the 'Retry' button (with controls active) to resume and finalize enrollment upload.");
+                }
+            } else {
+                showFeedback(false, "No User Controls", "Error: The upload progress bar is stalled with zero user controls. Enable the 'Add Stop/Retry Control Interface' to rescue the operation.");
+            }
+        }
+
+        /* GLOBAL SIMULATION HANDLERS */
+        function validateLevel() {
+            if (state.currentLevel === 1) validateLevel1();
+            else if (state.currentLevel === 2) validateLevel2();
+            else if (state.currentLevel === 3) validateLevel3();
+            else if (state.currentLevel === 4) validateLevel4();
+            else if (state.currentLevel === 5) validateLevel5();
+        }
+
+        function showFeedback(isSuccess, title, msg) {
+            const panel = document.getElementById('feedback-panel');
+            const fTitle = document.getElementById('feedback-title');
+            const fText = document.getElementById('feedback-text');
+            const eduPanel = document.getElementById('educational-explanation');
+            const eduText = document.getElementById('educational-explanation-text');
+
+            panel.className = "feedback-panel " + (isSuccess ? "success" : "error");
+            fTitle.innerText = title;
+            fText.innerText = msg;
+            panel.style.display = 'block';
+
+            if (isSuccess) {
+                eduText.innerText = levelData[state.currentLevel].explanation;
+                eduPanel.style.display = 'block';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                const nextBtn = document.getElementById('btn-next-level');
+                if (nextBtn) {
+                    nextBtn.className = "btn-action";
+                }
+            } else {
+                eduPanel.style.display = 'none';
+            }
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                const container = document.getElementById('mobile-screen-body');
+                container.innerHTML = `
+                <div class="final-screen">
+                    <span class="celebrate-icon">🎓</span>
+                    <h3>Simulation Complete!</h3>
+                    <p style="font-size:0.8rem;">You have mastered Subtopic 5.3: Labels, Indicators, and Information Control. You understand labels, sorting, avatars, loading patterns, and system recovery.</p>
+                </div>
+            `;
+                document.getElementById('level-title').innerText = "All Levels Complete";
+                document.getElementById('level-desc').innerText = "Congratulations! You have completed the interactive laboratory module on labels, indicators, and information control.";
+                document.getElementById('feedback-panel').style.display = 'none';
+                document.getElementById('educational-explanation').style.display = 'none';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                document.getElementById('btn-next-level').classList.add('hidden');
+                document.getElementById('btn-prev-level').classList.add('hidden');
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+    </script>
+</body>
+
+</html>

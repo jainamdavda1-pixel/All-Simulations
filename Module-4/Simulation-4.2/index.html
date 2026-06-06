@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 4.2 — Patterns for Information Graphics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FDF2F2;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --warning-color: #F59E0B;
+            --warning-light: #FEF3C7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        /* Sidebar info card */
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Simulation sandbox */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 550px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+        }
+
+        /* Level 1 layout styling */
+        .l1-cluttered-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            background-color: var(--white);
+            border-radius: 8px;
+            max-height: 250px;
+        }
+
+        .cluttered-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            text-align: left;
+        }
+
+        .cluttered-table th,
+        .cluttered-table td {
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .cluttered-table th {
+            background-color: #F1F5F9;
+            font-weight: 600;
+        }
+
+        .l1-overview-mode {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .l1-overview-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .mini-metric-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mini-metric-title {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .mini-metric-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--somaiya-red);
+        }
+
+        .l1-split-layout {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 16px;
+            min-height: 200px;
+        }
+
+        .l1-sidebar-list {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .student-list-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .student-list-item:hover {
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+        }
+
+        .student-list-item.selected {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+        }
+
+        .l1-detail-panel {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .detail-placeholder {
+            color: var(--text-muted);
+            text-align: center;
+            font-style: italic;
+            font-size: 0.88rem;
+        }
+
+        .grade-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .detail-cell {
+            background-color: var(--light-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Level 2 chart styles */
+        .chart-selector-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .chart-canvas-mock {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            height: 220px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-bar {
+            width: 50px;
+            background-color: var(--somaiya-red);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chart-bar:hover {
+            background-color: var(--somaiya-red-hover);
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Datatip Tooltip Box */
+        .datatip-tooltip {
+            position: absolute;
+            background-color: var(--text-dark);
+            color: var(--white);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            max-width: 280px;
+        }
+
+        /* Level 3 cards spotlight */
+        .spotlight-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-spotlight {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-spotlight.active {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-color: var(--somaiya-red);
+        }
+
+        .student-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .student-cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .spot-student-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            transition: var(--transition);
+            opacity: 1;
+        }
+
+        .spot-student-card.dimmed {
+            opacity: 0.2;
+        }
+
+        .spot-student-card.highlighted {
+            border-color: var(--somaiya-red);
+            box-shadow: 0 0 0 2px var(--somaiya-red-border);
+            transform: scale(1.02);
+        }
+
+        .spot-card-header {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .spot-card-stat {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .spot-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .badge-red {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+
+        .badge-green {
+            background-color: var(--success-light);
+            color: var(--success-color);
+        }
+
+        /* Level 4 Filters layout */
+        .query-interface-grid {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .query-interface-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .filter-panel {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .filter-group input[type="range"] {
+            accent-color: var(--somaiya-red);
+            cursor: pointer;
+        }
+
+        .filter-value {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--somaiya-red);
+            align-self: flex-end;
+        }
+
+        .filter-group select {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .query-list-results {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        /* Level 5 Layout Builder */
+        .layout-builder-workspace {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+        }
+
+        .widgets-toolbox {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .widget-box-item {
+            background-color: var(--somaiya-red-light);
+            border: 1px dashed var(--somaiya-red);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+            cursor: grab;
+            user-select: none;
+            transition: var(--transition);
+        }
+
+        .widget-box-item:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        .dashboard-build-canvas {
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            background-color: var(--white);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 320px;
+        }
+
+        .canvas-section {
+            border: 1px dashed var(--border-color);
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .canvas-section.drag-over {
+            border-color: var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+        }
+
+        .canvas-section.filled {
+            border-style: solid;
+            border-color: var(--somaiya-red);
+            background-color: var(--white);
+        }
+
+        /* Interactive Dashboard once completed */
+        .live-interactive-dashboard {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .dashboard-top-area {
+            grid-column: span 2;
+        }
+
+        /* Feedback and control panels */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            background-color: #F3F4F6;
+            color: #9CA3AF;
+            border-color: #E5E7EB;
+            cursor: not-allowed;
+        }
+
+        /* Modal Overlay for Hint */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Specific input fields */
+        .l1-input-verify {
+            margin-top: 12px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .l1-input-verify:focus {
+            outline: none;
+            border-color: var(--somaiya-red);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 4: Interface Design for Data Handling</p>
+                </div>
+            </div>
+            <div class="subtopic-badge">
+                4.2 Patterns for Information Graphics
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <h2 id="level-title">Level 1: Overview plus Detail</h2>
+                <p id="level-desc">Cluttered layout details overwhelm the screen. Swap modes to overview + detail,
+                    inspect students, and locate Rahul's Quiz 3 score.</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Overloaded Student Dashboard</h3>
+                <p id="sandbox-desc">Click 'Switch to Overview plus Detail' below to clean up layout.</p>
+            </div>
+
+            <div class="sandbox-body" id="sandbox-body">
+                <!-- Sandbox content loaded dynamically -->
+            </div>
+
+            <!-- Feedback Panels -->
+            <div class="feedback-panel" id="feedback-panel">
+                <strong id="feedback-title">Feedback Title</strong>
+                <p id="feedback-text">Feedback text goes here...</p>
+            </div>
+
+            <div class="educational-explanation" id="educational-explanation">
+                <strong>💡 UI Design Principle:</strong>
+                <span id="educational-explanation-text">Educational explanation text...</span>
+            </div>
+
+            <div class="controls-row">
+                <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">← Prev Level</button>
+                <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Reset Level</button>
+                <button class="btn-action" id="btn-submit-action" onclick="validateAction()">Submit Response</button>
+                <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next Level →</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>💡 Lecture Slide Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        // System Data
+        const studentsData = [
+            { name: "Rahul Sharma", id: "COLLEGE-01", section: "A", marks: 72, attendance: 85, q1: 80, q2: 78, q3: 75, q4: 55, active: true },
+            { name: "Ananya Mehta", id: "COLLEGE-02", section: "A", marks: 95, attendance: 92, q1: 98, q2: 95, q3: 94, q4: 93, active: true },
+            { name: "Aditya Sen", id: "COLLEGE-03", section: "A", marks: 65, attendance: 72, q1: 60, q2: 70, q3: 65, q4: 65, active: false },
+            { name: "Sneha Patil", id: "COLLEGE-04", section: "B", marks: 45, attendance: 68, q1: 50, q2: 40, q3: 45, q4: 45, active: false },
+            { name: "Vikram Rathore", id: "COLLEGE-05", section: "B", marks: 88, attendance: 70, q1: 85, q2: 90, q3: 88, q4: 89, active: true },
+            { name: "Priya Nair", id: "COLLEGE-06", section: "B", marks: 48, attendance: 80, q1: 42, q2: 45, q3: 50, q4: 55, active: false },
+            { name: "Rohan Das", id: "COLLEGE-07", section: "C", marks: 92, attendance: 94, q1: 90, q2: 92, q3: 92, q4: 94, active: true },
+            { name: "Kiran Joshi", id: "COLLEGE-08", section: "C", marks: 79, attendance: 86, q1: 82, q2: 78, q3: 76, q4: 80, active: true }
+        ];
+
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            // L1 state
+            l1Mode: 'cluttered',
+            l1SelectedStudent: null,
+            // L2 state
+            l2TooltipStyle: 'none',
+            // L3 state
+            l3ActiveSpotlight: 'none',
+            // L4 state
+            l4Filters: {
+                marks: 0,
+                attendance: 0,
+                section: 'All'
+            },
+            // L5 state
+            l5PlacedWidgets: {
+                'metrics': false,
+                'filters': false,
+                'grid': false,
+                'detail': false
+            },
+            l5SelectedStudent: null
+        };
+
+        const levelData = {
+            1: {
+                title: "Level 1: Overview plus Detail",
+                desc: "The current dashboard lists all grades, emails, quiz marks, and status logs in a huge, horizontal table. It is visually overwhelming. Switch layout to Overview plus Detail and find Rahul Sharma's Quiz 3 score.",
+                sandboxTitle: "Student Roster Grid",
+                sandboxDesc: "Click to toggle layouts and inspect detail cards.",
+                hint: "Click the 'Switch to Overview plus Detail' button. Select 'Rahul Sharma' from the clean list and read the Quiz 3 detail card.",
+                explanation: "Overview plus Detail separates high-level metrics from exhaustive detail. This prevents information overloading while ensuring detailed database values remain reachable on demand."
+            },
+            2: {
+                title: "Level 2: Datatips Challenge",
+                desc: "Datatips reveal details during hover. Some tooltips are empty (underloaded) and some contain massive database logs (overloaded). Select the best tooltip style and click on Bar 4 (Sneha Patil) to read her Quiz 2 score.",
+                sandboxTitle: "Performance Bar Chart",
+                sandboxDesc: "Choose a tooltip pattern, then hover over the graph bars.",
+                hint: "Choose the 'Recommended' tooltip style. It balances context and brevity. Then click/hover on Bar 4 and enter its exact y-value.",
+                explanation: "Good datatips are compact but contextual. They must display critical details (like value, label, units) right next to the cursor and vanish cleanly to avoid canvas obstruction."
+            },
+            3: {
+                title: "Level 3: Data Spotlight",
+                desc: "Locating specific students in a large grid is slow. Use Data Spotlight triggers to highlight categories of students. Count how many students are Weak (grades <50%) and how many have Low Attendance (attendance <75%).",
+                sandboxTitle: "Visual Attention Focus Board",
+                sandboxDesc: "Toggle spotlights to highlight critical cases while dimming the background data grid.",
+                hint: "Toggle the spotlight triggers to highlight Weak Students (<50%) and Low Attendance students (<75%). Count the highlighted students for each case.",
+                explanation: "Data Spotlight guides selective focus. Dimming non-relevant entries by lowering opacity to 20% while retaining full opacity on targets reduces search latencies and visual noise."
+            },
+            4: {
+                title: "Level 4: Dynamic Queries",
+                desc: "Use dynamic sliders to query the database instantly. Find the name of the student in Section A with score 60-80% and attendance above 80%.",
+                sandboxTitle: "Interactive Query Panel",
+                sandboxDesc: "Adjust sliders. The list below updates in real-time. Enter the name of the matching student.",
+                hint: "Set Section selector to 'A', drag Score slider above 60%, and drag Attendance above 80%. Read the name of the remaining student.",
+                explanation: "Dynamic Queries update graphics instantly. Removing 'Search' submit buttons and using sliders triggers immediate visual updates, allowing rapid hypothesis testing."
+            },
+            5: {
+                title: "Level 5: Dashboard Design Mission",
+                desc: "Assemble a student learning dashboard using standard UI graphics blocks, then solve the principal investigator query.",
+                sandboxTitle: "Dashboard Design Canvas",
+                sandboxDesc: "Drag widgets from the toolbox on the left into their correct slots on the canvas wireframe.",
+                hint: "Place Metrics at top, Filters in sidebar, Grid in body, and Detail panel in right sidebar. Once built, find the weak student (marks <50%) in Section B, open their details, and read their Quiz 3 score.",
+                explanation: "Integrated dashboards combine overview metrics, interactive filter controls, grids, spotlights, and tooltips into a unified visual workspace to accelerate data analysis."
+            }
+        };
+
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        function loadLevel(levelNum) {
+            state.currentLevel = levelNum;
+
+            // Reset Feedback
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+
+            // Progress Bar
+            const progressPercentage = (levelNum / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercentage + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${levelNum} of 5`;
+
+            // Update Text
+            document.getElementById('level-title').innerText = levelData[levelNum].title;
+            document.getElementById('level-desc').innerText = levelData[levelNum].desc;
+            document.getElementById('sandbox-title').innerText = levelData[levelNum].sandboxTitle;
+            document.getElementById('sandbox-desc').innerText = levelData[levelNum].sandboxDesc;
+
+            // Set Navigation states
+            document.getElementById('btn-prev-level').disabled = (levelNum === 1);
+            document.getElementById('btn-next-level').disabled = (levelNum === state.maxLevels);
+
+            // Render Sandbox content
+            const sandboxBody = document.getElementById('sandbox-body');
+            sandboxBody.innerHTML = '';
+
+            if (levelNum === 1) {
+                renderLevel1(sandboxBody);
+            } else if (levelNum === 2) {
+                renderLevel2(sandboxBody);
+            } else if (levelNum === 3) {
+                renderLevel3(sandboxBody);
+            } else if (levelNum === 4) {
+                renderLevel4(sandboxBody);
+            } else if (levelNum === 5) {
+                renderLevel5(sandboxBody);
+            }
+        }
+
+        function showHintModal() {
+            const modal = document.getElementById('hint-modal');
+            const text = document.getElementById('hint-text');
+            text.innerText = levelData[state.currentLevel].hint;
+            modal.style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        /* LEVEL 1: OVERVIEW PLUS DETAIL */
+        function renderLevel1(container) {
+            state.l1Mode = 'cluttered';
+            state.l1SelectedStudent = null;
+
+            const mainDiv = document.createElement('div');
+            mainDiv.className = 'l1-overview-mode';
+            mainDiv.id = 'l1-wrapper';
+
+            const header = document.createElement('div');
+            header.style.display = 'flex';
+            header.style.justifyContent = 'space-between';
+            header.style.marginBottom = '12px';
+            header.innerHTML = `
+            <span style="font-weight:600; font-size:0.9rem;">View Settings:</span>
+            <button class="btn-outline" style="padding:6px 12px; font-size:0.8rem;" id="l1-toggle-view-btn" onclick="toggleL1Layout()">Switch to Overview plus Detail</button>
+        `;
+            mainDiv.appendChild(header);
+
+            const clutteredView = document.createElement('div');
+            clutteredView.className = 'l1-cluttered-container';
+            clutteredView.id = 'l1-cluttered-view';
+
+            let tableRows = '';
+            studentsData.forEach(s => {
+                tableRows += `<tr>
+                <td>${s.name}</td>
+                <td>${s.id}</td>
+                <td>${s.section}</td>
+                <td>${s.marks}%</td>
+                <td>${s.attendance}%</td>
+                <td>${s.q1}</td>
+                <td>${s.q2}</td>
+                <td>${s.q3}</td>
+                <td>${s.q4}</td>
+                <td>${s.active ? 'Yes' : 'No'}</td>
+                <td>N/A</td>
+                <td>System Log OK</td>
+            </tr>`;
+            });
+
+            clutteredView.innerHTML = `
+            <table class="cluttered-table">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>ID</th><th>Sec</th><th>Avg Marks</th><th>Attd</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Active</th><th>Notes</th><th>System Status</th>
+                    </tr>
+                </thead>
+                <tbody>${tableRows}</tbody>
+            </table>
+        `;
+            mainDiv.appendChild(clutteredView);
+
+            const inputRow = document.createElement('div');
+            inputRow.style.marginTop = '16px';
+            inputRow.innerHTML = `
+            <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Enter Rahul's Quiz 3 score:</label>
+            <input type="number" class="l1-input-verify" id="l1-verify-ans" placeholder="Type score here">
+        `;
+            mainDiv.appendChild(inputRow);
+
+            container.appendChild(mainDiv);
+        }
+
+        function toggleL1Layout() {
+            const wrapper = document.getElementById('l1-wrapper');
+            const cluttered = document.getElementById('l1-cluttered-view');
+            const btn = document.getElementById('l1-toggle-view-btn');
+
+            if (state.l1Mode === 'cluttered') {
+                state.l1Mode = 'overview';
+                btn.innerText = "Switch to Cluttered Table Layout";
+                if (cluttered) cluttered.remove();
+
+                const overviewDiv = document.createElement('div');
+                overviewDiv.id = 'l1-overview-view';
+                overviewDiv.className = 'l1-overview-mode';
+
+                overviewDiv.innerHTML = `
+                <div class="l1-overview-cards">
+                    <div class="mini-metric-card">
+                        <div class="mini-metric-title">Class Average</div>
+                        <div class="mini-metric-value">75.8%</div>
+                    </div>
+                    <div class="mini-metric-card">
+                        <div class="mini-metric-title">Mean Attendance</div>
+                        <div class="mini-metric-value">80.5%</div>
+                    </div>
+                    <div class="mini-metric-card">
+                        <div class="mini-metric-title">Total Enrolled</div>
+                        <div class="mini-metric-value">8 Students</div>
+                    </div>
+                </div>
+                
+                <div class="l1-split-layout">
+                    <div class="l1-sidebar-list" id="l1-student-list"></div>
+                    <div class="l1-detail-panel" id="l1-details-box">
+                        <div class="detail-placeholder">Select a student from the left menu to view grades detail.</div>
+                    </div>
+                </div>
+            `;
+
+                wrapper.insertBefore(overviewDiv, wrapper.lastChild);
+
+                const listContainer = document.getElementById('l1-student-list');
+                studentsData.forEach(s => {
+                    const item = document.createElement('div');
+                    item.className = 'student-list-item';
+                    item.innerText = s.name;
+                    item.onclick = () => selectL1Student(s, item);
+                    listContainer.appendChild(item);
+                });
+
+            } else {
+                state.l1Mode = 'cluttered';
+                document.getElementById('l1-overview-view').remove();
+                loadLevel(1);
+            }
+        }
+
+        function selectL1Student(student, element) {
+            const items = document.querySelectorAll('.student-list-item');
+            items.forEach(i => i.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const detailsBox = document.getElementById('l1-details-box');
+            detailsBox.innerHTML = `
+            <div style="font-weight:700; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:12px; color:var(--somaiya-red);">
+                📋 Academic Details: ${student.name}
+            </div>
+            <div class="grade-detail-grid">
+                <div class="detail-cell"><strong>Roll ID:</strong> ${student.id}</div>
+                <div class="detail-cell"><strong>Section:</strong> ${student.section}</div>
+                <div class="detail-cell"><strong>Quiz 1 score:</strong> ${student.q1}</div>
+                <div class="detail-cell"><strong>Quiz 2 score:</strong> ${student.q2}</div>
+                <div class="detail-cell"><strong>Quiz 3 score:</strong> ${student.q3}</div>
+                <div class="detail-cell"><strong>Quiz 4 score:</strong> ${student.q4}</div>
+            </div>
+        `;
+        }
+
+        function validateLevel1() {
+            const inputVal = parseInt(document.getElementById('l1-verify-ans').value);
+            const correct = (inputVal === 75);
+
+            if (correct && state.l1Mode !== 'overview') {
+                showFeedback(false, "Correct value, but you didn't utilize the 'Overview plus Detail' design pattern layout. Switch views to complete correctly!");
+                return false;
+            }
+
+            showFeedback(correct, correct
+                ? "Excellent! The Overview plus Detail layout cleaned the visual slate and let you query Rahul's detail properties efficiently without horizontal scrolling."
+                : "Verification Failed: Incorrect Quiz 3 score. Switch to Overview plus Detail layout, select Rahul Sharma, and verify Quiz 3.");
+            return correct;
+        }
+
+        /* LEVEL 2: DATATIPS CHALLENGE */
+        function renderLevel2(container) {
+            state.l2TooltipStyle = 'none';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'l1-overview-mode';
+
+            const selectorRow = document.createElement('div');
+            selectorRow.className = 'chart-selector-row';
+            selectorRow.innerHTML = `
+            <button class="btn-spotlight" id="btn-tip-over" onclick="selectL2TipStyle('overloaded')">Overloaded Tooltip</button>
+            <button class="btn-spotlight" id="btn-tip-under" onclick="selectL2TipStyle('underloaded')">Underloaded Tooltip</button>
+            <button class="btn-spotlight" id="btn-tip-rec" onclick="selectL2TipStyle('recommended')">Recommended Datatip</button>
+        `;
+            wrapper.appendChild(selectorRow);
+
+            const chartArea = document.createElement('div');
+            chartArea.className = 'chart-canvas-mock';
+            chartArea.id = 'chart-canvas';
+
+            const subset = studentsData.slice(0, 6);
+            subset.forEach((s, i) => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${s.marks * 1.8}px`;
+                bar.innerHTML = `<span class="chart-label">Bar ${i + 1}</span>`;
+
+                bar.onmouseenter = (e) => showDatatip(e, s, i + 1);
+                bar.onmousemove = (e) => moveDatatip(e);
+                bar.onmouseleave = () => hideDatatip();
+
+                chartArea.appendChild(bar);
+            });
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'datatip-tooltip';
+            tooltip.id = 'chart-tooltip';
+            chartArea.appendChild(tooltip);
+
+            wrapper.appendChild(chartArea);
+
+            const inputRow = document.createElement('div');
+            inputRow.style.marginTop = '16px';
+            inputRow.innerHTML = `
+            <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Enter Bar 4's average score:</label>
+            <input type="number" class="l1-input-verify" id="l2-verify-ans" placeholder="Enter score here">
+        `;
+            wrapper.appendChild(inputRow);
+
+            container.appendChild(wrapper);
+        }
+
+        function selectL2TipStyle(style) {
+            state.l2TooltipStyle = style;
+            document.querySelectorAll('.btn-spotlight').forEach(b => b.classList.remove('active'));
+            if (style === 'overloaded') document.getElementById('btn-tip-over').classList.add('active');
+            if (style === 'underloaded') document.getElementById('btn-tip-under').classList.add('active');
+            if (style === 'recommended') document.getElementById('btn-tip-rec').classList.add('active');
+        }
+
+        function showDatatip(e, student, index) {
+            if (state.l2TooltipStyle === 'none') return;
+            const tooltip = document.getElementById('chart-tooltip');
+            tooltip.style.display = 'block';
+
+            if (state.l2TooltipStyle === 'underloaded') {
+                tooltip.innerHTML = `<strong>${student.marks}</strong>`;
+            } else if (state.l2TooltipStyle === 'overloaded') {
+                tooltip.innerHTML = `
+                <strong>Student Detail Log:</strong><br>
+                Name: ${student.name}<br>
+                Roll: ${student.id}<br>
+                Average Mark: ${student.marks}%<br>
+                Attendance: ${student.attendance}%<br>
+                System Latency: 4ms<br>
+                Canvas Coordinate: X=${e.clientX}, Y=${e.clientY}<br>
+                DB Index: ${index}
+            `;
+            } else {
+                tooltip.innerHTML = `
+                <strong>Student Name:</strong> ${student.name}<br>
+                <strong>Grade average:</strong> ${student.marks}%<br>
+                <strong>Attendance:</strong> ${student.attendance}%
+            `;
+            }
+            moveDatatip(e);
+        }
+
+        function moveDatatip(e) {
+            const tooltip = document.getElementById('chart-tooltip');
+            const rect = document.getElementById('chart-canvas').getBoundingClientRect();
+            tooltip.style.left = (e.clientX - rect.left + 15) + 'px';
+            tooltip.style.top = (e.clientY - rect.top - 15) + 'px';
+        }
+
+        function hideDatatip() {
+            document.getElementById('chart-tooltip').style.display = 'none';
+        }
+
+        function validateLevel2() {
+            const inputVal = parseInt(document.getElementById('l2-verify-ans').value);
+            const correctVal = (inputVal === 45);
+
+            if (state.l2TooltipStyle !== 'recommended') {
+                showFeedback(false, "To complete this level, select the 'Recommended' tooltip style. Other styles overload or omit context!");
+                return false;
+            }
+
+            showFeedback(correctVal, correctVal
+                ? "Excellent! Compact datatips display contextual information right at the hover coordinate, optimizing page scanning speeds."
+                : "Verification Failed: Incorrect score value for Bar 4. Check tooltip details and confirm value.");
+            return correctVal;
+        }
+
+        /* LEVEL 3: DATA SPOTLIGHT */
+        function renderLevel3(container) {
+            state.l3ActiveSpotlight = 'none';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'l1-overview-mode';
+
+            const controls = document.createElement('div');
+            controls.className = 'spotlight-controls';
+            controls.innerHTML = `
+            <button class="btn-spotlight" id="btn-spot-all" onclick="setL3Spotlight('all')">Show All</button>
+            <button class="btn-spotlight" id="btn-spot-weak" onclick="setL3Spotlight('weak')">Spotlight Weak (<50%)</button>
+            <button class="btn-spotlight" id="btn-spot-attd" onclick="setL3Spotlight('attd')">Spotlight Attendance (<75%)</button>
+        `;
+            wrapper.appendChild(controls);
+
+            const grid = document.createElement('div');
+            grid.className = 'student-cards-grid';
+            grid.id = 'l3-cards-grid';
+
+            studentsData.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'spot-student-card';
+                card.id = `spot-card-${s.id}`;
+                card.innerHTML = `
+                <div class="spot-card-header">${s.name}</div>
+                <div class="spot-card-stat">Grade: <strong>${s.marks}%</strong></div>
+                <div class="spot-card-stat">Attendance: <strong>${s.attendance}%</strong></div>
+                <div>
+                    ${s.marks < 50 ? '<span class="spot-badge badge-red">Failing Grade</span>' : ''}
+                    ${s.attendance < 75 ? '<span class="spot-badge badge-red">Low Attendance</span>' : ''}
+                </div>
+            `;
+                grid.appendChild(card);
+            });
+            wrapper.appendChild(grid);
+
+            const inputRow = document.createElement('div');
+            inputRow.style.marginTop = '16px';
+            inputRow.style.display = 'flex';
+            inputRow.style.flexDirection = 'column';
+            inputRow.style.gap = '12px';
+            inputRow.innerHTML = `
+            <div>
+                <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">1. How many students are Weak (Grades < 50%)?</label>
+                <input type="number" class="l1-input-verify" id="l3-verify-weak" placeholder="Enter count of weak students" style="margin-top:0;">
+            </div>
+            <div>
+                <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">2. How many students have Low Attendance (Attendance < 75%)?</label>
+                <input type="number" class="l1-input-verify" id="l3-verify-attd" placeholder="Enter count of low attendance students" style="margin-top:0;">
+            </div>
+        `;
+            wrapper.appendChild(inputRow);
+
+            container.appendChild(wrapper);
+        }
+
+        function setL3Spotlight(mode) {
+            state.l3ActiveSpotlight = mode;
+
+            document.getElementById('btn-spot-all').classList.toggle('active', mode === 'all');
+            document.getElementById('btn-spot-weak').classList.toggle('active', mode === 'weak');
+            document.getElementById('btn-spot-attd').classList.toggle('active', mode === 'attd');
+
+            studentsData.forEach(s => {
+                const card = document.getElementById(`spot-card-${s.id}`);
+                card.className = 'spot-student-card';
+
+                if (mode === 'all') {
+                    // Remove dimming
+                } else if (mode === 'weak') {
+                    if (s.marks < 50) {
+                        card.classList.add('highlighted');
+                    } else {
+                        card.classList.add('dimmed');
+                    }
+                } else if (mode === 'attd') {
+                    if (s.attendance < 75) {
+                        card.classList.add('highlighted');
+                    } else {
+                        card.classList.add('dimmed');
+                    }
+                }
+            });
+        }
+
+        function validateLevel3() {
+            const weakVal = parseInt(document.getElementById('l3-verify-weak').value);
+            const attdVal = parseInt(document.getElementById('l3-verify-attd').value);
+
+            const correctWeak = (weakVal === 2);
+            const correctAttd = (attdVal === 3);
+            const correct = correctWeak && correctAttd;
+
+            if (correct && (state.l3ActiveSpotlight === 'none' || state.l3ActiveSpotlight === 'all')) {
+                showFeedback(false, "To solve this efficiently, interact with the Spotlight triggers first to highlight target segments.");
+                return false;
+            }
+
+            showFeedback(correct, correct
+                ? "Excellent! Spotlight highlights important cells (full opacity, colored borders) while fading background rows, emphasizing focus targets."
+                : "Verification Failed: Incorrect counts. Use the spotlight buttons to highlight Weak Students (<50%) and Low Attendance students (<75%) to count them correctly.");
+            return correct;
+        }
+
+        /* LEVEL 4: DYNAMIC QUERIES */
+        function renderLevel4(container) {
+            const grid = document.createElement('div');
+            grid.className = 'query-interface-grid';
+
+            const sidebar = document.createElement('div');
+            sidebar.className = 'filter-panel';
+            sidebar.innerHTML = `
+            <div class="filter-group">
+                <label>Section:</label>
+                <select id="l4-sec" onchange="runL4Query()">
+                    <option value="All">All Sections</option>
+                    <option value="A">Section A</option>
+                    <option value="B">Section B</option>
+                    <option value="C">Section C</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Min Marks: <span class="filter-value" id="val-marks">0%</span></label>
+                <input type="range" id="range-marks" min="0" max="100" value="0" oninput="runL4Query()">
+            </div>
+            <div class="filter-group">
+                <label>Min Attendance: <span class="filter-value" id="val-attd">0%</span></label>
+                <input type="range" id="range-attd" min="0" max="100" value="0" oninput="runL4Query()">
+            </div>
+        `;
+
+            const rightPanel = document.createElement('div');
+            rightPanel.style.display = 'flex';
+            rightPanel.style.flexDirection = 'column';
+            rightPanel.style.gap = '12px';
+
+            const list = document.createElement('div');
+            list.className = 'query-list-results';
+            list.id = 'l4-results-list';
+
+            rightPanel.appendChild(list);
+
+            const verifyRow = document.createElement('div');
+            verifyRow.innerHTML = `
+            <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Enter matching student's full name (Section A, Score 60-80%, Attendance >80%):</label>
+            <input type="text" class="l1-input-verify" id="l4-verify-ans" placeholder="Enter student name">
+        `;
+            rightPanel.appendChild(verifyRow);
+
+            grid.appendChild(sidebar);
+            grid.appendChild(rightPanel);
+            container.appendChild(grid);
+
+            runL4Query();
+        }
+
+        function runL4Query() {
+            const sec = document.getElementById('l4-sec').value;
+            const marks = parseInt(document.getElementById('range-marks').value);
+            const attd = parseInt(document.getElementById('range-attd').value);
+
+            document.getElementById('val-marks').innerText = `${marks}%`;
+            document.getElementById('val-attd').innerText = `${attd}%`;
+
+            const results = studentsData.filter(s => {
+                const matchesSec = (sec === 'All' || s.section === sec);
+                const matchesMarks = (s.marks >= marks);
+                const matchesAttd = (s.attendance >= attd);
+                return matchesSec && matchesMarks && matchesAttd;
+            });
+
+            const container = document.getElementById('l4-results-list');
+            container.innerHTML = '';
+
+            if (results.length === 0) {
+                container.innerHTML = `<div style="text-align:center; font-style:italic; padding:12px; color:var(--text-muted);">No records match criteria.</div>`;
+            } else {
+                results.forEach(s => {
+                    const item = document.createElement('div');
+                    item.className = 'mock-row-item';
+                    item.innerHTML = `
+                    <span><strong>${s.name}</strong> (${s.id})</span>
+                    <span>Grade: ${s.marks}% | Attd: ${s.attendance}% | Sec: ${s.section}</span>
+                `;
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        function validateLevel4() {
+            const nameVal = document.getElementById('l4-verify-ans').value.trim().toLowerCase();
+            const correct = (nameVal === 'rahul sharma' || nameVal === 'aditya sen');
+
+            showFeedback(correct, correct
+                ? "Superb! Dynamic sliders update dashboard records instantly with 100ms response timelines, accelerating query efficiency."
+                : "Verification Failed: Incorrect student name. Adjust sidebar filters to find Section A students with score 60-80% and attendance above 80%.");
+            return correct;
+        }
+
+        /* LEVEL 5: DASHBOARD DESIGN MISSION */
+        function renderLevel5(container) {
+            state.l5PlacedWidgets = { 'metrics': false, 'filters': false, 'grid': false, 'detail': false };
+            state.l5SelectedStudent = null;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'layout-builder-workspace';
+
+            const toolbox = document.createElement('div');
+            toolbox.className = 'widgets-toolbox';
+            toolbox.innerHTML = `
+            <div style="font-weight:700; font-size:0.75rem; text-transform:uppercase; margin-bottom:8px; border-bottom:1px solid var(--border-color); padding-bottom:4px;">Toolbox</div>
+            <div class="widget-box-item" draggable="true" id="widget-metrics" ondragstart="dragStart">📊 Overview Metrics Card</div>
+            <div class="widget-box-item" draggable="true" id="widget-filters" ondragstart="dragStart">🎛️ Dynamic Filters Panel</div>
+            <div class="widget-box-item" draggable="true" id="widget-grid" ondragstart="dragStart">🗂️ Student List Grid</div>
+            <div class="widget-box-item" draggable="true" id="widget-detail" ondragstart="dragStart">📋 Detail Side Panel</div>
+        `;
+
+            const canvas = document.createElement('div');
+            canvas.className = 'dashboard-build-canvas';
+            canvas.id = 'l5-canvas';
+            canvas.innerHTML = `
+            <div class="canvas-section" id="slot-metrics" style="grid-column: span 2; min-height:50px;">Drag Overview Metrics Card here</div>
+            <div style="display:grid; grid-template-columns: 160px 1fr 180px; gap:12px; width:100%;">
+                <div class="canvas-section" id="slot-filters" style="min-height:160px;">Drag Filters Panel here</div>
+                <div class="canvas-section" id="slot-grid" style="min-height:160px;">Drag Student List here</div>
+                <div class="canvas-section" id="slot-detail" style="min-height:160px;">Drag Detail Panel here</div>
+            </div>
+        `;
+
+            setTimeout(() => {
+                document.querySelectorAll('.widget-box-item').forEach(b => {
+                    b.addEventListener('dragstart', dragStart);
+                });
+
+                document.querySelectorAll('.canvas-section').forEach(s => {
+                    s.addEventListener('dragover', dragOver);
+                    s.addEventListener('dragleave', dragLeave);
+                    s.addEventListener('drop', dropWidgetOnCanvas);
+                });
+            }, 50);
+
+            wrapper.appendChild(toolbox);
+            wrapper.appendChild(canvas);
+            container.appendChild(wrapper);
+        }
+
+        function dropWidgetOnCanvas(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove('drag-over');
+
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(draggedId);
+
+            const slotId = slot.id.replace('slot-', '');
+            const widgetId = draggedId.replace('widget-', '');
+
+            if (slotId === widgetId) {
+                slot.innerHTML = `<span style="font-weight:600; color:var(--somaiya-red);">${draggedElement.innerText} Installed</span>`;
+                slot.classList.add('filled');
+                state.l5PlacedWidgets[widgetId] = true;
+                draggedElement.remove();
+
+                const allPlaced = Object.values(state.l5PlacedWidgets).every(v => v === true);
+                if (allPlaced) {
+                    activateL5Dashboard();
+                }
+            } else {
+                alert(`Placement mismatch. "${draggedElement.innerText}" belongs in the correct slot outline!`);
+            }
+        }
+
+        function activateL5Dashboard() {
+            const canvas = document.getElementById('l5-canvas');
+            canvas.innerHTML = '';
+            canvas.className = 'live-interactive-dashboard';
+
+            canvas.innerHTML = `
+            <div class="dashboard-top-area" style="grid-column: span 2;">
+                <div class="l1-overview-cards">
+                    <div class="mini-metric-card">
+                        <div class="mini-metric-title">Active Class Enrolled</div>
+                        <div class="mini-metric-value">8 Students</div>
+                    </div>
+                    <div class="mini-metric-card">
+                        <div class="mini-metric-title">Critical Attention Cases</div>
+                        <div class="mini-metric-value" style="color:var(--danger-color)">2 Students</div>
+                    </div>
+                    <div class="mini-metric-card" style="display:flex; align-items:center; gap:8px;">
+                        <button class="btn-spotlight active" style="padding:6px; font-size:0.75rem;" id="l5-spot-weak" onclick="toggleL5Spotlight()">Spotlight Weak (<50%)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-panel">
+                <div class="filter-group">
+                    <label>Section Dropdown:</label>
+                    <select id="l5-filter-sec" onchange="runL5DashboardQuery()">
+                        <option value="All">All Sections</option>
+                        <option value="A">Section A</option>
+                        <option value="B">Section B</option>
+                        <option value="C">Section C</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Min Attendance: <span class="filter-value" id="l5-val-attd">0%</span></label>
+                    <input type="range" id="l5-range-attd" min="0" max="100" value="0" oninput="runL5DashboardQuery()">
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 180px; gap:12px;">
+                <div class="l1-sidebar-list" id="l5-student-list" style="max-height:220px;"></div>
+                <div class="l1-detail-panel" id="l5-detail-box">
+                    <div class="detail-placeholder">Click list.</div>
+                </div>
+            </div>
+        `;
+
+            const verifyRow = document.createElement('div');
+            verifyRow.style.gridColumn = 'span 2';
+            verifyRow.style.marginTop = '16px';
+            verifyRow.innerHTML = `
+            <div style="border-top:1px solid var(--border-color); padding-top:12px;">
+                <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Identify the weak student in Section B. Click them, open details, and enter their Quiz 3 score:</label>
+                <input type="number" class="l1-input-verify" id="l5-verify-ans" placeholder="Enter Quiz 3 score">
+            </div>
+        `;
+            canvas.appendChild(verifyRow);
+
+            runL5DashboardQuery();
+        }
+
+        let l5SpotlightOn = false;
+        function toggleL5Spotlight() {
+            l5SpotlightOn = !l5SpotlightOn;
+            document.getElementById('l5-spot-weak').classList.toggle('active', l5SpotlightOn);
+            runL5DashboardQuery();
+        }
+
+        function runL5DashboardQuery() {
+            const sec = document.getElementById('l5-filter-sec').value;
+            const attd = parseInt(document.getElementById('l5-range-attd').value);
+            document.getElementById('l5-val-attd').innerText = `${attd}%`;
+
+            const list = document.getElementById('l5-student-list');
+            list.innerHTML = '';
+
+            const results = studentsData.filter(s => {
+                const matchesSec = (sec === 'All' || s.section === sec);
+                const matchesAttd = (s.attendance >= attd);
+                return matchesSec && matchesAttd;
+            });
+
+            results.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'student-list-item';
+
+                if (l5SpotlightOn) {
+                    if (s.marks < 50) {
+                        item.style.borderColor = 'var(--somaiya-red)';
+                        item.style.backgroundColor = 'var(--somaiya-red-light)';
+                    } else {
+                        item.style.opacity = '0.3';
+                    }
+                } else {
+                    item.style.borderColor = 'transparent';
+                    item.style.opacity = '1';
+                    item.style.backgroundColor = 'transparent';
+                }
+
+                item.innerText = s.name;
+                item.onclick = () => selectL5Student(s, item);
+                list.appendChild(item);
+            });
+        }
+
+        function selectL5Student(student, element) {
+            document.querySelectorAll('#l5-student-list .student-list-item').forEach(i => i.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const details = document.getElementById('l5-detail-box');
+            details.innerHTML = `
+            <div style="font-size:0.75rem; font-weight:700; color:var(--somaiya-red); border-bottom:1px solid var(--border-color); padding-bottom:4px; margin-bottom:8px;">
+                ${student.name}
+            </div>
+            <div style="font-size:0.72rem; display:flex; flex-direction:column; gap:4px;">
+                <div><strong>ID:</strong> ${student.id}</div>
+                <div><strong>Sec:</strong> ${student.section}</div>
+                <div><strong>Grade avg:</strong> ${student.marks}%</div>
+                <div><strong>Quiz 3 Score:</strong> <span style="font-weight:700; color:var(--somaiya-red);">${student.q3}</span></div>
+            </div>
+        `;
+        }
+
+        function validateLevel5() {
+            const allPlaced = Object.values(state.l5PlacedWidgets).every(v => v === true);
+            if (!allPlaced) {
+                showFeedback(false, "Dashboard incomplete. Drag and install all 4 core widget modules from the toolbox to start.");
+                return false;
+            }
+
+            const score = parseInt(document.getElementById('l5-verify-ans').value);
+            const correct = (score === 45 || score === 50);
+
+            showFeedback(correct, correct
+                ? "Congratulations! You successfully designed, populated, and executed a complete interactive information dashboard."
+                : "Verification Failed: Incorrect Quiz 3 score. Select the weak student in Section B (Sneha or Priya) from list, check details, and re-enter score.");
+
+            return correct;
+        }
+
+        function showFeedback(success, text) {
+            const panel = document.getElementById('feedback-panel');
+            const title = document.getElementById('feedback-title');
+            const desc = document.getElementById('feedback-text');
+            const submitBtn = document.getElementById('btn-submit-action');
+
+            panel.className = success ? 'feedback-panel success' : 'feedback-panel error';
+            title.innerText = success ? '✅ Verification Passed!' : '❌ Verification Failed';
+            desc.innerText = text;
+            panel.style.display = 'block';
+
+            if (success) {
+                submitBtn.disabled = true;
+                const eduPanel = document.getElementById('educational-explanation');
+                const eduText = document.getElementById('educational-explanation-text');
+                eduText.innerText = levelData[state.currentLevel].explanation;
+                eduPanel.style.display = 'block';
+            }
+        }
+
+        /* GENERAL HANDLERS */
+        function validateAction() {
+            if (state.currentLevel === 1) {
+                validateLevel1();
+            } else if (state.currentLevel === 2) {
+                validateLevel2();
+            } else if (state.currentLevel === 3) {
+                validateLevel3();
+            } else if (state.currentLevel === 4) {
+                validateLevel4();
+            } else if (state.currentLevel === 5) {
+                validateLevel5();
+            }
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                renderFinalCompletionScreen();
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function renderFinalCompletionScreen() {
+            document.getElementById('btn-submit-action').classList.add('hidden');
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+
+            const sandbox = document.getElementById('sandbox-body');
+            sandbox.innerHTML = `
+            <div class="final-screen">
+                <span class="celebrate-icon">🏆</span>
+                <h3>Module 4.2 Completed!</h3>
+                <p>Excellent job! You have mastered the patterns for Information Graphics in UI Design. You successfully navigated Overview plus Detail, configured dynamic datatips, spotlighted data anomalies, executed dynamic slider queries, and designed a dashboard architecture.</p>
+                <div style="margin-top: 24px;">
+                    <button class="btn-action" onclick="restartSimulation()">Restart Lab Simulation</button>
+                </div>
+            </div>
+        `;
+            document.getElementById('sandbox-title').innerText = "Dashboard Certification Granted";
+            document.getElementById('sandbox-desc').innerText = "All levels completed successfully.";
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+        function dragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+        function dragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+    </script>
+</body>
+
+</html>

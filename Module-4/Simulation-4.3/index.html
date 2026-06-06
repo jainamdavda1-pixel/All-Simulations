@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 4.3 — Patterns with Form Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FDF2F2;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --warning-color: #F59E0B;
+            --warning-light: #FEF3C7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        /* Sidebar info card */
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Simulation sandbox */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 550px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+        }
+
+        /* Level-specific form components */
+        .l1-split-grid {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .l1-split-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .input-group label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .input-group input {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--somaiya-red);
+            box-shadow: 0 0 0 2px var(--somaiya-red-border);
+        }
+
+        .parsing-status-box {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .parsed-field {
+            font-size: 0.78rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .parsed-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--somaiya-red);
+            margin-top: 4px;
+        }
+
+        /* Structured inputs OTP */
+        .otp-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .otp-box {
+            width: 48px;
+            height: 48px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .otp-box:focus {
+            outline: none;
+            border-color: var(--somaiya-red);
+            box-shadow: 0 0 0 2px var(--somaiya-red-border);
+        }
+
+        .roll-seg-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .roll-prefix {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .roll-year {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .roll-num {
+            width: 80px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        /* Fill in the blanks */
+        .sentence-form {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            line-height: 2.2;
+            font-size: 1.05rem;
+            color: var(--text-dark);
+        }
+
+        .sentence-input {
+            border: none;
+            border-bottom: 2px solid var(--somaiya-red);
+            font-family: inherit;
+            font-size: 1.05rem;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: var(--somaiya-red);
+            text-align: center;
+            background-color: transparent;
+        }
+
+        .sentence-input:focus {
+            outline: none;
+            background-color: var(--somaiya-red-light);
+        }
+
+        .hint-bar-active {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border: 1px dashed var(--somaiya-red);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #7A1C1C;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Autocomplete suggestions */
+        .suggest-wrapper {
+            position: relative;
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+            margin-top: 4px;
+        }
+
+        .suggest-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .suggest-item:hover {
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+        }
+
+        /* Floating label styling */
+        .floating-label-group {
+            position: relative;
+            margin-top: 12px;
+        }
+
+        .floating-label-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .floating-label-group label {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--white);
+            padding: 0 4px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .floating-label-group input:focus~label,
+        .floating-label-group input:not(:placeholder-shown)~label {
+            top: 0;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--somaiya-red);
+        }
+
+        /* Password Strength Meter */
+        .password-checklist {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 500px) {
+            .password-checklist {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .check-item.valid {
+            color: var(--success-color);
+            font-weight: 500;
+        }
+
+        .check-icon {
+            font-size: 0.85rem;
+        }
+
+        .strength-meter-bar-container {
+            height: 6px;
+            background-color: #E2E8F0;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .strength-meter-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--danger-color);
+            transition: width var(--transition), background-color var(--transition);
+        }
+
+        .strength-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 4px;
+            text-align: right;
+            text-transform: uppercase;
+        }
+
+        /* General Feedback and layouts */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            background-color: #F3F4F6;
+            color: #9CA3AF;
+            border-color: #E5E7EB;
+            cursor: not-allowed;
+        }
+
+        /* Modal Overlay for Hint */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 4: Interface Design for Data Handling</p>
+                </div>
+            </div>
+            <div class="subtopic-badge">
+                4.3 Patterns with Form Design
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <h2 id="level-title">Level 1: Forgiving Format</h2>
+                <p id="level-desc">Strict formatting rules frustrate users. Enter non-standard formats for phone number,
+                    date, and fee amount to watch the forgiving parser format them instantly.</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Flexible Formatting Input Portal</h3>
+                <p id="sandbox-desc">Enter valid formats (like +91-98765 43210, 12/06/2026, Rs. 5,000).</p>
+            </div>
+
+            <div class="sandbox-body" id="sandbox-body">
+                <!-- Sandbox loaded dynamically -->
+            </div>
+
+            <!-- Feedback Panels -->
+            <div class="feedback-panel" id="feedback-panel">
+                <strong id="feedback-title">Feedback Title</strong>
+                <p id="feedback-text">Feedback body content...</p>
+            </div>
+
+            <div class="educational-explanation" id="educational-explanation">
+                <strong>💡 UI Design Principle:</strong>
+                <span id="educational-explanation-text">Educational explanation text...</span>
+            </div>
+
+            <div class="controls-row">
+                <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">← Prev Level</button>
+                <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Reset Level</button>
+                <button class="btn-action" id="btn-submit-action" onclick="validateAction()">Submit Response</button>
+                <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next Level →</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>💡 Lecture Slide Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            // L1 state
+            l1ParsedPhone: '',
+            l1ParsedDate: '',
+            l1ParsedAmount: '',
+            // L3 state
+            l3FocusedField: '',
+            // L4 state
+            l4FixedPrompt: false,
+            l4Autocompleted: false
+        };
+
+        const levelData = {
+            1: {
+                title: "Level 1: Forgiving Format",
+                desc: "Don't force users to type in exactly one format. Provide a forgiving parser that cleans phone numbers (e.g. +91 98765 43210), dates (e.g. 12/06/26), and amounts (e.g. Rs 5,000) into standardized DB variables in real time.",
+                sandboxTitle: "Forgiving Input Form",
+                sandboxDesc: "Type non-standard numbers, dates, and amounts to see live cleaning.",
+                hint: "Try typing phone: '+91 98765 43210', date: '12-06-26' or '12/06/2026', amount: 'Rs. 5,000' or '5000/-'. The parser extracts clean values.",
+                explanation: "Forgiving Format accepts varying user keystrokes (dashes, spaces, currency indicators) and reformats them programmatically instead of blocking form completion with validation alerts."
+            },
+            2: {
+                title: "Level 2: Structured Format",
+                desc: "For fixed IDs like OTPs or Semester codes, structured segmented boxes prevent input overflow, clarify expected character count, and automate page tab indexes. Complete the structured form below.",
+                sandboxTitle: "Segmented Security Check",
+                sandboxDesc: "Type 6 digits into the OTP blocks. Focus shifts automatically. Choose why structured inputs outperform raw boxes here.",
+                hint: "OTP boxes accept 1 digit each. As you type, focus auto-jumps. Complete the roll ID and pick the answer about preventing input size slips.",
+                explanation: "Structured Format divides input fields into segments matching the structural blocks of the data (like OTP codes, credit cards, dates), strictly preventing formatting errors before form submission."
+            },
+            3: {
+                title: "Level 3: Fill-in-the-Blanks + Hints",
+                desc: "Natural sentence-style forms feel human and friendly. Click blanks to complete the paragraph. Read contextual Input Hints underneath fields.",
+                sandboxTitle: "Sentence Registration Form",
+                sandboxDesc: "Fill in the blank fields to construct a valid registration request.",
+                hint: "Name: Your name. Course: Select Web UI. Date: Monday in June (e.g. 15-06-2026). Roll: 4 digits. Hints appear on selection.",
+                explanation: "Fill-in-the-Blanks forms feel conversational, making forms feel shorter. Input Hints appear on-focus, providing immediate context without cluttering the screen static text."
+            },
+            4: {
+                title: "Level 4: Input Prompt & Autocompletion",
+                desc: "Input prompts (placeholders) are helpful but disappear on typing, leading to memory slips. Floating labels and autocompletion listings fix this. Auto-fill the course and fix the prompt.",
+                sandboxTitle: "Autocompleting Course Search",
+                sandboxDesc: "Search course codes with automatic drop-downs, and fix the vanishing placeholder.",
+                hint: "Type 'web' in the search bar, click 'Web UI Design (IT-404)'. Then click 'Fix Vanishing Label' to convert the disappearing placeholder into a floating label.",
+                explanation: "Input Prompts should not double as field labels. Once focus is gained, placeholders disappear; persistent labels (like floating labels) protect short-term memory capacity."
+            },
+            5: {
+                title: "Level 5: Password Strength Meter",
+                desc: "Password constraints are hard to remember. Create a robust signup credential. Check criteria markers in real time as strength grows from weak (red) to medium (yellow) to strong (green).",
+                sandboxTitle: "Registration Security Audit",
+                sandboxDesc: "Type a password checking off all safety markers including length, letters, symbols, and exclusions.",
+                hint: "Type a password like 'College@2026'. Ensure it has at least 8 characters, capital letters, digits, special characters, and excludes common names.",
+                explanation: "Password Strength Meters convert complex password rule validation into intuitive visual status tracks, helping users adjust keystrokes dynamically before hitting submit."
+            }
+        };
+
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        function loadLevel(levelNum) {
+            state.currentLevel = levelNum;
+
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+
+            const progressPercentage = (levelNum / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercentage + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${levelNum} of 5`;
+
+            document.getElementById('level-title').innerText = levelData[levelNum].title;
+            document.getElementById('level-desc').innerText = levelData[levelNum].desc;
+            document.getElementById('sandbox-title').innerText = levelData[levelNum].sandboxTitle;
+            document.getElementById('sandbox-desc').innerText = levelData[levelNum].sandboxDesc;
+
+            // Set Navigation states
+            document.getElementById('btn-prev-level').disabled = (levelNum === 1);
+            document.getElementById('btn-next-level').disabled = (levelNum === state.maxLevels);
+
+            const sandboxBody = document.getElementById('sandbox-body');
+            sandboxBody.innerHTML = '';
+
+            if (levelNum === 1) {
+                renderLevel1(sandboxBody);
+            } else if (levelNum === 2) {
+                renderLevel2(sandboxBody);
+            } else if (levelNum === 3) {
+                renderLevel3(sandboxBody);
+            } else if (levelNum === 4) {
+                renderLevel4(sandboxBody);
+            } else if (levelNum === 5) {
+                renderLevel5(sandboxBody);
+            }
+        }
+
+        function showHintModal() {
+            const modal = document.getElementById('hint-modal');
+            const text = document.getElementById('hint-text');
+            text.innerText = levelData[state.currentLevel].hint;
+            modal.style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        /* LEVEL 1: FORGIVING FORMAT */
+        function renderLevel1(container) {
+            state.l1ParsedPhone = '';
+            state.l1ParsedDate = '';
+            state.l1ParsedAmount = '';
+
+            const grid = document.createElement('div');
+            grid.className = 'l1-split-grid';
+
+            const form = document.createElement('div');
+            form.className = 'form-card';
+            form.innerHTML = `
+            <div class="input-group">
+                <label>Contact Phone Number:</label>
+                <input type="text" id="l1-phone" placeholder="e.g. +91 98765-43210" oninput="parseL1Phone()">
+            </div>
+            <div class="input-group">
+                <label>Admission Seminar Date:</label>
+                <input type="text" id="l1-date" placeholder="e.g. 12/06/2026" oninput="parseL1Date()">
+            </div>
+            <div class="input-group">
+                <label>Tuition Fees Amount:</label>
+                <input type="text" id="l1-amount" placeholder="e.g. Rs 5,000/-" oninput="parseL1Amount()">
+            </div>
+        `;
+
+            const parsingStatus = document.createElement('div');
+            parsingStatus.className = 'parsing-status-box';
+            parsingStatus.innerHTML = `
+            <strong style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; border-bottom:1px solid var(--border-color); padding-bottom:4px;">Live DB Clean Parser:</strong>
+            <div class="parsed-field">
+                Phone: <span id="chk-phone-icon">❌</span>
+                <div class="parsed-value" id="res-phone">--</div>
+            </div>
+            <div class="parsed-field">
+                Date: <span id="chk-date-icon">❌</span>
+                <div class="parsed-value" id="res-date">--</div>
+            </div>
+            <div class="parsed-field">
+                Amount: <span id="chk-amount-icon">❌</span>
+                <div class="parsed-value" id="res-amount">--</div>
+            </div>
+        `;
+
+            grid.appendChild(form);
+            grid.appendChild(parsingStatus);
+            container.appendChild(grid);
+        }
+
+        function parseL1Phone() {
+            const raw = document.getElementById('l1-phone').value;
+            const clean = raw.replace(/\D/g, '');
+
+            if (clean.length === 10) {
+                state.l1ParsedPhone = `+91 ${clean.slice(0, 5)} ${clean.slice(5)}`;
+                document.getElementById('res-phone').innerText = state.l1ParsedPhone;
+                document.getElementById('chk-phone-icon').innerText = '✅';
+            } else if (clean.length === 12 && clean.startsWith('91')) {
+                state.l1ParsedPhone = `+91 ${clean.slice(2, 7)} ${clean.slice(7)}`;
+                document.getElementById('res-phone').innerText = state.l1ParsedPhone;
+                document.getElementById('chk-phone-icon').innerText = '✅';
+            } else {
+                state.l1ParsedPhone = '';
+                document.getElementById('res-phone').innerText = '--';
+                document.getElementById('chk-phone-icon').innerText = '❌';
+            }
+        }
+
+        function parseL1Date() {
+            const raw = document.getElementById('l1-date').value.trim();
+            const parts = raw.split(/[\/\-\.]/);
+
+            if (parts.length === 3) {
+                let day = parseInt(parts[0]);
+                let month = parseInt(parts[1]);
+                let year = parts[2];
+
+                if (year.length === 2) {
+                    year = '20' + year;
+                }
+
+                if (day > 0 && day <= 31 && month > 0 && month <= 12 && year.length === 4) {
+                    const formattedDay = day < 10 ? '0' + day : day;
+                    const formattedMonth = month < 10 ? '0' + month : month;
+                    state.l1ParsedDate = `${year}-${formattedMonth}-${formattedDay}`;
+                    document.getElementById('res-date').innerText = state.l1ParsedDate;
+                    document.getElementById('chk-date-icon').innerText = '✅';
+                    return;
+                }
+            }
+            state.l1ParsedDate = '';
+            document.getElementById('res-date').innerText = '--';
+            document.getElementById('chk-date-icon').innerText = '❌';
+        }
+
+        function parseL1Amount() {
+            const raw = document.getElementById('l1-amount').value;
+            const clean = raw.replace(/\D/g, '');
+
+            if (clean.length > 0) {
+                const val = parseInt(clean);
+                state.l1ParsedAmount = `₹ ${val.toLocaleString('en-IN')}`;
+                document.getElementById('res-amount').innerText = state.l1ParsedAmount;
+                document.getElementById('chk-amount-icon').innerText = '✅';
+            } else {
+                state.l1ParsedAmount = '';
+                document.getElementById('res-amount').innerText = '--';
+                document.getElementById('chk-amount-icon').innerText = '❌';
+            }
+        }
+
+        function validateLevel1() {
+            const correct = (state.l1ParsedPhone !== '' && state.l1ParsedDate !== '' && state.l1ParsedAmount !== '');
+            showFeedback(correct, correct
+                ? "Excellent parser implementation! By parsing varying inputs, you protect users from validation errors and reduce form friction."
+                : "Verification Failed: Ensure all fields are filled with valid numeric formats. Watch for green checks in the Live DB clean panel.");
+            return correct;
+        }
+
+        /* LEVEL 2: STRUCTURED FORMAT */
+        function renderLevel2(container) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'form-card';
+
+            const labelOtp = document.createElement('label');
+            labelOtp.style.fontWeight = '600';
+            labelOtp.style.fontSize = '0.95rem';
+            labelOtp.innerText = "Enter 6-Digit Enrollment OTP (Structured Format):";
+            wrapper.appendChild(labelOtp);
+
+            const otpDiv = document.createElement('div');
+            otpDiv.className = 'otp-container';
+            for (let i = 0; i < 6; i++) {
+                const box = document.createElement('input');
+                box.type = 'text';
+                box.maxLength = 1;
+                box.className = 'otp-box';
+                box.id = `otp-box-${i}`;
+                box.oninput = (e) => {
+                    if (e.target.value.length === 1 && i < 5) {
+                        document.getElementById(`otp-box-${i + 1}`).focus();
+                    }
+                };
+                box.onkeydown = (e) => {
+                    if (e.key === 'Backspace' && e.target.value.length === 0 && i > 0) {
+                        document.getElementById(`otp-box-${i - 1}`).focus();
+                    }
+                };
+                otpDiv.appendChild(box);
+            }
+            wrapper.appendChild(otpDiv);
+
+            const labelRoll = document.createElement('label');
+            labelRoll.style.fontWeight = '600';
+            labelRoll.style.fontSize = '0.95rem';
+            labelRoll.style.display = 'block';
+            labelRoll.style.marginBottom = '8px';
+            labelRoll.innerText = "Structured Segmented Roll Code:";
+            wrapper.appendChild(labelRoll);
+
+            const rollDiv = document.createElement('div');
+            rollDiv.className = 'roll-seg-container';
+            rollDiv.innerHTML = `
+            <div class="roll-prefix">COLLEGE</div>
+            <span style="font-weight:bold; color:var(--text-muted);">-</span>
+            <select class="roll-year" id="l2-roll-year">
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+            </select>
+            <span style="font-weight:bold; color:var(--text-muted);">-</span>
+            <input type="text" class="roll-num" id="l2-roll-val" placeholder="0001" maxLength="4">
+        `;
+            wrapper.appendChild(rollDiv);
+
+            const questionDiv = document.createElement('div');
+            questionDiv.style.borderTop = '1px solid var(--border-color)';
+            questionDiv.style.paddingTop = '16px';
+            questionDiv.innerHTML = `
+            <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:8px;">
+                Why should we use Segmented/Structured Format instead of Forgiving Format for identifiers?
+            </label>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.85rem;">
+                <label style="cursor:pointer;"><input type="radio" name="l2-q" value="wrong" style="margin-right:6px;"> Because it allows users to type infinite alphanumeric notes.</label>
+                <label style="cursor:pointer;"><input type="radio" name="l2-q" value="correct" style="margin-right:6px;"> Because it limits length, aligns with document formats, and blocks invalid entry early.</label>
+            </div>
+        `;
+            wrapper.appendChild(questionDiv);
+
+            container.appendChild(wrapper);
+        }
+
+        function validateLevel2() {
+            let otpVal = '';
+            for (let i = 0; i < 6; i++) {
+                otpVal += document.getElementById(`otp-box-${i}`).value;
+            }
+
+            const rollVal = document.getElementById('l2-roll-val').value.trim();
+            const radioVal = document.querySelector('input[name="l2-q"]:checked');
+
+            const otpCorrect = (otpVal.length === 6 && !isNaN(otpVal));
+            const rollCorrect = (rollVal.length === 4 && !isNaN(rollVal));
+            const qCorrect = (radioVal && radioVal.value === 'correct');
+
+            const allCorrect = (otpCorrect && rollCorrect && qCorrect);
+
+            showFeedback(allCorrect, allCorrect
+                ? "Excellent! Segmented inputs reduce key mistakes on critical IDs, checking dimensions instantly on every keystroke."
+                : "Verification Failed: Complete OTP (6 digits), Roll Number (4 digits), and answer the priority question.");
+            return allCorrect;
+        }
+
+        /* LEVEL 3: FILL IN THE BLANKS + INPUT HINTS */
+        function renderLevel3(container) {
+            state.l3FocusedField = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'level-grid';
+
+            const sentence = document.createElement('div');
+            sentence.className = 'sentence-form';
+            sentence.innerHTML = `
+            I, <input type="text" class="sentence-input" id="l3-name" style="width: 160px;" placeholder="[Full Student Name]" onfocus="focusL3Field('name')">, 
+            request enrollment in the <select class="sentence-input" id="l3-course" style="width: 140px;" onfocus="focusL3Field('course')">
+                <option value="">-- Choose --</option>
+                <option value="web">Web UI Design</option>
+                <option value="data">Data Structures</option>
+            </select> elective, scheduled for next Monday on 
+            <input type="text" class="sentence-input" id="l3-date" style="width: 120px;" placeholder="[DD-MM-YYYY]" onfocus="focusL3Field('date')">, 
+            bearing college numeric roll code 
+            <input type="text" class="sentence-input" id="l3-roll" style="width: 80px;" placeholder="[0000]" onfocus="focusL3Field('roll')" maxLength="4">.
+        `;
+            wrapper.appendChild(sentence);
+
+            const hintBar = document.createElement('div');
+            hintBar.className = 'hint-bar-active';
+            hintBar.id = 'l3-hint-bar';
+            hintBar.innerText = "Click on any input blank in the sentence above to view its design instructions.";
+            wrapper.appendChild(hintBar);
+
+            container.appendChild(wrapper);
+        }
+
+        function focusL3Field(type) {
+            state.l3FocusedField = type;
+            const bar = document.getElementById('l3-hint-bar');
+
+            if (type === 'name') {
+                bar.innerText = "💡 Input Hint: Type your official student name as registered in college systems (e.g. Rahul Sharma).";
+            } else if (type === 'course') {
+                bar.innerText = "💡 Input Hint: Select the core department elective you are applying to load.";
+            } else if (type === 'date') {
+                bar.innerText = "💡 Input Hint: Must specify next Monday date (e.g., 15-06-2026 is a valid Monday in June 2026).";
+            } else if (type === 'roll') {
+                bar.innerText = "💡 Input Hint: Provide your 4-digit unique roll suffix (digits only, e.g. 9812).";
+            }
+        }
+
+        function validateLevel3() {
+            const nameVal = document.getElementById('l3-name').value.trim();
+            const courseVal = document.getElementById('l3-course').value;
+            const dateVal = document.getElementById('l3-date').value.trim();
+            const rollVal = document.getElementById('l3-roll').value.trim();
+
+            const nameValid = (nameVal.length > 3);
+            const courseValid = (courseVal !== '');
+            const rollValid = (rollVal.length === 4 && !isNaN(rollVal));
+
+            const dateParts = dateVal.split('-');
+            let dateValid = false;
+            if (dateParts.length === 3) {
+                const d = parseInt(dateParts[0]);
+                const m = parseInt(dateParts[1]);
+                const y = parseInt(dateParts[2]);
+                if (d > 0 && d <= 31 && m === 6 && y === 2026) {
+                    dateValid = true;
+                }
+            }
+
+            const allCorrect = (nameValid && courseValid && rollValid && dateValid);
+
+            showFeedback(allCorrect, allCorrect
+                ? "Excellent paragraph form setup! Natural language forms feel less intimidating, and contextual hints guide inputs correctly."
+                : "Verification Failed: Check sentence input formats. Date must be in June 2026 (DD-06-2026), roll code must be 4 digits.");
+
+            return allCorrect;
+        }
+
+        /* LEVEL 4: INPUT PROMPT & AUTOCOMPLETE */
+        function renderLevel4(container) {
+            state.l4FixedPrompt = false;
+            state.l4Autocompleted = false;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'form-card';
+
+            const searchGroup = document.createElement('div');
+            searchGroup.className = 'input-group';
+            searchGroup.innerHTML = `
+            <label>🔎 Dynamic Course Syllabus Search:</label>
+            <div class="suggest-wrapper">
+                <input type="text" id="l4-search" placeholder="Type course keyword (e.g. web, data)..." oninput="showL4Suggestions()" autocomplete="off">
+                <div class="suggestions-dropdown" id="l4-dropdown"></div>
+            </div>
+        `;
+            wrapper.appendChild(searchGroup);
+
+            const promptGroup = document.createElement('div');
+            promptGroup.className = 'input-group';
+            promptGroup.style.marginTop = '20px';
+            promptGroup.id = 'l4-prompt-container';
+            promptGroup.innerHTML = `
+            <label id="l4-prompt-title" style="color:var(--danger-color);">⚠️ Bad Design: Disappearing Placeholder Label</label>
+            <input type="text" id="l4-prompt-input" placeholder="Type your Student email ID here..." onfocus="l4PromptFocused()">
+            <span id="l4-prompt-error-msg" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">When focused, the placeholder instruction disappears, leaving users with no labels.</span>
+            <button class="btn-outline" style="margin-top:10px; font-size:0.8rem; align-self:flex-start;" onclick="fixL4LabelPrompt()">Fix Vanishing Label</button>
+        `;
+            wrapper.appendChild(promptGroup);
+
+            container.appendChild(wrapper);
+        }
+
+        const syllabusCourses = [
+            "Web UI Design (IT-404)",
+            "Web Security (IT-403)",
+            "Data Structures (IT-201)",
+            "Data Warehousing (IT-402)",
+            "AI Foundations (IT-410)"
+        ];
+
+        function showL4Suggestions() {
+            const query = document.getElementById('l4-search').value.toLowerCase();
+            const dropdown = document.getElementById('l4-dropdown');
+            dropdown.innerHTML = '';
+
+            if (query.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            const matches = syllabusCourses.filter(c => c.toLowerCase().includes(query));
+
+            if (matches.length > 0) {
+                matches.forEach(m => {
+                    const item = document.createElement('div');
+                    item.className = 'suggest-item';
+                    item.innerText = m;
+                    item.onclick = () => {
+                        document.getElementById('l4-search').value = m;
+                        dropdown.style.display = 'none';
+                        state.l4Autocompleted = true;
+                    };
+                    dropdown.appendChild(item);
+                });
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function l4PromptFocused() {
+            if (!state.l4FixedPrompt) {
+                document.getElementById('l4-prompt-input').placeholder = '';
+            }
+        }
+
+        function fixL4LabelPrompt() {
+            state.l4FixedPrompt = true;
+            const container = document.getElementById('l4-prompt-container');
+            container.innerHTML = `
+            <label style="color:var(--success-color); font-weight:700;">✅ Restored: Persistent Floating Label Pattern</label>
+            <div class="floating-label-group">
+                <input type="text" id="l4-prompt-input-fixed" placeholder=" " required>
+                <label for="l4-prompt-input-fixed">Your Student Email Address</label>
+            </div>
+            <span style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Now the label floats to the top, remaining persistent throughout typing.</span>
+        `;
+        }
+
+        function validateLevel4() {
+            const correct = (state.l4Autocompleted && state.l4FixedPrompt);
+            showFeedback(correct, correct
+                ? "Excellent layout adjustments! Floating labels protect memory space, and autocomplete speeds search time."
+                : "Verification Failed: Complete Course search using Autocomplete and click 'Fix Vanishing Label' to clean inputs.");
+            return correct;
+        }
+
+        /* LEVEL 5: PASSWORD STRENGTH METER */
+        function renderLevel5(container) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'form-card';
+
+            wrapper.innerHTML = `
+            <div class="input-group">
+                <label>Create Secure Password:</label>
+                <input type="password" id="l5-pass" placeholder="Enter password here" oninput="auditL5Password()">
+                
+                <div class="strength-meter-bar-container">
+                    <div class="strength-meter-fill" id="l5-strength-bar"></div>
+                </div>
+                <div class="strength-label" id="l5-strength-text" style="color:var(--danger-color)">Weak</div>
+            </div>
+
+            <div class="password-checklist">
+                <div class="check-item" id="chk-len">
+                    <span class="check-icon" id="chk-len-icon">❌</span>
+                    <span>At least 8 characters</span>
+                </div>
+                <div class="check-item" id="chk-upper">
+                    <span class="check-icon" id="chk-upper-icon">❌</span>
+                    <span>1 Uppercase letter</span>
+                </div>
+                <div class="check-item" id="chk-num">
+                    <span class="check-icon" id="chk-num-icon">❌</span>
+                    <span>1 Number (0-9)</span>
+                </div>
+                <div class="check-item" id="chk-symbol">
+                    <span class="check-icon" id="chk-symbol-icon">❌</span>
+                    <span>1 Special Character (!@#$)</span>
+                </div>
+                <div class="check-item" id="chk-common" style="grid-column: span 2;">
+                    <span class="check-icon" id="chk-common-icon">✅</span>
+                    <span>Excludes common terms (college, student, password)</span>
+                </div>
+            </div>
+        `;
+
+            container.appendChild(wrapper);
+        }
+
+        function auditL5Password() {
+            const pass = document.getElementById('l5-pass').value;
+
+            const len = (pass.length >= 8);
+            const upper = /[A-Z]/.test(pass);
+            const num = /[0-9]/.test(pass);
+            const symbol = /[!@#\$%\^&\*]/.test(pass);
+
+            const commonTerms = ['college', 'student', 'password', '12345678'];
+            let excludes = true;
+            commonTerms.forEach(t => {
+                if (pass.toLowerCase().includes(t)) excludes = false;
+            });
+
+            updateCheckItem('len', len);
+            updateCheckItem('upper', upper);
+            updateCheckItem('num', num);
+            updateCheckItem('symbol', symbol);
+            updateCheckItem('common', excludes);
+
+            let score = 0;
+            if (len) score++;
+            if (upper) score++;
+            if (num) score++;
+            if (symbol) score++;
+            if (excludes && pass.length > 0) score++;
+
+            const fill = document.getElementById('l5-strength-bar');
+            const text = document.getElementById('l5-strength-text');
+
+            const pct = (score / 5) * 100;
+            fill.style.width = pct + '%';
+
+            if (score <= 2) {
+                fill.style.backgroundColor = 'var(--danger-color)';
+                text.innerText = "Weak";
+                text.style.color = 'var(--danger-color)';
+            } else if (score <= 4) {
+                fill.style.backgroundColor = 'var(--warning-color)';
+                text.innerText = "Medium";
+                text.style.color = 'var(--warning-color)';
+            } else {
+                fill.style.backgroundColor = 'var(--success-color)';
+                text.innerText = "Strong";
+                text.style.color = 'var(--success-color)';
+            }
+        }
+
+        function updateCheckItem(id, valid) {
+            const item = document.getElementById(`chk-${id}`);
+            const icon = document.getElementById(`chk-${id}-icon`);
+
+            if (valid) {
+                item.classList.add('valid');
+                icon.innerText = '✅';
+            } else {
+                item.classList.remove('valid');
+                icon.innerText = '❌';
+            }
+        }
+
+        function validateLevel5() {
+            const pass = document.getElementById('l5-pass').value;
+            const len = (pass.length >= 8);
+            const upper = /[A-Z]/.test(pass);
+            const num = /[0-9]/.test(pass);
+            const symbol = /[!@#\$%\^&\*]/.test(pass);
+
+            const commonTerms = ['college', 'student', 'password', '12345678'];
+            let excludes = true;
+            commonTerms.forEach(t => {
+                if (pass.toLowerCase().includes(t)) excludes = false;
+            });
+
+            const strong = (len && upper && num && symbol && excludes);
+
+            showFeedback(strong, strong
+                ? "Perfect Account Signup! You built a robust, secure password meeting university directory guidelines."
+                : "Security Alert: Password too weak. Fulfill all checkboxes (uppercase, symbol, length, exclude common words).");
+
+            return strong;
+        }
+
+        /* SYSTEM HANDLERS */
+        function validateAction() {
+            if (state.currentLevel === 1) {
+                validateLevel1();
+            } else if (state.currentLevel === 2) {
+                validateLevel2();
+            } else if (state.currentLevel === 3) {
+                validateLevel3();
+            } else if (state.currentLevel === 4) {
+                validateLevel4();
+            } else if (state.currentLevel === 5) {
+                validateLevel5();
+            }
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                renderFinalCompletionScreen();
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function renderFinalCompletionScreen() {
+            document.getElementById('btn-submit-action').classList.add('hidden');
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+
+            const sandbox = document.getElementById('sandbox-body');
+            sandbox.innerHTML = `
+            <div class="final-screen">
+                <span class="celebrate-icon">🏆</span>
+                <h3>Module 4.3 Completed!</h3>
+                <p>Congratulations! You have mastered the patterns for Form Design in UI Programming. You successfully parsed forgiving inputs, structured segmented values, designed sentence forms with hints, resolved floating prompts with autocomplete, and engineered password strength analyzers.</p>
+                <div style="margin-top: 24px;">
+                    <button class="btn-action" onclick="restartSimulation()">Restart Lab Simulation</button>
+                </div>
+            </div>
+        `;
+            document.getElementById('sandbox-title').innerText = "Form Design Course Verified";
+            document.getElementById('sandbox-desc').innerText = "All levels completed successfully.";
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+    </script>
+</body>
+
+</html>

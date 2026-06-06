@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 5.2 — Lateral Access and Drill Down Patterns</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FFF5F5;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --warning-color: #F59E0B;
+            --warning-light: #FEF3C7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Sandbox */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 620px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Workspace Panel Structure (No phone bezel, notch, or status bar) */
+        .workspace-panel {
+            width: 100%;
+            max-width: 600px;
+            min-height: 520px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            height: 48px;
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: var(--white);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Level 1: Tabs */
+        .tab-bar-mock {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            background-color: var(--light-bg);
+        }
+
+        .tab-item-mock {
+            flex: 1;
+            padding: 10px 4px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-item-mock.active {
+            color: var(--somaiya-red);
+            border-bottom-color: var(--somaiya-red);
+            background-color: var(--white);
+        }
+
+        /* Level 2: Onboarding & Pagination */
+        .onboarding-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px 12px;
+            flex-grow: 1;
+        }
+
+        .pagination-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: auto;
+            padding: 12px 0;
+        }
+
+        .pag-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .pag-dot.active {
+            background-color: var(--somaiya-red);
+            width: 18px;
+            border-radius: 4px;
+        }
+
+        /* Level 3: Peel & Flip */
+        .card-container {
+            perspective: 800px;
+            width: 100%;
+            height: 180px;
+            margin: auto 0;
+        }
+
+        .card-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .card-3d.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-front {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .card-back {
+            background-color: var(--somaiya-red-light);
+            color: var(--text-dark);
+            transform: rotateY(180deg);
+            border-color: var(--somaiya-red-border);
+        }
+
+        .peel-card {
+            width: 100%;
+            height: 180px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .peel-corner {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(225deg, transparent 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.15) 55%, transparent 55%),
+                linear-gradient(225deg, var(--white) 50%, #E2E8F0 50%);
+            box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .peel-card.peeled .peel-corner {
+            width: 100px;
+            height: 100px;
+        }
+
+        .peel-hidden-content {
+            display: none;
+            font-size: 0.8rem;
+            color: var(--somaiya-red);
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .peel-card.peeled .peel-hidden-content {
+            display: block;
+        }
+
+        .peel-card.peeled .peel-main-content {
+            display: none;
+        }
+
+        /* Level 4: Drill Down Match */
+        .drill-list-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            cursor: pointer;
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+
+        .drill-list-item:hover {
+            border-color: var(--somaiya-red);
+        }
+
+        .drill-trigger-select {
+            padding: 4px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            outline: none;
+        }
+
+        /* Level 5: Navigation Flow Builder */
+        .flow-builder-slots {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            justify-content: center;
+        }
+
+        .flow-slot {
+            width: 54px;
+            height: 54px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            text-align: center;
+            font-weight: 600;
+            background-color: var(--light-bg);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .flow-slot.filled {
+            border-color: var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border-style: solid;
+        }
+
+        .flow-blocks-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .flow-block-item {
+            padding: 6px 10px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .flow-block-item:hover {
+            border-color: var(--somaiya-red);
+            color: var(--somaiya-red);
+        }
+
+        /* Feedback Panel */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            border-color: #CBD5E1;
+            color: #CBD5E1;
+            cursor: not-allowed;
+            background-color: var(--white);
+        }
+
+        /* Hint Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .nav-sim-btn {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-sim-btn:hover {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 5: Pattern with Mobile Interface Design</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="simulation-5.1.html" class="nav-sim-btn">&larr; Prev Subtopic</a>
+                <a href="simulation-5.3.html" class="nav-sim-btn">Next Subtopic &rarr;</a>
+                <div class="subtopic-badge">
+                    5.2 Lateral Access & Drill Down
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <h2 id="level-title">Level 1: Tabs Setup</h2>
+                <p id="level-desc">Loading instructions...</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                        style="vertical-align: middle; margin-right: 4px;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Lateral & Drill Down Workspace</h3>
+                <p id="sandbox-desc">Interact with the mobile screen mockup to design navigation flows.</p>
+            </div>
+
+            <div class="sandbox-body">
+                <!-- Flat Workspace Panel -->
+                <div class="workspace-panel" id="workspace-panel-frame">
+                    <div class="panel-header" id="mobile-app-bar-title">
+                        Course Hub
+                    </div>
+                    <div class="panel-body" id="mobile-screen-body">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+            <!-- Dynamic -->
+        </div>
+        </div>
+        </div>
+
+        <div class="feedback-panel" id="feedback-panel">
+            <strong id="feedback-title">Feedback Title</strong>
+            <p id="feedback-text">Feedback text goes here.</p>
+        </div>
+
+        <div class="educational-explanation" id="educational-explanation">
+            <strong>💡 UI Design Principle:</strong>
+            <span id="educational-explanation-text">Design explanation goes here.</span>
+        </div>
+
+        <div class="controls-row">
+            <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">&larr; Prev</button>
+            <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Restart</button>
+            <button class="btn-action" id="btn-submit-action" onclick="validateLevel()">Submit</button>
+            <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next &rarr;</button>
+        </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>📖 UI Design Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            levelAnswers: {},
+            activeTab: 'overview',
+            clickedTabs: new Set(),
+            onboardingPage: 1,
+            onboardingSettings: {
+                dots: false,
+                title: false,
+                arrows: false
+            },
+            peelPeeled: false,
+            cardFlipped: false,
+            flowSlots: [null, null, null, null, null, null],
+            flowAnswers: ['tabs', 'card', 'chevron', 'button', 'detail', 'dots']
+        };
+
+        const levelData = {
+            1: {
+                title: "Level 1: Peer Access Pattern Matching & Config",
+                desc: "A common UI flaw is using vertical back-button stacks for switching between peer categories of equal status. Map the scenarios to the correct access pattern, then enable and test a lateral Tab Bar.",
+                hint: "Pair the scenarios first. Then enable the Tab Bar checkbox and click all three tabs (Overview, Syllabus, Grades) to verify peer state switches.",
+                explanation: "Tabs represent lateral access. They group content of equal hierarchical status on the same level, allowing immediate tab switching without forcing users to climb up and down navigation trees."
+            },
+            2: {
+                title: "Level 2: Pagination & Location Within Tuning",
+                desc: "Choose the correct progress indicators based on flow volume, then navigate a linear onboarding wizard.",
+                hint: "Select 'Progress Bar' for 15-page forms, 'Slide Dots' for 4-image carousels, and 'Numbered Indicators' for 6-step tutorials. Then check the indicator boxes and navigate to Page 4.",
+                explanation: "Location indicators (dots, numbering, progress bars) provide orientation. In mobile screens, showing where users are prevents drop-offs during linear multi-step onboarding processes."
+            },
+            3: {
+                title: "Level 3: Peel-Away vs 3D Card Flip Metaphors",
+                desc: "Determine which gesture metaphor is best suited for visual reveals, then perform both tasks in the workspace.",
+                hint: "Map '3D Card Flip' to the interactive flashcard, and 'Peel-Away' to the quick note preview. Then click Card A's fold corner and tap Card B to flip it.",
+                explanation: "Simulated depth adds interactive focus. Use 3D card flips for flashcard-like responses (A-B states), and peel-aways to suggest underlying sheets or details."
+            },
+            4: {
+                title: "Level 4: Drill Down Affordance & Transition Matching",
+                desc: "Assign the correct visual trigger affordances based on destination targets and safety implications.",
+                hint: "Chevron: expansion; Red Button: destructive action; Text Link with Icon: external URL; Status Icon: lock status.",
+                explanation: "Different drill-down shapes trigger different expectations. Underlined links imply external destinations, buttons represent core actions, chevrons expand details in-line, and icons denote status modifications."
+            },
+            5: {
+                title: "Level 5: Unified Navigation Flow Builder",
+                desc: "Assemble a cascaded navigation tree that starts at peer levels, drills down to details, and finishes at confirmation.",
+                hint: "Place the components in sequence: 1) Lateral Tabs, 2) Course Card, 3) Chevron Expandable, 4) Drill-Down Button, 5) Detail View, 6) Progress Dots.",
+                explanation: "A clean mobile navigation flow combines lateral access (tabs for shifting peers) and vertical drill-downs (buttons/cards for going deeper) while reinforcing context with back arrows and location markers."
+            }
+        };
+
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        function loadLevel(num) {
+            state.currentLevel = num;
+
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+
+            const prevBtn = document.getElementById('btn-prev-level');
+            const nextBtn = document.getElementById('btn-next-level');
+            if (prevBtn) {
+                prevBtn.classList.remove('hidden');
+                prevBtn.disabled = (num === 1);
+            }
+            if (nextBtn) {
+                nextBtn.classList.remove('hidden');
+                nextBtn.disabled = false;
+                nextBtn.className = "btn-outline";
+            }
+
+            const progressPercent = (num / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercent + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${num} of 5`;
+
+            document.getElementById('level-title').innerText = levelData[num].title;
+            document.getElementById('level-desc').innerText = levelData[num].desc;
+
+            const body = document.getElementById('mobile-screen-body');
+            body.innerHTML = '';
+
+            if (num === 1) {
+                renderLevel1(body);
+            } else if (num === 2) {
+                renderLevel2(body);
+            } else if (num === 3) {
+                renderLevel3(body);
+            } else if (num === 4) {
+                renderLevel4(body);
+            } else if (num === 5) {
+                renderLevel5(body);
+            }
+        }
+
+        function showHintModal() {
+            document.getElementById('hint-text').innerText = levelData[state.currentLevel].hint;
+            document.getElementById('hint-modal').style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        /* LEVEL 1: Peer Access Pattern Matching */
+        function renderLevel1(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "College Classroom";
+            state.levelAnswers = {
+                matchA: '',
+                matchB: '',
+                matchC: '',
+                tabsEnabled: false
+            };
+            state.clickedTabs.clear();
+
+            container.innerHTML = `
+                <div class="control-panel" style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:12px; margin-bottom:12px; background:var(--somaiya-red-light); font-size:0.8rem; display:flex; flex-direction:column; gap:8px;">
+                    <strong>Step 1: Match the Scenario to the correct Pattern:</strong>
+                    
+                    <div>
+                        <span style="display:block; margin-bottom:4px;">A. Main Dashboard: Overview, Syllabus, Grades:</span>
+                        <select id="l1-match-a" class="pattern-select" onchange="state.levelAnswers.matchA = this.value">
+                            <option value="">-- Choose Pattern --</option>
+                            <option value="tabs">Lateral Tabs</option>
+                            <option value="back">Back-Button Stack Drill-Down</option>
+                            <option value="pagination">Wizard Pagination</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <span style="display:block; margin-bottom:4px;">B. Student Registration: Step 1 -> Step 2 -> Step 3:</span>
+                        <select id="l1-match-b" class="pattern-select" onchange="state.levelAnswers.matchB = this.value">
+                            <option value="">-- Choose Pattern --</option>
+                            <option value="tabs">Lateral Tabs</option>
+                            <option value="back">Back-Button Stack Drill-Down</option>
+                            <option value="pagination">Wizard Pagination</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <span style="display:block; margin-bottom:4px;">C. Topic List -> Click Lesson -> Read Article:</span>
+                        <select id="l1-match-c" class="pattern-select" onchange="state.levelAnswers.matchC = this.value">
+                            <option value="">-- Choose Pattern --</option>
+                            <option value="tabs">Lateral Tabs</option>
+                            <option value="back">Back-Button Stack Drill-Down</option>
+                            <option value="pagination">Wizard Pagination</option>
+                        </select>
+                    </div>
+
+                    <strong style="margin-top:8px;">Step 2: Configure Workspace Header:</strong>
+                    <label style="font-weight:bold; cursor:pointer;">
+                        <input type="checkbox" id="chk-l1-tabs" onchange="toggleL1Tabs(this.checked)"> Enable Tab Bar Lateral Navigation
+                    </label>
+                </div>
+
+                <!-- Tabs placeholder in mockup -->
+                <div id="l1-tab-container" class="hidden" style="width:100%;">
+                    <div class="tab-bar-mock" style="display:flex; justify-content:space-around; background:var(--light-bg); border-bottom:1px solid var(--border-color);">
+                        <div class="tab-item-mock active" id="tab-overview" onclick="switchL1Tab('overview')" style="padding:10px; cursor:pointer; font-weight:600; font-size:0.8rem; flex-grow:1; text-align:center;">Overview</div>
+                        <div class="tab-item-mock" id="tab-syllabus" onclick="switchL1Tab('syllabus')" style="padding:10px; cursor:pointer; font-weight:600; font-size:0.8rem; flex-grow:1; text-align:center;">Syllabus</div>
+                        <div class="tab-item-mock" id="tab-grades" onclick="switchL1Tab('grades')" style="padding:10px; cursor:pointer; font-weight:600; font-size:0.8rem; flex-grow:1; text-align:center;">Grades</div>
+                    </div>
+                </div>
+
+                <div id="l1-tab-content-box" style="border:1px solid var(--border-color); border-radius:8px; padding:16px; font-size:0.8rem; flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center; margin-top:8px; min-height:100px;">
+                    <p>Tab bar disabled. Choose settings and toggle checkbox above to configure.</p>
+                </div>
+            `;
+        }
+
+        function toggleL1Tabs(checked) {
+            state.levelAnswers.tabsEnabled = checked;
+            const bar = document.getElementById('l1-tab-container');
+            if (checked) {
+                bar.classList.remove('hidden');
+                switchL1Tab('overview');
+            } else {
+                bar.classList.add('hidden');
+                document.getElementById('l1-tab-content-box').innerHTML = '<p>Tab bar disabled. Choose settings and toggle checkbox above to configure.</p>';
+            }
+        }
+
+        function switchL1Tab(tabName) {
+            state.activeTab = tabName;
+            state.clickedTabs.add(tabName);
+            const box = document.getElementById('l1-tab-content-box');
+
+            if (state.levelAnswers.tabsEnabled) {
+                document.getElementById('tab-overview').style.borderBottom = 'none';
+                document.getElementById('tab-overview').style.color = 'var(--text-muted)';
+                document.getElementById('tab-syllabus').style.borderBottom = 'none';
+                document.getElementById('tab-syllabus').style.color = 'var(--text-muted)';
+                document.getElementById('tab-grades').style.borderBottom = 'none';
+                document.getElementById('tab-grades').style.color = 'var(--text-muted)';
+
+                const activeEl = document.getElementById(`tab-${tabName}`);
+                activeEl.style.borderBottom = '3px solid var(--somaiya-red)';
+                activeEl.style.color = 'var(--somaiya-red)';
+            }
+
+            if (tabName === 'overview') {
+                box.innerHTML = `<p><strong>Overview View:</strong> Main course goals, materials links, and overview slides.</p>`;
+            } else if (tabName === 'syllabus') {
+                box.innerHTML = `<p><strong>Syllabus View:</strong> Weekly topic schedule, lecture outline, and credits description.</p>`;
+            } else if (tabName === 'grades') {
+                box.innerHTML = `<p><strong>Grades View:</strong> Cumulative marks dashboard, homework reports, and final examination details.</p>`;
+            }
+        }
+
+        function validateLevel1() {
+            const answers = state.levelAnswers;
+            if (answers.matchA !== 'tabs' || answers.matchB !== 'pagination' || answers.matchC !== 'back') {
+                showFeedback(false, "Pattern Matching Mismatch", "Incorrect scenario pairings! Tab layout matches dashboards. Stack traversal matches deep list topics. Sequential step matching requires wizard pagination.");
+                return;
+            }
+
+            if (!answers.tabsEnabled) {
+                showFeedback(false, "Tab Bar Disabled", "Please tick the checkbox to enable the lateral tab bar inside the mobile screen simulator.");
+                return;
+            }
+
+            if (state.clickedTabs.size < 3) {
+                showFeedback(false, "Verification Incomplete", "Please click and view all three tabs (Overview, Syllabus, and Grades) to test the lateral access model.");
+                return;
+            }
+
+            showFeedback(true, "Peer Access Configured!", "Excellent! You matched the correct UX patterns and verified lateral access. Moving between Overview, Syllabus, and Grades is smooth and doesn't trigger back-stack rebuilds.");
+        }
+
+        /* LEVEL 2: PAGINATION AND LOCATION WITHIN */
+        function renderLevel2(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Sequential Wizard";
+            state.onboardingPage = 1;
+            state.levelAnswers = {
+                match1: '',
+                match2: '',
+                match3: '',
+                dotsEnabled: false,
+                titleEnabled: false,
+                arrowsEnabled: false
+            };
+
+            container.innerHTML = `
+                <div class="control-panel" style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:12px; margin-bottom:12px; background:var(--somaiya-red-light); font-size:0.8rem; display:flex; flex-direction:column; gap:8px;">
+                    <strong>Step 1: Match Flow Size to Progress Indicator:</strong>
+                    
+                    <div>
+                        <span>1. 15-page Multi-step Enrollment Form:</span>
+                        <select id="l2-match-1" class="pattern-select" onchange="state.levelAnswers.match1 = this.value">
+                            <option value="">-- Choose Indicator --</option>
+                            <option value="bar">Progress Bar</option>
+                            <option value="dots">Slide Dots</option>
+                            <option value="numbers">Numbered Indicators</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <span>2. 4-image Gallery Slide:</span>
+                        <select id="l2-match-2" class="pattern-select" onchange="state.levelAnswers.match2 = this.value">
+                            <option value="">-- Choose Indicator --</option>
+                            <option value="bar">Progress Bar</option>
+                            <option value="dots">Slide Dots</option>
+                            <option value="numbers">Numbered Indicators</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <span>3. 6-step Tutorial Walkthrough:</span>
+                        <select id="l2-match-3" class="pattern-select" onchange="state.levelAnswers.match3 = this.value">
+                            <option value="">-- Choose Indicator --</option>
+                            <option value="bar">Progress Bar</option>
+                            <option value="dots">Slide Dots</option>
+                            <option value="numbers">Numbered Indicators</option>
+                        </select>
+                    </div>
+
+                    <strong style="margin-top:8px;">Step 2: Enable Walkthrough UI Indicators:</strong>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                        <label><input type="checkbox" id="chk-l2-dots" onchange="toggleL2Settings()"> Dots</label>
+                        <label><input type="checkbox" id="chk-l2-title" onchange="toggleL2Settings()"> Title</label>
+                        <label><input type="checkbox" id="chk-l2-arrows" onchange="toggleL2Settings()"> Navigation Buttons</label>
+                    </div>
+                </div>
+
+                <div class="onboarding-screen" style="border:1px solid var(--border-color); border-radius:8px; padding:16px; background:#FAFAFB; min-height:160px; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div id="l2-header-title" style="font-size:0.75rem; font-weight:700; color:var(--somaiya-red); border-bottom:1px solid var(--border-color); padding-bottom:4px; display:none;">
+                        Step 1 of 4: Profile Creation
+                    </div>
+                    
+                    <div id="l2-content-area" style="font-size:0.8rem; margin:16px 0; min-height:45px;">
+                        Loading onboarding walkthrough instructions... Choose settings above.
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:8px;">
+                        <button id="l2-arrow-prev" class="btn-outline" style="padding:4px 8px; font-size:0.7rem; display:none;" onclick="navigateL2(-1)">&lt; Prev</button>
+                        
+                        <div class="pagination-dots" id="l2-dots-container" style="display:none; gap:6px; justify-content:center;">
+                            <span class="pag-dot" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#CBD5E1;"></span>
+                            <span class="pag-dot" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#CBD5E1;"></span>
+                            <span class="pag-dot" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#CBD5E1;"></span>
+                            <span class="pag-dot" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#CBD5E1;"></span>
+                        </div>
+
+                        <button id="l2-arrow-next" class="btn-action" style="padding:4px 10px; font-size:0.7rem; display:none;" onclick="navigateL2(1)">Next &gt;</button>
+                    </div>
+                </div>
+            `;
+            toggleL2Settings();
+        }
+
+        function toggleL2Settings() {
+            state.levelAnswers.dotsEnabled = document.getElementById('chk-l2-dots').checked;
+            state.levelAnswers.titleEnabled = document.getElementById('chk-l2-title').checked;
+            state.levelAnswers.arrowsEnabled = document.getElementById('chk-l2-arrows').checked;
+
+            document.getElementById('l2-dots-container').style.display = state.levelAnswers.dotsEnabled ? 'flex' : 'none';
+            document.getElementById('l2-header-title').style.display = state.levelAnswers.titleEnabled ? 'block' : 'none';
+            document.getElementById('l2-arrow-prev').style.display = state.levelAnswers.arrowsEnabled ? 'block' : 'none';
+            document.getElementById('l2-arrow-next').style.display = state.levelAnswers.arrowsEnabled ? 'block' : 'none';
+
+            updateL2Content();
+        }
+
+        function updateL2Content() {
+            const pages = [
+                "Step 1: Set up your academic profile details.",
+                "Step 2: Connect your official university credentials.",
+                "Step 3: Select your department curriculum catalog.",
+                "Step 4: Confirm setup information and enter classroom portal!"
+            ];
+
+            const pageTitles = [
+                "Step 1 of 4: Profile Setup",
+                "Step 2 of 4: Authentication",
+                "Step 3 of 4: Curriculum Choice",
+                "Step 4 of 4: Setup Confirmation"
+            ];
+
+            document.getElementById('l2-content-area').innerText = pages[state.onboardingPage - 1];
+            document.getElementById('l2-header-title').innerText = pageTitles[state.onboardingPage - 1];
+
+            if (state.levelAnswers.dotsEnabled) {
+                const dots = document.querySelectorAll('#l2-dots-container .pag-dot');
+                dots.forEach((dot, idx) => {
+                    if (idx === state.onboardingPage - 1) {
+                        dot.style.background = 'var(--somaiya-red)';
+                    } else {
+                        dot.style.background = '#CBD5E1';
+                    }
+                });
+            }
+        }
+
+        function navigateL2(dir) {
+            let nextPage = state.onboardingPage + dir;
+            if (nextPage >= 1 && nextPage <= 4) {
+                state.onboardingPage = nextPage;
+                updateL2Content();
+            }
+        }
+
+        function validateLevel2() {
+            const ans = state.levelAnswers;
+            if (ans.match1 !== 'bar' || ans.match2 !== 'dots' || ans.match3 !== 'numbers') {
+                showFeedback(false, "Indicator Tuning Error", "Check your matched progress indicators. Long forms need a Progress Bar. Media galleries require Slide Dots. Short guided tutorials need Numbered Indicators.");
+                return;
+            }
+
+            if (!ans.dotsEnabled || !ans.titleEnabled || !ans.arrowsEnabled) {
+                showFeedback(false, "Walkthrough UI Incomplete", "Please enable all visual indicators (Dots, Title, and Navigation Buttons) to ensure high location context.");
+                return;
+            }
+
+            if (state.onboardingPage !== 4) {
+                showFeedback(false, "Walkthrough Flow Incomplete", "The indicators are active. Use the Next button to navigate the wizard to Page 4 (Confirmation).");
+                return;
+            }
+
+            showFeedback(true, "Pagination & Orientation Perfect!", "Well done! You correctly sized the indicator controls and verified step-by-step sequential feedback. This prevents disorientation drops.");
+        }
+
+        /* LEVEL 3: PEEL AND FLIP */
+        function renderLevel3(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Reveals & Depth Metaphors";
+            state.peelPeeled = false;
+            state.cardFlipped = false;
+            state.levelAnswers = {
+                matchPeel: '',
+                matchFlip: ''
+            };
+
+            container.innerHTML = `
+                <div class="control-panel" style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:12px; margin-bottom:12px; background:var(--somaiya-red-light); font-size:0.8rem; display:flex; flex-direction:column; gap:8px;">
+                    <strong>Step 1: Match Metaphor to Design Case:</strong>
+                    
+                    <div>
+                        <span>1. Flip (Double-Sided 3D Card):</span>
+                        <select id="l3-match-flip" class="pattern-select" onchange="state.levelAnswers.matchFlip = this.value">
+                            <option value="">-- Choose Case --</option>
+                            <option value="peel">Reveal contextual footnotes/metadata on the backside sheet</option>
+                            <option value="flip">Self-assessment flashcard question/answer comparison</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <span>2. Peel-Away (Corner curl reveal):</span>
+                        <select id="l3-match-peel" class="pattern-select" onchange="state.levelAnswers.matchPeel = this.value">
+                            <option value="">-- Choose Case --</option>
+                            <option value="peel">Reveal contextual footnotes/metadata on the backside sheet</option>
+                            <option value="flip">Self-assessment flashcard question/answer comparison</option>
+                        </select>
+                    </div>
+                </div>
+
+                <p style="font-size:0.75rem; font-weight:600; margin-bottom:8px; color:var(--text-muted);">Step 2: Trigger both sensory depth animations:</p>
+
+                <div style="font-size:0.75rem; font-weight:bold; margin-bottom:4px;">Card A: Peel-Away (Interactive Document Sheet)</div>
+                <div class="peel-card" id="l3-peel-card" style="margin-bottom:16px;">
+                    <div class="peel-corner" onclick="triggerL3Peel()" style="cursor:pointer;"></div>
+                    <div class="peel-main-content">
+                        <p style="font-weight:bold; color:var(--somaiya-red); font-size:0.8rem;">Module 5 Lesson Plan Details</p>
+                        <p style="font-size:0.7rem; color:var(--text-muted);">Click the top-right corner to peel back the metadata.</p>
+                    </div>
+                    <div class="peel-hidden-content" style="font-size:0.75rem;">
+                        📅 Author: Faculty Chair<br>
+                        📚 Version: 2026.1
+                    </div>
+                </div>
+
+                <div style="font-size:0.75rem; font-weight:bold; margin-bottom:4px;">Card B: 3D Flip Card (Self-Assessment Flashcard)</div>
+                <div class="card-container" style="perspective: 1000px; width: 100%; height: 100px; margin-bottom:12px;">
+                    <div class="card-3d" id="l3-flip-card" onclick="triggerL3Flip()" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer;">
+                        <div class="card-face card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px;">
+                            <p style="font-weight:bold; font-size:0.8rem;">What is a Fisheye List?</p>
+                            <p style="font-size:0.65rem; color:var(--text-muted); margin-top:4px;">[Click card to flip]</p>
+                        </div>
+                        <div class="card-face card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: var(--somaiya-red-light); border: 1px solid var(--somaiya-red-border); border-radius: 8px; display: flex; justify-content: center; align-items: center; padding: 12px; font-size: 0.75rem; transform: rotateY(180deg); color: var(--somaiya-red); text-align: center;">
+                            💡 A list view where the item under the cursor expands dynamically while adjacent items shrink.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function triggerL3Peel() {
+            const card = document.getElementById('l3-peel-card');
+            card.classList.toggle('peeled');
+            state.peelPeeled = card.classList.contains('peeled');
+        }
+
+        function triggerL3Flip() {
+            const card = document.getElementById('l3-flip-card');
+            card.classList.toggle('flipped');
+            state.cardFlipped = card.classList.contains('flipped');
+
+            if (state.cardFlipped) {
+                card.style.transform = 'rotateY(180deg)';
+            } else {
+                card.style.transform = 'rotateY(0deg)';
+            }
+        }
+
+        function validateLevel3() {
+            const ans = state.levelAnswers;
+            if (ans.matchFlip !== 'flip' || ans.matchPeel !== 'peel') {
+                showFeedback(false, "Metaphor Mapping Mismatch", "Incorrect interactive metaphors! Flashcards compare double-sided contents (Flip), while sheet tags open context overlays (Peel-Away).");
+                return;
+            }
+
+            if (!state.peelPeeled) {
+                showFeedback(false, "Peel Animation Missing", "Please click the top-right corner fold on Card A to trigger the peel animation.");
+                return;
+            }
+
+            if (!state.cardFlipped) {
+                showFeedback(false, "Flip Animation Missing", "Please tap Card B to flip and review the back-face content.");
+                return;
+            }
+
+            showFeedback(true, "Spatial Metaphors Authenticated!", "Excellent! You matched the correct interaction models and performed both depth gestures. 3D rotates represent total state transition; peels present adjacent metadata overlays.");
+        }
+
+        /* LEVEL 4: DRILL DOWN TRIGGERS */
+        function renderLevel4(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Drill Down Mappings";
+            state.levelAnswers = {
+                t1: '',
+                t2: '',
+                t3: '',
+                t4: ''
+            };
+
+            container.innerHTML = `
+                <p style="font-size:0.75rem; margin-bottom:8px; color:var(--text-muted);">Assign the correct affordance based on task action, redirection, and risk properties:</p>
+
+                <div class="drill-list-item" style="display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border-color); padding:10px; border-radius:8px; margin-bottom:8px; font-size:0.75rem;">
+                    <span>1. Collapse/Expand Syllabus rows (In-place reveal):</span>
+                    <select id="l4-sel-1" class="pattern-select" style="width:140px; margin:0;" onchange="state.levelAnswers.t1 = this.value">
+                        <option value="">-- Choose --</option>
+                        <option value="chevron">Chevron Indicator</option>
+                        <option value="button">Red Button</option>
+                        <option value="link">Text Link + Icon</option>
+                        <option value="lock">Lock Icon</option>
+                    </select>
+                </div>
+
+                <div class="drill-list-item" style="display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border-color); padding:10px; border-radius:8px; margin-bottom:8px; font-size:0.75rem;">
+                    <span>2. Reset entire course workspace (Destructive action):</span>
+                    <select id="l4-sel-2" class="pattern-select" style="width:140px; margin:0;" onchange="state.levelAnswers.t2 = this.value">
+                        <option value="">-- Choose --</option>
+                        <option value="chevron">Chevron Indicator</option>
+                        <option value="button">Red Button</option>
+                        <option value="link">Text Link + Icon</option>
+                        <option value="lock">Lock Icon</option>
+                    </select>
+                </div>
+
+                <div class="drill-list-item" style="display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border-color); padding:10px; border-radius:8px; margin-bottom:8px; font-size:0.75rem;">
+                    <span>3. Open locked Faculty Syllabus (Security constraint):</span>
+                    <select id="l4-sel-3" class="pattern-select" style="width:140px; margin:0;" onchange="state.levelAnswers.t3 = this.value">
+                        <option value="">-- Choose --</option>
+                        <option value="chevron">Chevron Indicator</option>
+                        <option value="button">Red Button</option>
+                        <option value="link">Text Link + Icon</option>
+                        <option value="lock">Lock Icon</option>
+                    </select>
+                </div>
+
+                <div class="drill-list-item" style="display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border-color); padding:10px; border-radius:8px; margin-bottom:8px; font-size:0.75rem;">
+                    <span>4. Open External University Portal (Redirect):</span>
+                    <select id="l4-sel-4" class="pattern-select" style="width:140px; margin:0;" onchange="state.levelAnswers.t4 = this.value">
+                        <option value="">-- Choose --</option>
+                        <option value="chevron">Chevron Indicator</option>
+                        <option value="button">Red Button</option>
+                        <option value="link">Text Link + Icon</option>
+                        <option value="lock">Lock Icon</option>
+                    </select>
+                </div>
+            `;
+        }
+
+        function validateLevel4() {
+            const ans = state.levelAnswers;
+            if (!ans.t1 || !ans.t2 || !ans.t3 || !ans.t4) {
+                showFeedback(false, "Configuration Incomplete", "Please specify affordance selections for all four categories.");
+                return;
+            }
+
+            if (ans.t1 === 'chevron' && ans.t2 === 'button' && ans.t3 === 'lock' && ans.t4 === 'link') {
+                showFeedback(true, "Visual Affordances Verified!", "Excellent! Chevrons signify inline list expansion. Action buttons handle high-intent actions (like destructive updates). Locked statuses must display lock icons. External page changes need an underlined text link and external symbol.");
+            } else {
+                showFeedback(false, "Affordance Mismatch", "Wrong selection. Check: 1) expansion uses Chevron. 2) dangerous command actions need a high-contrast Red Button. 3) safety limits use Lock Icons. 4) exit paths use External Text Links.");
+            }
+        }
+
+        /* LEVEL 5: HIERARCHICAL NAV BUILDER */
+        function renderLevel5(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "UX Flow Tree Builder";
+            state.flowSlots = [null, null, null, null, null, null];
+
+            container.innerHTML = `
+                <p style="font-size:0.75rem; margin-bottom:8px; color:var(--text-muted);">Configure the structural sequence of components from topmost peer access down to step-by-step wizard confirmation:</p>
+                
+                <div class="flow-builder-slots" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
+                    <div class="flow-slot" id="f-slot-0" onclick="clearFlowSlot(0)" style="border:1px dashed var(--border-color); border-radius:6px; padding:8px; text-align:center; font-size:0.75rem; background:var(--light-bg); cursor:pointer;">[Slot 1: Broad Peer Navigation]</div>
+                    <div class="flow-slot" id="f-slot-1" onclick="clearFlowSlot(1)" style="border:1px dashed var(--border-color); border-radius:6px; padding:8px; text-align:center; font-size:0.75rem; background:var(--light-bg); cursor:pointer;">[Slot 2: Course Category Hub Card]</div>
+                    <div class="flow-slot" id="f-slot-2" onclick="clearFlowSlot(2)" style="border:1px dashed var(--border-color); border-radius:6px; padding:8px; text-align:center; font-size:0.75rem; background:var(--light-bg); cursor:pointer;">[Slot 3: Expansion Indicator]</div>
+                    <div class="flow-slot" id="f-slot-3" onclick="clearFlowSlot(3)" style="border:1px dashed var(--border-color); border-radius:6px; padding:8px; text-align:center; font-size:0.75rem; background:var(--light-bg); cursor:pointer;">[Slot 4: Action Drill Button]</div>
+                    <div class="flow-slot" id="f-slot-4" onclick="clearFlowSlot(4)" style="border:1px dashed var(--border-color); border-radius:6px; padding:8px; text-align:center; font-size:0.75rem; background:var(--light-bg); cursor:pointer;">[Slot 5: Final Task Detail Screen]</div>
+                    <div class="flow-slot" id="f-slot-5" onclick="clearFlowSlot(5)" style="border:1px dashed var(--border-color); border-radius:6px; padding:8px; text-align:center; font-size:0.75rem; background:var(--light-bg); cursor:pointer;">[Slot 6: Wizard Completion Indicators]</div>
+                </div>
+
+                <div class="flow-blocks-pool" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+                    <div class="flow-block-item" onclick="clickFlowBlock('tabs')" style="border:1px solid var(--border-color); border-radius:6px; padding:8px; font-size:0.75rem; text-align:center; cursor:pointer; background:#fff; box-shadow:var(--shadow-sm);">1. Lateral Tabs</div>
+                    <div class="flow-block-item" onclick="clickFlowBlock('card')" style="border:1px solid var(--border-color); border-radius:6px; padding:8px; font-size:0.75rem; text-align:center; cursor:pointer; background:#fff; box-shadow:var(--shadow-sm);">2. Course Card</div>
+                    <div class="flow-block-item" onclick="clickFlowBlock('chevron')" style="border:1px solid var(--border-color); border-radius:6px; padding:8px; font-size:0.75rem; text-align:center; cursor:pointer; background:#fff; box-shadow:var(--shadow-sm);">3. Chevron Expandable</div>
+                    <div class="flow-block-item" onclick="clickFlowBlock('button')" style="border:1px solid var(--border-color); border-radius:6px; padding:8px; font-size:0.75rem; text-align:center; cursor:pointer; background:#fff; box-shadow:var(--shadow-sm);">4. Drill-Down Button</div>
+                    <div class="flow-block-item" onclick="clickFlowBlock('detail')" style="border:1px solid var(--border-color); border-radius:6px; padding:8px; font-size:0.75rem; text-align:center; cursor:pointer; background:#fff; box-shadow:var(--shadow-sm);">5. Detail View</div>
+                    <div class="flow-block-item" onclick="clickFlowBlock('dots')" style="border:1px solid var(--border-color); border-radius:6px; padding:8px; font-size:0.75rem; text-align:center; cursor:pointer; background:#fff; box-shadow:var(--shadow-sm);">6. Progress Dots</div>
+                </div>
+            `;
+        }
+
+        function clickFlowBlock(type) {
+            const nextSlot = state.flowSlots.findIndex(s => s === null);
+            if (nextSlot !== -1) {
+                state.flowSlots[nextSlot] = type;
+                const slotEl = document.getElementById(`f-slot-${nextSlot}`);
+                slotEl.style.background = 'var(--somaiya-red-light)';
+                slotEl.style.border = '1px solid var(--somaiya-red-border)';
+                slotEl.style.color = 'var(--somaiya-red)';
+                slotEl.style.fontWeight = 'bold';
+                slotEl.innerText = getFlowLabel(type);
+            }
+        }
+
+        function clearFlowSlot(idx) {
+            state.flowSlots[idx] = null;
+            const slotEl = document.getElementById(`f-slot-${idx}`);
+            slotEl.style.background = 'var(--light-bg)';
+            slotEl.style.border = '1px dashed var(--border-color)';
+            slotEl.style.color = 'var(--text-dark)';
+            slotEl.style.fontWeight = 'normal';
+            slotEl.innerText = `[Slot ${idx + 1}: ${getSlotPlaceholder(idx)}]`;
+        }
+
+        function getSlotPlaceholder(idx) {
+            if (idx === 0) return "Broad Peer Navigation";
+            if (idx === 1) return "Course Category Hub Card";
+            if (idx === 2) return "Expansion Indicator";
+            if (idx === 3) return "Action Drill Button";
+            if (idx === 4) return "Final Task Detail Screen";
+            if (idx === 5) return "Wizard Completion Indicators";
+            return "";
+        }
+
+        function getFlowLabel(type) {
+            if (type === 'tabs') return "1. Lateral Tabs";
+            if (type === 'card') return "2. Course Card";
+            if (type === 'chevron') return "3. Chevron Expandable";
+            if (type === 'button') return "4. Drill-Down Button";
+            if (type === 'detail') return "5. Detail View";
+            if (type === 'dots') return "6. Progress Dots";
+            return "";
+        }
+
+        function validateLevel5() {
+            let isCorrect = true;
+            for (let i = 0; i < 6; i++) {
+                if (state.flowSlots[i] !== state.flowAnswers[i]) {
+                    isCorrect = false;
+                }
+            }
+
+            if (isCorrect) {
+                showFeedback(true, "Navigation Architecture Complete!", "Excellent! You assembled the hierarchical flow correctly: Lateral Peer Navigation -> Card Entry -> Inline Expansion -> Detail Trigger -> Target View -> Confirmation feedback.");
+            } else {
+                showFeedback(false, "Sequence Broken", "Incorrect component order. A typical flow follows: Lateral tabs at the top -> High-level content card -> Inline chevron detail -> Direct action trigger button -> Dedicated details screen -> Progress indicators.");
+            }
+        }
+
+        /* GLOBAL SIMULATION HANDLERS */
+        function validateLevel() {
+            if (state.currentLevel === 1) validateLevel1();
+            else if (state.currentLevel === 2) validateLevel2();
+            else if (state.currentLevel === 3) validateLevel3();
+            else if (state.currentLevel === 4) validateLevel4();
+            else if (state.currentLevel === 5) validateLevel5();
+        }
+
+        function showFeedback(isSuccess, title, msg) {
+            const panel = document.getElementById('feedback-panel');
+            const fTitle = document.getElementById('feedback-title');
+            const fText = document.getElementById('feedback-text');
+            const eduPanel = document.getElementById('educational-explanation');
+            const eduText = document.getElementById('educational-explanation-text');
+
+            panel.className = "feedback-panel " + (isSuccess ? "success" : "error");
+            fTitle.innerText = title;
+            fText.innerText = msg;
+            panel.style.display = 'block';
+
+            if (isSuccess) {
+                eduText.innerText = levelData[state.currentLevel].explanation;
+                eduPanel.style.display = 'block';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                const nextBtn = document.getElementById('btn-next-level');
+                if (nextBtn) {
+                    nextBtn.className = "btn-action";
+                }
+            } else {
+                eduPanel.style.display = 'none';
+            }
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                const container = document.getElementById('mobile-screen-body');
+                container.innerHTML = `
+                <div class="final-screen">
+                    <span class="celebrate-icon">🎓</span>
+                    <h3>Simulation Complete!</h3>
+                    <p style="font-size:0.8rem;">You have mastered Subtopic 5.2: Lateral Access and Drill Down. You understand how tabs, pagination, card depth effects, and triggers guide seamless navigation.</p>
+                </div>
+            `;
+                document.getElementById('level-title').innerText = "All Levels Complete";
+                document.getElementById('level-desc').innerText = "Congratulations! You have completed the interactive laboratory module on lateral access and drill-down patterns.";
+                document.getElementById('feedback-panel').style.display = 'none';
+                document.getElementById('educational-explanation').style.display = 'none';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                document.getElementById('btn-next-level').classList.add('hidden');
+                document.getElementById('btn-prev-level').classList.add('hidden');
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+    </script>
+</body>
+
+</html>

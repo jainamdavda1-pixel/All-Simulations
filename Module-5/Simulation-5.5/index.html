@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 5.5 — Managing Mobile Components: Advanced Display, Control & Confirmation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FFF5F5;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Sandbox */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 620px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mobile Mockup */
+        .mobile-mockup {
+            width: 320px;
+            height: 540px;
+            border: 12px solid #1E1E24;
+            border-radius: 36px;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-status-bar {
+            height: 24px;
+            background-color: var(--somaiya-red-hover);
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .mobile-status-icons {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .mobile-app-bar {
+            height: 48px;
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mobile-screen-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: var(--white);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Level 1 List item */
+        .match-row-l1 {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 0.72rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Level 3 Builder styles */
+        .gallery-slot {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .gallery-slot.filled {
+            border-color: var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border-style: solid;
+        }
+
+        /* Component layouts */
+        .mock-carousel-row {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .mock-car-box {
+            flex: 0 0 100px;
+            height: 50px;
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            padding: 4px;
+        }
+
+        .mock-film-row {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .mock-film-box {
+            flex: 0 0 35px;
+            height: 35px;
+            background-color: #E2E8F0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+
+        /* Level 5 Capstone Slots */
+        .capstone-slot {
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 4px;
+            margin-bottom: 6px;
+            font-size: 0.65rem;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .capstone-slot.filled {
+            border-style: solid;
+            border-color: var(--somaiya-red);
+            background-color: var(--white);
+            color: var(--text-dark);
+            min-height: 50px;
+        }
+
+        /* Feedback and educational panel */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            border-color: #CBD5E1;
+            color: #CBD5E1;
+            cursor: not-allowed;
+            background-color: var(--white);
+        }
+
+        /* Hint Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 5: Pattern with Mobile Interface Design</p>
+                </div>
+            </div>
+            <div class="subtopic-badge">
+                5.5 Advanced Components Review
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <h2 id="level-title">Level 1: Choose the Right Mobile List</h2>
+                <p id="level-desc">Loading instructions...</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"
+                        style="vertical-align: middle; margin-right: 4px;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Component Review Board</h3>
+                <p id="sandbox-desc">Resolve layout challenges in the smartphone mockup frame.</p>
+            </div>
+
+            <div class="sandbox-body">
+                <div class="mobile-mockup" id="mobile-mockup-frame">
+                    <div class="mobile-status-bar">
+                        <span>College LTE</span>
+                        <span>12:20 PM</span>
+                        <div class="mobile-status-icons">🔋 85%</div>
+                    </div>
+                    <div class="mobile-app-bar" id="mobile-app-bar-title">
+                        Layout Builder
+                    </div>
+                    <div class="mobile-screen-content" id="mobile-screen-body">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback-panel" id="feedback-panel">
+                <strong id="feedback-title">Feedback Title</strong>
+                <p id="feedback-text">Feedback text goes here.</p>
+            </div>
+
+            <div class="educational-explanation" id="educational-explanation">
+                <strong>💡 UI Design Principle:</strong>
+                <span id="educational-explanation-text">Design explanation goes here.</span>
+            </div>
+
+            <div class="controls-row">
+                <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">&larr; Prev</button>
+                <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Restart</button>
+                <button class="btn-action" id="btn-submit-action" onclick="validateLevel()">Submit</button>
+                <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next &rarr;</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>📖 UI Design Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            levelAnswers: {},
+            l3Slots: [null, null, null],
+            l3Answers: ['carousel', 'filmstrip', 'slideshow'],
+            l4Guards: {
+                preview: false,
+                dialog: false,
+                banner: false
+            },
+            l4Step: 1,
+            l5Slots: [null, null, null, null, null],
+            l5Answers: ['semester', 'carousel', 'filmstrip', 'vertical', 'confirm'],
+            l5StepFlow: 1
+        };
+
+        const levelData = {
+            1: {
+                title: "Level 1: Choose the Right Mobile List",
+                desc: "Match the mobile content types to their corresponding optimal list pattern to establish clear visualization hierarchies.",
+                hint: "Assign: 1. Syllabus -> Vertical List; 2. Event Photos -> Thumbnail List; 3. Scans -> Film Strip; 4. Banners -> Carousel Grid; 5. Single Poster -> Slideshow.",
+                explanation: "Matching layout patterns is critical. Banners use horizontal carousels, detailed texts use vertical margins, image-heavy albums use thumbnail cells, slides use slideshow views, and video previews use film strips."
+            },
+            2: {
+                title: "Level 2: Infinite List vs Select List",
+                desc: "Understand the design boundary between continuous discoverability (Infinite List) and restricted academic choices (Select List).",
+                hint: "Assign: Video Browsing -> Infinite List; Semester selection -> Select List; Course enrollment picker -> Select List; Activity photostream -> Infinite List.",
+                explanation: "Infinite scrolling drives discovery for large, unstructured datasets. Dropdown Select Lists are mandatory for bounded parameter constraints to prevent user choice confusion."
+            },
+            3: {
+                title: "Level 3: Mobile Gallery Builder",
+                desc: "Build a structured visual browsing screen inside the mockup, placing the horizontal grids, preview films, and large slideshow focuses in layout order.",
+                hint: "Select slots to add components: Slot 1 (Top) -> Carousel Grid; Slot 2 (Middle) -> Film Strip; Slot 3 (Bottom) -> Slideshow.",
+                explanation: "Visual browsing grids structure dense files. Top carousels invite swipe clicks, middle film-strips offer fast previews, and full slideshow frames isolate the current focus."
+            },
+            4: {
+                title: "Level 4: Confirmation Pattern Fix",
+                desc: "Build an explicit confirmation prompt layout to protect students from accidental submissions and file deletion mistakes.",
+                hint: "Enable all three confirmation options: Preview Screen, Modal Dialog, and Success Banner in the mockup controls, then submit the project.",
+                explanation: "Important actions require feedback friction. Placing preview review screens and confirmation alerts ensures files are checked, and success notifications verify complete database storage."
+            },
+            5: {
+                title: "Level 5: Complete Mobile Component Mission",
+                desc: "Capstone: Design a complete course overview page combining selectors, carousel highlights, film strip previews, list details, and confirmation steps.",
+                hint: "Click the layout blocks at the bottom in sequence: 1) Semester Dropdown, 2) Carousel Modules, 3) Film Strip, 4) Vertical Syllabus, 5) Confirm Button. Then interact with the mock screen to complete enrollment.",
+                explanation: "A complete mobile screen coordinates components. Bounded dropdown select lists feed carousels and detailed vertical directories, and a progressive validation sequence guarantees secure transactions."
+            }
+        };
+
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        function loadLevel(num) {
+            state.currentLevel = num;
+
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+
+            const prevBtn = document.getElementById('btn-prev-level');
+            const nextBtn = document.getElementById('btn-next-level');
+            if (prevBtn) {
+                prevBtn.classList.remove('hidden');
+                prevBtn.disabled = (num === 1);
+            }
+            if (nextBtn) {
+                nextBtn.classList.remove('hidden');
+                nextBtn.disabled = false;
+                nextBtn.className = "btn-outline";
+            }
+
+            const progressPercent = (num / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercent + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${num} of 5`;
+
+            document.getElementById('level-title').innerText = levelData[num].title;
+            document.getElementById('level-desc').innerText = levelData[num].desc;
+
+            const body = document.getElementById('mobile-screen-body');
+            body.innerHTML = '';
+
+            if (num === 1) {
+                renderLevel1(body);
+            } else if (num === 2) {
+                renderLevel2(body);
+            } else if (num === 3) {
+                renderLevel3(body);
+            } else if (num === 4) {
+                renderLevel4(body);
+            } else if (num === 5) {
+                renderLevel5(body);
+            }
+        }
+
+        function showHintModal() {
+            document.getElementById('hint-text').innerText = levelData[state.currentLevel].hint;
+            document.getElementById('hint-modal').style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        /* LEVEL 1: LIST MATCHING */
+        function renderLevel1(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "List Classification";
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:10px; color:var(--text-muted);">Assign the correct display pattern to the content:</p>
+
+            <div class="match-row-l1">
+                <span>1. Syllabus Chapters (Text)</span>
+                <select class="drill-trigger-select" id="l1-sel-1">
+                    <option value="">-- Layout --</option>
+                    <option value="vertical">Vertical List</option>
+                    <option value="thumbnail">Thumbnail List</option>
+                    <option value="carousel">Carousel Grid</option>
+                    <option value="filmstrip">Film Strip</option>
+                    <option value="slideshow">Slideshow</option>
+                </select>
+            </div>
+
+            <div class="match-row-l1">
+                <span>2. Tech Event Photos (Square)</span>
+                <select class="drill-trigger-select" id="l1-sel-2">
+                    <option value="">-- Layout --</option>
+                    <option value="vertical">Vertical List</option>
+                    <option value="thumbnail">Thumbnail List</option>
+                    <option value="carousel">Carousel Grid</option>
+                    <option value="filmstrip">Film Strip</option>
+                    <option value="slideshow">Slideshow</option>
+                </select>
+            </div>
+
+            <div class="match-row-l1">
+                <span>3. Slideshow Banners (Horizontal)</span>
+                <select class="drill-trigger-select" id="l1-sel-3">
+                    <option value="">-- Layout --</option>
+                    <option value="vertical">Vertical List</option>
+                    <option value="thumbnail">Thumbnail List</option>
+                    <option value="carousel">Carousel Grid</option>
+                    <option value="filmstrip">Film Strip</option>
+                    <option value="slideshow">Slideshow</option>
+                </select>
+            </div>
+
+            <div class="match-row-l1">
+                <span>4. Micro Lecture Video frames</span>
+                <select class="drill-trigger-select" id="l1-sel-4">
+                    <option value="">-- Layout --</option>
+                    <option value="vertical">Vertical List</option>
+                    <option value="thumbnail">Thumbnail List</option>
+                    <option value="carousel">Carousel Grid</option>
+                    <option value="filmstrip">Film Strip</option>
+                    <option value="slideshow">Slideshow</option>
+                </select>
+            </div>
+
+            <div class="match-row-l1" style="margin-bottom:0;">
+                <span>5. Focus research poster image</span>
+                <select class="drill-trigger-select" id="l1-sel-5">
+                    <option value="">-- Layout --</option>
+                    <option value="vertical">Vertical List</option>
+                    <option value="thumbnail">Thumbnail List</option>
+                    <option value="carousel">Carousel Grid</option>
+                    <option value="filmstrip">Film Strip</option>
+                    <option value="slideshow">Slideshow</option>
+                </select>
+            </div>
+        `;
+        }
+
+        function validateLevel1() {
+            const s1 = document.getElementById('l1-sel-1').value;
+            const s2 = document.getElementById('l1-sel-2').value;
+            const s3 = document.getElementById('l1-sel-3').value;
+            const s4 = document.getElementById('l1-sel-4').value;
+            const s5 = document.getElementById('l1-sel-5').value;
+
+            if (!s1 || !s2 || !s3 || !s4 || !s5) {
+                showFeedback(false, "Incomplete Matches", "Please choose a display layout for all five contents.");
+                return;
+            }
+
+            if (s1 === 'vertical' && s2 === 'thumbnail' && s3 === 'carousel' && s4 === 'filmstrip' && s5 === 'slideshow') {
+                showFeedback(true, "List Styles Approved!", "Great! You matched them accurately. Vertical layouts show structural text lines, thumbnails display gallery grid squares, carousel grids manage banner swipes, film strips handle small horizontal scans, and slideshows allow large image zoom.");
+            } else {
+                showFeedback(false, "Layout Error", "Mismatch. Remember: text syllabus matches Vertical; album photos match Thumbnail; horizontal banners match Carousel; video keyframes match Film Strip; single details match Slideshow.");
+            }
+        }
+
+        /* LEVEL 2: INFINITE VS SELECT LIST */
+        function renderLevel2(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Choice vs Discover";
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:12px; color:var(--text-muted);">Assign 'Infinite List' or 'Select List' based on content scale:</p>
+
+            <div class="match-row-l1">
+                <span>1. Scroll 100+ university course videos</span>
+                <select class="drill-trigger-select" id="l2-sel-1">
+                    <option value="">-- Choose --</option>
+                    <option value="infinite">Infinite List</option>
+                    <option value="select">Select List (Dropdown)</option>
+                </select>
+            </div>
+
+            <div class="match-row-l1">
+                <span>2. Select exactly 1 Semester from 8 options</span>
+                <select class="drill-trigger-select" id="l2-sel-2">
+                    <option value="">-- Choose --</option>
+                    <option value="infinite">Infinite List</option>
+                    <option value="select">Select List (Dropdown)</option>
+                </select>
+            </div>
+
+            <div class="match-row-l1">
+                <span>3. Choose Core Elective (3 options)</span>
+                <select class="drill-trigger-select" id="l2-sel-3">
+                    <option value="">-- Choose --</option>
+                    <option value="infinite">Infinite List</option>
+                    <option value="select">Select List (Dropdown)</option>
+                </select>
+            </div>
+
+            <div class="match-row-l1" style="margin-bottom:0;">
+                <span>4. Passive browsing photostream of campus</span>
+                <select class="drill-trigger-select" id="l2-sel-4">
+                    <option value="">-- Choose --</option>
+                    <option value="infinite">Infinite List</option>
+                    <option value="select">Select List (Dropdown)</option>
+                </select>
+            </div>
+        `;
+        }
+
+        function validateLevel2() {
+            const s1 = document.getElementById('l2-sel-1').value;
+            const s2 = document.getElementById('l2-sel-2').value;
+            const s3 = document.getElementById('l2-sel-3').value;
+            const s4 = document.getElementById('l2-sel-4').value;
+
+            if (!s1 || !s2 || !s3 || !s4) {
+                showFeedback(false, "Selections Incomplete", "Please assign a scroll pattern to all four rows.");
+                return;
+            }
+
+            if (s1 === 'infinite' && s2 === 'select' && s3 === 'select' && s4 === 'infinite') {
+                showFeedback(true, "Scrolling Confirmed!", "Excellent! Infinite Lists support discovery and browsing engagement. Select Lists enforce controlled parameters, making them mandatory for structured choices.");
+            } else {
+                showFeedback(false, "Behavior Error", "Incorrect choice. Infinite lists are for endless discovery (university videos, photostreams). Select lists are for strict parameter values (Semester number, elective course).");
+            }
+        }
+
+        /* LEVEL 3: MOBILE GALLERY BUILDER */
+        function renderLevel3(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Gallery Setup";
+            state.l3Slots = [null, null, null];
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:8px; color:var(--text-muted);">Assemble the visual components in layout sequence:</p>
+            
+            <div class="gallery-slot" id="g-slot-0" onclick="clearL3Slot(0)">[ Slot 1: Top of Page ]</div>
+            <div class="gallery-slot" id="g-slot-1" onclick="clearL3Slot(1)">[ Slot 2: Middle Page ]</div>
+            <div class="gallery-slot" id="g-slot-2" onclick="clearL3Slot(2)">[ Slot 3: Bottom Page ]</div>
+
+            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; border-top:1px solid var(--border-color); padding-top:10px; margin-top:12px;">
+                <div class="flow-block-item" onclick="clickL3Block('carousel')">Carousel Grid</div>
+                <div class="flow-block-item" onclick="clickL3Block('filmstrip')">Film Strip</div>
+                <div class="flow-block-item" onclick="clickL3Block('slideshow')">Slideshow</div>
+            </div>
+        `;
+        }
+
+        function clickL3Block(type) {
+            const nextSlot = state.l3Slots.findIndex(s => s === null);
+            if (nextSlot !== -1) {
+                state.l3Slots[nextSlot] = type;
+                const slotEl = document.getElementById(`g-slot-${nextSlot}`);
+                slotEl.classList.add('filled');
+
+                if (type === 'carousel') {
+                    slotEl.innerHTML = `
+                    <div style="width:100%;">
+                        <span style="font-size:0.6rem; font-weight:bold; display:block; text-align:left;">Swipe Banners (Carousel)</span>
+                        <div class="mock-carousel-row">
+                            <div class="mock-car-box">Adv UI Design</div>
+                            <div class="mock-car-box">HCI Lab</div>
+                        </div>
+                    </div>
+                `;
+                } else if (type === 'filmstrip') {
+                    slotEl.innerHTML = `
+                    <div style="width:100%;">
+                        <span style="font-size:0.6rem; font-weight:bold; display:block; text-align:left;">Video Previews (Film Strip)</span>
+                        <div class="mock-film-row">
+                            <div class="mock-film-box">f1</div>
+                            <div class="mock-film-box">f2</div>
+                            <div class="mock-film-box">f3</div>
+                        </div>
+                    </div>
+                `;
+                } else if (type === 'slideshow') {
+                    slotEl.innerHTML = `
+                    <div style="width:100%; height:40px; background:#DDD; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.65rem;">
+                        🖥️ Slideshow: Single Video Details Focus Page
+                    </div>
+                `;
+                }
+            }
+        }
+
+        function clearL3Slot(idx) {
+            state.l3Slots[idx] = null;
+            const slotEl = document.getElementById(`g-slot-${idx}`);
+            slotEl.classList.remove('filled');
+            slotEl.innerText = `[ Slot ${idx + 1}: Click to Fill ]`;
+        }
+
+        function validateLevel3() {
+            let correct = true;
+            for (let i = 0; i < 3; i++) {
+                if (state.l3Slots[i] !== state.l3Answers[i]) correct = false;
+            }
+
+            if (correct) {
+                showFeedback(true, "Visual Layout Satisfied!", "Incredible! You arranged the page elements optimally. Top banners use Carousel swipes, the middle section displays a Film Strip of slides, and the base displays the detailed Slideshow.");
+            } else {
+                showFeedback(false, "Layout Flow Broken", "Recall standard page hierarchy: Carousel banners at the top; compact Film Strip scrolling in the middle; full details Slideshow at the bottom.");
+            }
+        }
+
+        /* LEVEL 4: CONFIRMATION FIX */
+        function renderLevel4(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Project Submissions";
+            state.l4Guards = { preview: false, dialog: false, banner: false };
+            state.l4Step = 1;
+
+            container.innerHTML = `
+            <div style="border:1px dashed var(--somaiya-red); border-radius:8px; padding:6px; margin-bottom:12px; background:var(--somaiya-red-light); font-size:0.75rem;">
+                <p style="font-weight:bold; margin-bottom:4px; color:var(--somaiya-red);">🛠️ Enable Safeguards:</p>
+                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="chk-l4-preview" onchange="toggleL4Guards()"> File Preview screen</label>
+                <label style="display:block; margin-bottom:2px;"><input type="checkbox" id="chk-l4-dialog" onchange="toggleL4Guards()"> Modal Confirmation prompt</label>
+                <label style="display:block;"><input type="checkbox" id="chk-l4-banner" onchange="toggleL4Guards()"> Success validation page</label>
+            </div>
+
+            <div id="l4-transaction-screen" style="border:1px solid var(--border-color); border-radius:8px; padding:10px; font-size:0.75rem; flex-grow:1; display:flex; flex-direction:column; justify-content:space-between;">
+                <!-- Dynamic form steps -->
+            </div>
+        `;
+            toggleL4Guards();
+        }
+
+        function toggleL4Guards() {
+            state.l4Guards.preview = document.getElementById('chk-l4-preview').checked;
+            state.l4Guards.dialog = document.getElementById('chk-l4-dialog').checked;
+            state.l4Guards.banner = document.getElementById('chk-l4-banner').checked;
+
+            renderL4Step();
+        }
+
+        function renderL4Step() {
+            const wrapper = document.getElementById('l4-transaction-screen');
+            if (!wrapper) return;
+
+            if (state.l4Step === 1) {
+                wrapper.innerHTML = `
+                <div>
+                    <span style="font-weight:bold; display:block; margin-bottom:8px;">Submit Lab File</span>
+                    <div style="border:1px solid var(--border-color); border-radius:6px; padding:8px; background:#FAFAFB;">
+                        📁 term_project_final_draft.pdf
+                    </div>
+                </div>
+                <button class="btn-action" style="padding:6px 12px; font-size:0.72rem; margin-top:10px;" onclick="clickL4Submit()">Submit Project</button>
+            `;
+            } else if (state.l4Step === 2) {
+                wrapper.innerHTML = `
+                <div>
+                    <span style="font-weight:bold; color:var(--somaiya-red); display:block; margin-bottom:6px;">Preview Submitted Details</span>
+                    <p>File: term_project_final_draft.pdf</p>
+                    <p>Size: 4.8 MB</p>
+                </div>
+                <div style="display:flex; gap:6px; margin-top:12px;">
+                    <button class="btn-outline" style="flex:1; padding:4px 8px; font-size:0.7rem;" onclick="state.l4Step = 1; renderL4Step();">Back</button>
+                    <button class="btn-action" style="flex:1; padding:4px 8px; font-size:0.7rem;" onclick="clickL4Finalize()">Finalize Send</button>
+                </div>
+            `;
+            } else if (state.l4Step === 3) {
+                wrapper.innerHTML = `
+                <div style="text-align:center; padding:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-grow:1;">
+                    <span style="font-size:2.5rem; color:var(--success-color);">✔️</span>
+                    <h4 style="font-size:0.85rem; font-weight:bold; color:var(--success-color); margin-top:6px;">Upload Verified</h4>
+                    <p style="font-size:0.68rem; color:var(--text-muted); margin-top:4px;">Receipt reference has been written to system logs.</p>
+                </div>
+                <button class="btn-outline" style="padding:4px 8px; font-size:0.7rem; margin-top:8px;" onclick="state.l4Step=1; renderL4Step();">Upload Another</button>
+            `;
+            }
+        }
+
+        function clickL4Submit() {
+            if (!state.l4Guards.preview) {
+                if (state.l4Guards.dialog) {
+                    triggerL4DialogPrompt();
+                } else if (state.l4Guards.banner) {
+                    state.l4Step = 3;
+                    renderL4Step();
+                } else {
+                    alert("File submitted instantly with zero confirmation safeguards!");
+                    state.l4Step = 1;
+                    renderL4Step();
+                }
+            } else {
+                state.l4Step = 2;
+                renderL4Step();
+            }
+        }
+
+        function triggerL4DialogPrompt() {
+            const res = confirm("⚠️ Send Lab Project File?\n\nYou cannot overwrite this submission after the deadline.");
+            if (res) {
+                if (state.l4Guards.banner) {
+                    state.l4Step = 3;
+                    renderL4Step();
+                } else {
+                    alert("File uploaded.");
+                    state.l4Step = 1;
+                    renderL4Step();
+                }
+            }
+        }
+
+        function clickL4Finalize() {
+            if (state.l4Guards.dialog) {
+                triggerL4DialogPrompt();
+            } else if (state.l4Guards.banner) {
+                state.l4Step = 3;
+                renderL4Step();
+            } else {
+                alert("File uploaded.");
+                state.l4Step = 1;
+                renderL4Step();
+            }
+        }
+
+        function validateLevel4() {
+            if (state.l4Guards.preview && state.l4Guards.dialog && state.l4Guards.banner) {
+                if (state.l4Step === 3) {
+                    showFeedback(true, "Safety Validation Met!", "Excellent work! Adding a file preview screen, a confirmation dialog, and a success notification protects users from slips and errors.");
+                } else {
+                    showFeedback(false, "Run the transaction", "All verification steps are active. Submit the file and complete the transaction flow to reach the success page.");
+                }
+            } else {
+                showFeedback(false, "Unchecked upload", "Danger! Submit buttons without confirmation steps cause high student error rates. Enable all safeguards to proceed.");
+            }
+        }
+
+        /* LEVEL 5: COMPLETE MOBILE COMPONENT MISSION */
+        function renderLevel5(container) {
+            document.getElementById('mobile-app-bar-title').innerText = "Semester Enroll Hub";
+            state.l5Slots = [null, null, null, null, null];
+            state.l5StepFlow = 1;
+
+            container.innerHTML = `
+            <p style="font-size:0.75rem; margin-bottom:8px; color:var(--text-muted);">Arrange components into the layout slots to build the registration screen:</p>
+            
+            <div class="capstone-slot" id="cap-slot-0" onclick="clearL5Slot(0)">Slot 1: Semester Select (Dropdown)</div>
+            <div class="capstone-slot" id="cap-slot-1" onclick="clearL5Slot(1)">Slot 2: Swipe Highlights (Carousel Grid)</div>
+            <div class="capstone-slot" id="cap-slot-2" onclick="clearL5Slot(2)">Slot 3: Quick Screenshot Previews (Film Strip)</div>
+            <div class="capstone-slot" id="cap-slot-3" onclick="clearL5Slot(3)">Slot 4: Detail Chapter checklist (Vertical List)</div>
+            <div class="capstone-slot" id="cap-slot-4" onclick="clearL5Slot(4)">Slot 5: Finalization Trigger (Submit Button)</div>
+
+            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; border-top:1px solid var(--border-color); padding-top:10px; margin-top:8px;">
+                <div class="flow-block-item" onclick="clickL5Block('semester')">Semester Select</div>
+                <div class="flow-block-item" onclick="clickL5Block('carousel')">Carousel Banners</div>
+                <div class="flow-block-item" onclick="clickL5Block('filmstrip')">Film Strip</div>
+                <div class="flow-block-item" onclick="clickL5Block('vertical')">Vertical List</div>
+                <div class="flow-block-item" onclick="clickL5Block('confirm')">Submit Button</div>
+            </div>
+        `;
+        }
+
+        function clickL5Block(type) {
+            const nextSlot = state.l5Slots.findIndex(s => s === null);
+            if (nextSlot !== -1) {
+                state.l5Slots[nextSlot] = type;
+                const slotEl = document.getElementById(`cap-slot-${nextSlot}`);
+                slotEl.classList.add('filled');
+
+                if (type === 'semester') {
+                    slotEl.innerHTML = `
+                    <select class="pattern-select" style="margin-top:0;" id="l5-semester-select">
+                        <option value="">-- Select Semester --</option>
+                        <option value="6">Semester 6</option>
+                    </select>
+                `;
+                } else if (type === 'carousel') {
+                    slotEl.innerHTML = `
+                    <div class="mock-carousel-row" style="width:100%;">
+                        <div class="mock-car-box" style="height:30px; font-size:0.6rem;">Module 5 Card</div>
+                        <div class="mock-car-box" style="height:30px; font-size:0.6rem;">Module 6 Card</div>
+                    </div>
+                `;
+                } else if (type === 'filmstrip') {
+                    slotEl.innerHTML = `
+                    <div class="mock-film-row" style="width:100%;">
+                        <div class="mock-film-box" style="height:25px; width:25px; font-size:0.55rem;">v1</div>
+                        <div class="mock-film-box" style="height:25px; width:25px; font-size:0.55rem;">v2</div>
+                    </div>
+                `;
+                } else if (type === 'vertical') {
+                    slotEl.innerHTML = `
+                    <div style="font-size:0.6rem; text-align:left; width:100%;">
+                        📝 List Item: 5.1 Mobile Components<br>
+                        📝 List Item: 5.2 Drill Down
+                    </div>
+                `;
+                } else if (type === 'confirm') {
+                    slotEl.innerHTML = `
+                    <button class="btn-action" style="width:100%; padding:6px; font-size:0.7rem;" onclick="executeL5CapstoneFlow()">Register & Submit</button>
+                `;
+                }
+            }
+        }
+
+        function clearL5Slot(idx) {
+            state.l5Slots[idx] = null;
+            const slotEl = document.getElementById(`cap-slot-${idx}`);
+            slotEl.classList.remove('filled');
+
+            const labels = [
+                "Slot 1: Semester Select (Dropdown)",
+                "Slot 2: Swipe Highlights (Carousel Grid)",
+                "Slot 3: Quick Screenshot Previews (Film Strip)",
+                "Slot 4: Detail Chapter checklist (Vertical List)",
+                "Slot 5: Finalization Trigger (Submit Button)"
+            ];
+            slotEl.innerText = labels[idx];
+        }
+
+        function executeL5CapstoneFlow() {
+            // Did they build correct slots?
+            let correct = true;
+            for (let i = 0; i < 5; i++) {
+                if (state.l5Slots[i] !== state.l5Answers[i]) correct = false;
+            }
+
+            if (!correct) {
+                alert("Page layout is broken. Submit button clicked but registration failed due to layout conflicts.");
+                return;
+            }
+
+            const semVal = document.getElementById('l5-semester-select').value;
+            if (!semVal) {
+                alert("Please select Semester 6 first from the dropdown list.");
+                return;
+            }
+
+            // Safe confirmation flow
+            const confirmDialog = confirm("⚠️ Finalize Course Enrollment?\n\nThis registers you for Semester 6 core syllabus.");
+            if (confirmDialog) {
+                state.l5StepFlow = 3; // Success state
+                const screen = document.getElementById('mobile-screen-body');
+                screen.innerHTML = `
+                <div style="text-align:center; padding-top:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-grow:1;">
+                    <span style="font-size:3rem; color:var(--success-color);">✔️</span>
+                    <h3 style="font-size:1.1rem; font-weight:bold; color:var(--success-color); margin-top:12px;">Enrollment Completed</h3>
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Semester 6 database record successfully registered.</p>
+                    <button class="btn-outline" style="margin-top:20px; padding:6px 12px; font-size:0.75rem;" onclick="loadLevel(5)">Restart Level</button>
+                </div>
+            `;
+            }
+        }
+
+        function validateLevel5() {
+            let correct = true;
+            for (let i = 0; i < 5; i++) {
+                if (state.l5Slots[i] !== state.l5Answers[i]) correct = false;
+            }
+
+            if (correct) {
+                if (state.l5StepFlow === 3) {
+                    showFeedback(true, "Capstone Mission Accomplished!", "Sensational! You designed a complete mobile workflow linking Select dropdowns, Carousel banners, Film strip screenshots, and Vertical detail list items, finalized with a bulletproof confirmation prompt.");
+                } else {
+                    showFeedback(false, "Run the capstone", "Layout configured successfully! Now select Semester 6 in the dropdown picker inside the phone screen and click 'Register & Submit' to finalize registration.");
+                }
+            } else {
+                showFeedback(false, "Syllabus Layout Broken", "Design Error. Re-arrange from top to bottom: 1) Dropdown pickers, 2) Horizontal Carousel highlights, 3) Film Strip screenshots, 4) Detail Vertical List lines, 5) Submit Action Button.");
+            }
+        }
+
+        /* GLOBAL SIMULATION HANDLERS */
+        function validateLevel() {
+            if (state.currentLevel === 1) validateLevel1();
+            else if (state.currentLevel === 2) validateLevel2();
+            else if (state.currentLevel === 3) validateLevel3();
+            else if (state.currentLevel === 4) validateLevel4();
+            else if (state.currentLevel === 5) validateLevel5();
+        }
+
+        function showFeedback(isSuccess, title, msg) {
+            const panel = document.getElementById('feedback-panel');
+            const fTitle = document.getElementById('feedback-title');
+            const fText = document.getElementById('feedback-text');
+            const eduPanel = document.getElementById('educational-explanation');
+            const eduText = document.getElementById('educational-explanation-text');
+
+            panel.className = "feedback-panel " + (isSuccess ? "success" : "error");
+            fTitle.innerText = title;
+            fText.innerText = msg;
+            panel.style.display = 'block';
+
+            if (isSuccess) {
+                eduText.innerText = levelData[state.currentLevel].explanation;
+                eduPanel.style.display = 'block';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                const nextBtn = document.getElementById('btn-next-level');
+                if (nextBtn) {
+                    nextBtn.className = "btn-action";
+                }
+            } else {
+                eduPanel.style.display = 'none';
+            }
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                const container = document.getElementById('mobile-screen-body');
+                container.innerHTML = `
+                <div class="final-screen">
+                    <span class="celebrate-icon">🎓</span>
+                    <h3>Simulation Complete!</h3>
+                    <p style="font-size:0.8rem;">You have mastered Subtopic 5.5: Advanced Display, Control, and Confirmation. You successfully integrated selection dropdowns, visual galleries, list views, and transaction safety prompts into a College learning app.</p>
+                </div>
+            `;
+                document.getElementById('level-title').innerText = "All Levels Complete";
+                document.getElementById('level-desc').innerText = "Congratulations! You have completed the interactive laboratory module on advanced display, control, and confirmation patterns.";
+                document.getElementById('feedback-panel').style.display = 'none';
+                document.getElementById('educational-explanation').style.display = 'none';
+                document.getElementById('btn-submit-action').classList.add('hidden');
+                document.getElementById('btn-next-level').classList.add('hidden');
+                document.getElementById('btn-prev-level').classList.add('hidden');
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 4.4 — Pattern with Social Content Production</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FDF2F2;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --warning-color: #F59E0B;
+            --warning-light: #FEF3C7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        /* Sidebar info card */
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Simulation sandbox */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 550px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+        }
+
+        /* Level 1 Feed Arrangement styling */
+        .feed-setup-layout {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .feed-setup-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .feed-pool {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feed-skeleton-canvas {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .feed-slot {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .feed-slot.drag-over {
+            border-color: var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+        }
+
+        .feed-slot.filled {
+            border-style: solid;
+            border-color: var(--border-color);
+            background-color: var(--light-bg);
+        }
+
+        .card-social-item {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.78rem;
+            box-shadow: var(--shadow-sm);
+            cursor: grab;
+            user-select: none;
+            width: 100%;
+        }
+
+        .card-social-item.installed {
+            box-shadow: none;
+            cursor: default;
+        }
+
+        .social-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .badge-ann {
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+        }
+
+        .badge-stu {
+            background-color: #E0F2FE;
+            color: #0369A1;
+        }
+
+        .badge-exp {
+            background-color: #ECFDF5;
+            color: #047857;
+        }
+
+        .badge-poll {
+            background-color: #FEF3C7;
+            color: #B45309;
+        }
+
+        .badge-news {
+            background-color: #F3E8FF;
+            color: #7E22CE;
+        }
+
+        /* Level 2 Personal voice columns */
+        .voice-comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .voice-comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .voice-card-select {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .voice-card-select:hover {
+            border-color: var(--somaiya-red);
+            box-shadow: var(--shadow-md);
+        }
+
+        .voice-card-select.selected {
+            border-color: var(--somaiya-red);
+            box-shadow: 0 0 0 2px var(--somaiya-red-border);
+            background-color: var(--somaiya-red-light);
+        }
+
+        .voice-header {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        /* Level 3 Repost commentary sandbox */
+        .repost-layout {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .source-post-box {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .commentary-input-box {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            resize: none;
+            margin-bottom: 12px;
+        }
+
+        .commentary-input-box:focus {
+            outline: none;
+            border-color: var(--somaiya-red);
+        }
+
+        .reposted-preview-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Level 4 Conversation Starter setup */
+        .starter-interactive-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .post-transform-box {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .options-list-starters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Level 5 Nano Pyramid layout */
+        .pyramid-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .pyramid-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pyramid-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pyramid-zone {
+            border: 2px dashed var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .pyramid-zone.drag-over {
+            background-color: var(--somaiya-red-border);
+        }
+
+        .pyramid-zone.filled {
+            border-style: solid;
+            border-color: var(--somaiya-red);
+            background-color: var(--white);
+        }
+
+        .pyramid-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--somaiya-red);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        /* General Feedback systems */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            background-color: #F3F4F6;
+            color: #9CA3AF;
+            border-color: #E5E7EB;
+            cursor: not-allowed;
+        }
+
+        /* Modal Overlay for Hint */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 4: Interface Design for Data Handling</p>
+                </div>
+            </div>
+            <div class="subtopic-badge">
+                4.4 Social Content Production
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <h2 id="level-title">Level 1: Editorial Mix</h2>
+                <p id="level-desc">Feeds containing only announcements bore readers. Drag different cards to create a
+                    balanced editorial mix skeleton.</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Social Stream Canvas</h3>
+                <p id="sandbox-desc">Arrange one card of each role into the skeleton slots below.</p>
+            </div>
+
+            <div class="sandbox-body" id="sandbox-body">
+                <!-- Loaded dynamically -->
+            </div>
+
+            <!-- Feedback Messages -->
+            <div class="feedback-panel" id="feedback-panel">
+                <strong id="feedback-title">Feedback Title</strong>
+                <p id="feedback-text">Feedback body description...</p>
+            </div>
+
+            <div class="educational-explanation" id="educational-explanation">
+                <strong>💡 UI Design Principle:</strong>
+                <span id="educational-explanation-text">Explanation...</span>
+            </div>
+
+            <div class="controls-row">
+                <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">← Prev Level</button>
+                <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Reset Level</button>
+                <button class="btn-action" id="btn-submit-action" onclick="validateAction()">Submit Response</button>
+                <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next Level →</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>💡 Lecture Slide Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            // L1 state
+            l1Slots: [null, null, null, null, null],
+            // L2 state
+            l2SelectedVoice: 'none',
+            // L3 state
+            l3ShareMode: 'none',
+            // L4 state
+            l4StarterSelected: 'none',
+            // L5 state
+            l5PyramidBlocks: {
+                'top': null,
+                'middle': null,
+                'bottom': null
+            }
+        };
+
+        const levelData = {
+            1: {
+                title: "Level 1: Editorial Mix",
+                desc: "A balanced social feed contains mixed updates (expert advice, announcements, achievements, polls, news) to retain user retention. Drag one block of each category into the stream skeleton.",
+                sandboxTitle: "Balanced Feed Organizer",
+                sandboxDesc: "Place 5 distinct categories into the skeleton slots.",
+                hint: "Drag the cards into the empty boxes. Make sure each box gets exactly one different card (1 Announcement, 1 Student Voice, 1 Expert Tip, 1 Community Poll, 1 Campus News).",
+                explanation: "Editorial Mix ensures diverse stream formats. Mixing dry announcements with community polls and expert advice raises user engagement limits by 40%."
+            },
+            2: {
+                title: "Level 2: Personal Voices",
+                desc: "Robotic notices sound cold and hostile. Authentic conversational copies increase credibility. Choose the human-centered copy, then select the best rewording for the campus notification.",
+                sandboxTitle: "Authentic Tone Assessment",
+                sandboxDesc: "Select the post below that sounds warm and human-centered.",
+                hint: "Select Version B (uses conversational words like 'Hey everyone' and 'excited'). For the second test, choose the rewrite that is friendly but descriptive.",
+                explanation: "Personal Voices write for humans. Shifting from corporate declarations to authentic conversation patterns encourages student community participation."
+            },
+            3: {
+                title: "Level 3: Repost and Comment",
+                desc: "Raw retweets clutter feeds without adding meaning. Sharing with comments provides context. Select 'Repost with Comment' and add why this robotics announcement is useful to your cohort.",
+                sandboxTitle: "milestone sharing center",
+                sandboxDesc: "Choose sharing mode. Write a short explanation comment (min 10 characters) to complete repost.",
+                hint: "Choose 'Repost with Comment', type a short comment (e.g. 'Highly relevant for our upcoming design team project!'), and click submit.",
+                explanation: "Repost and Comment adds metadata value. Adding commentary clarifies why the shared content is relevant, directing peer navigation on dense news feeds."
+            },
+            4: {
+                title: "Level 4: Conversation Starter",
+                desc: "Flat statements ('Syllabus uploaded') die without engagement. Turn dry updates into high-engagement conversation prompts by appending interactive hooks.",
+                sandboxTitle: "Engagement Hook Builder",
+                sandboxDesc: "Select the most engaging conversion for the announcement: 'New project submissions are due next week.'",
+                hint: "Select the option that invites feedback (contains a poll question asking about project challenges). This starts active threads.",
+                explanation: "Conversation Starters transform lectures into dialog. Adding poll cards or open feedback questions triggers peer responses, building community bonds."
+            },
+            5: {
+                title: "Level 5: Inverted Nano-pyramid",
+                desc: "Dense paragraphs fail on mobile screens. Re-order the news release following the Inverted Nano-pyramid structure: Key news first, supporting details second, action link last.",
+                sandboxTitle: "Mobile Content Re-formatter",
+                sandboxDesc: "Drag content blocks from the right into the pyramid slots (Top=Core News, Middle=Context, Bottom=Call-To-Action).",
+                hint: "Top slot gets the main headline ('UX Google Lecture Friday 11am'). Middle slot gets background context ('Learn metrics inside Seminar Hall'). Bottom slot gets the direct registration URL.",
+                explanation: "Inverted Nano-pyramids maximize scan readability. Putting core news first ensures users get values immediately, with links at the bottom for easy next steps."
+            }
+        };
+
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        function loadLevel(levelNum) {
+            state.currentLevel = levelNum;
+
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+
+            const progressPercentage = (levelNum / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercentage + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${levelNum} of 5`;
+
+            document.getElementById('level-title').innerText = levelData[levelNum].title;
+            document.getElementById('level-desc').innerText = levelData[levelNum].desc;
+            document.getElementById('sandbox-title').innerText = levelData[levelNum].sandboxTitle;
+            document.getElementById('sandbox-desc').innerText = levelData[levelNum].sandboxDesc;
+
+            // Set Navigation states
+            document.getElementById('btn-prev-level').disabled = (levelNum === 1);
+            document.getElementById('btn-next-level').disabled = (levelNum === state.maxLevels);
+
+            const sandboxBody = document.getElementById('sandbox-body');
+            sandboxBody.innerHTML = '';
+
+            if (levelNum === 1) {
+                renderLevel1(sandboxBody);
+            } else if (levelNum === 2) {
+                renderLevel2(sandboxBody);
+            } else if (levelNum === 3) {
+                renderLevel3(sandboxBody);
+            } else if (levelNum === 4) {
+                renderLevel4(sandboxBody);
+            } else if (levelNum === 5) {
+                renderLevel5(sandboxBody);
+            }
+        }
+
+        function showHintModal() {
+            const modal = document.getElementById('hint-modal');
+            const text = document.getElementById('hint-text');
+            text.innerText = levelData[state.currentLevel].hint;
+            modal.style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        /* LEVEL 1: EDITORIAL MIX */
+        function renderLevel1(container) {
+            state.l1Slots = [null, null, null, null, null];
+
+            const grid = document.createElement('div');
+            grid.className = 'feed-setup-layout';
+
+            const toolbox = document.createElement('div');
+            toolbox.className = 'feed-pool';
+            toolbox.id = 'l1-pool';
+            toolbox.innerHTML = `<strong style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted);">Content Pool</strong>`;
+
+            const socialCards = [
+                { id: 'mix-ann', badge: 'badge-ann', text: '📢 Exam Schedule: June finals timing tables released.', cat: 'ann' },
+                { id: 'mix-stu', badge: 'badge-stu', text: '🥳 Peer Spotlight: Amit wins Hackathon trophy!', cat: 'stu' },
+                { id: 'mix-exp', badge: 'badge-exp', text: '💡 Design Tip: Keep input layouts single column.', cat: 'exp' },
+                { id: 'mix-poll', badge: 'badge-poll', text: '🗳️ Poll: Which topic was hardest in Module 4?', cat: 'poll' },
+                { id: 'mix-news', badge: 'badge-news', text: '📰 Campus: Library hours extended for exams.', cat: 'news' }
+            ];
+
+            socialCards.sort(() => 0.5 - Math.random()).forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card-social-item';
+                cardEl.draggable = true;
+                cardEl.id = card.id;
+                cardEl.innerHTML = `
+                <span class="social-badge ${card.badge}">${card.cat}</span>
+                <div>${card.text}</div>
+            `;
+                cardEl.addEventListener('dragstart', dragStart);
+                toolbox.appendChild(cardEl);
+            });
+
+            const skeleton = document.createElement('div');
+            skeleton.className = 'feed-skeleton-canvas';
+            skeleton.innerHTML = `<strong style="font-size:0.75rem; text-transform:uppercase; color:var(--somaiya-red); margin-bottom:8px;">Class Daily Stream Skeleton</strong>`;
+
+            for (let i = 0; i < 5; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'feed-slot';
+                slot.id = `feed-slot-${i}`;
+                slot.innerText = `[Slot ${i + 1}: Drop Mixed Card here]`;
+                slot.addEventListener('dragover', dragOver);
+                slot.addEventListener('dragleave', dragLeave);
+                slot.addEventListener('drop', dropFeedSlot);
+
+                skeleton.appendChild(slot);
+            }
+
+            grid.appendChild(toolbox);
+            grid.appendChild(skeleton);
+            container.appendChild(grid);
+        }
+
+        function dropFeedSlot(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove('drag-over');
+
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(draggedId);
+
+            if (draggedElement) {
+                const existingChild = slot.querySelector('.card-social-item');
+                if (existingChild) {
+                    document.getElementById('l1-pool').appendChild(existingChild);
+                }
+
+                slot.innerHTML = '';
+                slot.appendChild(draggedElement);
+                slot.classList.add('filled');
+
+                const index = parseInt(slot.id.replace('feed-slot-', ''));
+                state.l1Slots[index] = draggedId.replace('mix-', '');
+            }
+        }
+
+        function validateLevel1() {
+            const unique = new Set(state.l1Slots.filter(s => s !== null));
+            const allPlaced = (unique.size === 5);
+
+            showFeedback(allPlaced, allPlaced
+                ? "Excellent Mix! Your feed has balanced roles: Announcements, Peer achievements, Expert advices, Polls, and Campus updates."
+                : "Mix Failure: Your feed is unbalanced. Ensure all 5 slots are filled, with each containing a unique category block.");
+            return allPlaced;
+        }
+
+        /* LEVEL 2: PERSONAL VOICES */
+        function renderLevel2(container) {
+            state.l2SelectedVoice = 'none';
+
+            const main = document.createElement('div');
+            main.className = 'l1-overview-mode';
+
+            const grid = document.createElement('div');
+            grid.className = 'voice-comparison-grid';
+
+            const A = document.createElement('div');
+            A.className = 'voice-card-select';
+            A.id = 'voice-card-A';
+            A.innerHTML = `
+            <div class="voice-header" style="color:var(--text-muted)">Notice Version A</div>
+            <p style="font-size:0.88rem; color:var(--text-dark)">Attention all enrollees. It is mandated to clear pending laboratory log uploads by Friday close. Delays will generate system lockouts. No excuses processed.</p>
+        `;
+            A.onclick = () => selectVoice('A');
+
+            const B = document.createElement('div');
+            B.className = 'voice-card-select';
+            B.id = 'voice-card-B';
+            B.innerHTML = `
+            <div class="voice-header" style="color:var(--somaiya-red)">Notice Version B</div>
+            <p style="font-size:0.88rem; color:var(--text-dark)">Hey team! Just a quick check-in to help you avoid last-minute jams. Make sure to upload your UI simulator logs before Friday afternoon. Let us know if you have questions! 👍</p>
+        `;
+            B.onclick = () => selectVoice('B');
+
+            grid.appendChild(A);
+            grid.appendChild(B);
+            main.appendChild(grid);
+
+            const qRow = document.createElement('div');
+            qRow.style.borderTop = '1px solid var(--border-color)';
+            qRow.style.paddingTop = '16px';
+            qRow.innerHTML = `
+            <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:8px;">
+                Choose the best authentic rewrite for this robotic alert: "Portal operational. Users must perform registration."
+            </label>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.85rem;">
+                <label style="cursor:pointer;"><input type="radio" name="l2-q" value="wrong1" style="margin-right:6px;"> "Submission portal activated. Enroll now."</label>
+                <label style="cursor:pointer;"><input type="radio" name="l2-q" value="correct" style="margin-right:6px;"> "Exciting news! The design course registrations are officially open. Grab your elective slot today! 🎓"</label>
+                <label style="cursor:pointer;"><input type="radio" name="l2-q" value="wrong2" style="margin-right:6px;"> "Failure to check portals halts graduation credits."</label>
+            </div>
+        `;
+            main.appendChild(qRow);
+
+            container.appendChild(main);
+        }
+
+        function selectVoice(mode) {
+            state.l2SelectedVoice = mode;
+            document.getElementById('voice-card-A').classList.toggle('selected', mode === 'A');
+            document.getElementById('voice-card-B').classList.toggle('selected', mode === 'B');
+        }
+
+        function validateLevel2() {
+            const radioVal = document.querySelector('input[name="l2-q"]:checked');
+            const vCorrect = (state.l2SelectedVoice === 'B');
+            const qCorrect = (radioVal && radioVal.value === 'correct');
+
+            const success = (vCorrect && qCorrect);
+
+            showFeedback(success, success
+                ? "Wonderful! You picked authentic, empathetic human copywriting. This shifts interfaces from institutional notices to friendly conversations."
+                : "Tone Failure: Choose Version B notices and select the friendly registration rewrite to proceed.");
+            return success;
+        }
+
+        /* LEVEL 3: REPOST AND COMMENT */
+        function renderLevel3(container) {
+            state.l3ShareMode = 'none';
+
+            const main = document.createElement('div');
+            main.className = 'repost-layout';
+
+            main.innerHTML = `
+            <div class="source-post-box">
+                <span class="social-badge badge-ann">College Research</span>
+                <strong style="display:block; margin-bottom:4px; font-size:0.9rem;">College Robotics Team wins national cup!</strong>
+                <p style="font-size:0.8rem; color:var(--text-muted);">The lab developed a new navigation model that handles cluttered coordinates efficiently.</p>
+            </div>
+            
+            <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:8px;">Share Choice:</label>
+            <div style="display:flex; gap:12px; margin-bottom:16px;">
+                <button class="btn-spotlight" id="btn-share-raw" onclick="setL3Share('raw')">Direct Share Link</button>
+                <button class="btn-spotlight" id="btn-share-comment" onclick="setL3Share('comment')">Repost with Commentary</button>
+            </div>
+
+            <div id="commentary-box-wrapper" style="display:none;">
+                <textarea class="commentary-input-box" id="l3-comment" placeholder="Add your notes: Why is this important to your cohort? (min 10 characters)"></textarea>
+            </div>
+
+            <div id="reposted-preview" style="display:none;"></div>
+        `;
+
+            container.appendChild(main);
+        }
+
+        function setL3Share(mode) {
+            state.l3ShareMode = mode;
+            document.getElementById('btn-share-raw').classList.toggle('active', mode === 'raw');
+            document.getElementById('btn-share-comment').classList.toggle('active', mode === 'comment');
+
+            const box = document.getElementById('commentary-box-wrapper');
+            const preview = document.getElementById('reposted-preview');
+
+            if (mode === 'comment') {
+                box.style.display = 'block';
+                preview.style.display = 'none';
+            } else {
+                box.style.display = 'none';
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                <div class="reposted-preview-card">
+                    <span style="font-size:0.75rem; color:var(--text-muted);">Raw link reposted in Class Stream.</span>
+                </div>
+            `;
+            }
+        }
+
+        function validateLevel3() {
+            if (state.l3ShareMode !== 'comment') {
+                showFeedback(false, "Verification Failed: Choose 'Repost with Commentary' to add context. Raw shares are ignored.");
+                return false;
+            }
+
+            const commentText = document.getElementById('l3-comment').value.trim();
+            if (commentText.length < 10) {
+                showFeedback(false, "Commentary too brief. Write at least 10 characters explaining why the robotics breakthrough is cool.");
+                return false;
+            }
+
+            const preview = document.getElementById('reposted-preview');
+            preview.style.display = 'block';
+            preview.innerHTML = `
+            <div class="reposted-preview-card">
+                <div style="font-weight:700; font-size:0.85rem; color:var(--somaiya-red); margin-bottom:4px;">You Reposted:</div>
+                <p style="font-size:0.88rem; font-style:italic; margin-bottom:10px; border-left:2px solid var(--somaiya-red); padding-left:8px;">"${commentText}"</p>
+                <div style="font-size:0.75rem; color:var(--text-muted); background-color:var(--light-bg); padding:8px; border-radius:6px;">
+                    <strong>🔄 Shared Post:</strong> College Robotics wins national cup.
+                </div>
+            </div>
+        `;
+
+            showFeedback(true, "Excellent share! Commentary adds personal context, encouraging peers to click and read.");
+            return true;
+        }
+
+        /* LEVEL 4: CONVERSATION STARTER */
+        function renderLevel4(container) {
+            state.l4StarterSelected = 'none';
+
+            const main = document.createElement('div');
+            main.className = 'starter-interactive-card';
+            main.innerHTML = `
+            <div style="font-size:0.75rem; font-weight:700; color:var(--somaiya-red); text-transform:uppercase; margin-bottom:6px;">Flat Announcement:</div>
+            <div class="post-transform-box">"New design project guidelines are uploaded."</div>
+            
+            <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:8px;">Transform into Conversation Starter:</label>
+            <div class="options-list-starters">
+                <div class="voice-card-select" id="starter-opt-1" onclick="selectL4Starter('opt1')">
+                    <strong>Option 1:</strong> "Guidelines uploaded. Access guidelines in directories immediately."
+                </div>
+                <div class="voice-card-select" id="starter-opt-2" onclick="selectL4Starter('opt2')">
+                    <strong>Option 2:</strong> "Guidelines uploaded. Download PDF link."
+                </div>
+                <div class="voice-card-select" id="starter-opt-3" onclick="selectL4Starter('opt3')">
+                    <strong>Option 3:</strong> "Hey designers! The project guidelines are live. 🚀 Which simulation subtopic are you planning to build? Vote in the poll below or drop ideas! 👇 [Poll Box]"
+                </div>
+            </div>
+        `;
+
+            container.appendChild(main);
+        }
+
+        function selectL4Starter(id) {
+            state.l4StarterSelected = id;
+            document.querySelectorAll('.options-list-starters .voice-card-select').forEach(b => b.classList.remove('selected'));
+            document.getElementById(`starter-${id}`).classList.add('selected');
+        }
+
+        function validateLevel4() {
+            const correct = (state.l4StarterSelected === 'opt3');
+            showFeedback(correct, correct
+                ? "Superb choice! Prompts with questions and interactive poll hooks invite peer comments, fostering dialogue."
+                : "Engagement Failure: Pick Option 3 to hook reader feedback.");
+            return correct;
+        }
+
+        /* LEVEL 5: INVERTED NANO-PYRAMID */
+        function renderLevel5(container) {
+            state.l5PyramidBlocks = { 'top': null, 'middle': null, 'bottom': null };
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'pyramid-wrapper';
+
+            const pyramid = document.createElement('div');
+            pyramid.className = 'pyramid-container';
+
+            const zones = [
+                { id: 'top', label: '▼ 1. Core News Headline (Top Pyramid)' },
+                { id: 'middle', label: '⚡ 2. Supporting Context (Middle Pyramid)' },
+                { id: 'bottom', label: '🔗 3. Action Link / Exit (Bottom Pyramid)' }
+            ];
+
+            zones.forEach(z => {
+                const zone = document.createElement('div');
+                zone.className = 'pyramid-zone';
+                zone.id = `pyr-zone-${z.id}`;
+                zone.innerHTML = `
+                <div class="pyramid-label">${z.label}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);" class="pyr-placeholder">Drop target text block here</div>
+            `;
+                zone.addEventListener('dragover', dragOver);
+                zone.addEventListener('dragleave', dragLeave);
+                zone.addEventListener('drop', dropPyramidSlot);
+
+                pyramid.appendChild(zone);
+            });
+
+            const pool = document.createElement('div');
+            pool.className = 'feed-pool';
+            pool.id = 'pyr-pool';
+            pool.innerHTML = `<strong style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Details Pool</strong>`;
+
+            const blocks = [
+                { id: 'pyr-block-headline', text: '🎓 UX Design Lecture by Google designer this Friday 11 AM.' },
+                { id: 'pyr-block-context', text: 'Learn dynamic queries and speed tips inside Seminar Hall A. Open entry, free snacks.' },
+                { id: 'pyr-block-link', text: '👉 [Register Free Google Form Link]' }
+            ];
+
+            blocks.sort(() => 0.5 - Math.random()).forEach(b => {
+                const card = document.createElement('div');
+                card.className = 'card-social-item';
+                card.draggable = true;
+                card.id = b.id;
+                card.innerText = b.text;
+                card.addEventListener('dragstart', dragStart);
+                pool.appendChild(card);
+            });
+
+            wrapper.appendChild(pyramid);
+            wrapper.appendChild(pool);
+            container.appendChild(wrapper);
+        }
+
+        function dropPyramidSlot(e) {
+            e.preventDefault();
+            const zone = e.currentTarget;
+            zone.classList.remove('drag-over');
+
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(draggedId);
+
+            if (draggedElement) {
+                const placeholder = zone.querySelector('.pyr-placeholder');
+                if (placeholder) placeholder.remove();
+
+                const existing = zone.querySelector('.card-social-item');
+                if (existing) {
+                    document.getElementById('pyr-pool').appendChild(existing);
+                }
+
+                zone.appendChild(draggedElement);
+                zone.classList.add('filled');
+
+                const zoneId = zone.id.replace('pyr-zone-', '');
+                state.l5PyramidBlocks[zoneId] = draggedId;
+            }
+        }
+
+        function validateLevel5() {
+            const correctMapping = {
+                'top': 'pyr-block-headline',
+                'middle': 'pyr-block-context',
+                'bottom': 'pyr-block-link'
+            };
+
+            let correct = true;
+            let errors = [];
+
+            Object.keys(correctMapping).forEach(zone => {
+                if (state.l5PyramidBlocks[zone] !== correctMapping[zone]) {
+                    correct = false;
+                    errors.push(`Pyramid slot ${zone.toUpperCase()} does not match correct block.`);
+                }
+            });
+
+            showFeedback(correct, correct
+                ? "Congratulations! The Inverted Nano-pyramid keeps news readable on mobile streams: news headline top, supporting data mid, action button bottom."
+                : `Pyramid Layout Failure: ${errors[0] || "Check block placements."}`);
+
+            return correct;
+        }
+
+        /* SYSTEM HANDLERS */
+        function validateAction() {
+            if (state.currentLevel === 1) {
+                validateLevel1();
+            } else if (state.currentLevel === 2) {
+                validateLevel2();
+            } else if (state.currentLevel === 3) {
+                validateLevel3();
+            } else if (state.currentLevel === 4) {
+                validateLevel4();
+            } else if (state.currentLevel === 5) {
+                validateLevel5();
+            }
+        }
+
+        // Navigation triggers
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                renderFinalCompletionScreen();
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function renderFinalCompletionScreen() {
+            document.getElementById('btn-submit-action').classList.add('hidden');
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+
+            const sandbox = document.getElementById('sandbox-body');
+            sandbox.innerHTML = `
+            <div class="final-screen">
+                <span class="celebrate-icon">🏆</span>
+                <h3>Module 4.4 Completed!</h3>
+                <p>Congratulations! You have mastered the patterns for Social Content Production in UI design. You successfully arranged balanced editorial feeds, comparison-selected personal authentic tones, shared repost commentaries, built conversation hook starters, and structured Nano-pyramid summaries.</p>
+                <div style="margin-top: 24px;">
+                    <button class="btn-action" onclick="restartSimulation()">Restart Lab Simulation</button>
+                </div>
+            </div>
+        `;
+            document.getElementById('sandbox-title').innerText = "Social Content Course Verified";
+            document.getElementById('sandbox-desc').innerText = "All levels completed successfully.";
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+        function dragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+        function dragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+    </script>
+</body>
+
+</html>

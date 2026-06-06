@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation 4.1 — Patterns for Actions and Commands</title>
+    <!-- Google Fonts: Inter for premium clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --somaiya-red: #A8201A;
+            --somaiya-red-hover: #801813;
+            --somaiya-red-light: #FDF2F2;
+            --somaiya-red-border: #F8D7DA;
+            --text-dark: #1E1E24;
+            --text-muted: #5A5A66;
+            --white: #FFFFFF;
+            --light-bg: #FAFAFB;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --success-light: #ECFDF5;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --warning-color: #F59E0B;
+            --warning-light: #FEF3C7;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(168, 32, 26, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(168, 32, 26, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            font-weight: 700;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid var(--white);
+        }
+
+        .logo-title h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .subtopic-badge {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        /* Sidebar info card */
+        .info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: fit-content;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 110px;
+        }
+
+        .progress-section {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--somaiya-red);
+            width: 20%;
+            transition: width var(--transition);
+        }
+
+        .level-card {
+            border-top: 2px solid var(--somaiya-red);
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .level-card h2 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .level-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+            border: 1px dashed var(--somaiya-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-hint:hover {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border-style: solid;
+        }
+
+        /* Simulation sandbox */
+        .sandbox {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 500px;
+        }
+
+        .sandbox-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sandbox-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--somaiya-red);
+        }
+
+        .sandbox-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sandbox-body {
+            flex-grow: 1;
+            margin-bottom: 24px;
+        }
+
+        /* Level Specific Layouts */
+        /* Level 1: Command Sorting */
+        .level-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .command-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-height: 80px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .draggable-command {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: grab;
+            box-shadow: var(--shadow-sm);
+            user-select: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .draggable-command:hover {
+            border-color: var(--somaiya-red);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .category-bins-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .category-bins-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .bin {
+            background-color: var(--white);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .bin.drag-over {
+            border-color: var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+        }
+
+        .bin-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--somaiya-red);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .bin-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex-grow: 1;
+            align-items: flex-start;
+        }
+
+        /* Level 2: Button Hierarchy Styling */
+        .bad-form-simulation {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-header-mock {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-row {
+            margin-bottom: 16px;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        .form-row input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            background-color: var(--light-bg);
+            cursor: not-allowed;
+        }
+
+        .form-button-container-mock {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            justify-content: flex-end;
+        }
+
+        .mock-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid #D1D5DB;
+            background-color: #F3F4F6;
+            color: #374151;
+            position: relative;
+        }
+
+        .mock-btn:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mock-btn.active-primary {
+            background-color: var(--somaiya-red);
+            border-color: var(--somaiya-red);
+            color: var(--white);
+        }
+
+        .mock-btn.active-secondary {
+            background-color: var(--white);
+            border-color: var(--somaiya-red);
+            color: var(--somaiya-red);
+        }
+
+        .mock-btn.active-danger {
+            background-color: var(--white);
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .mock-btn.active-disabled {
+            background-color: #E2E8F0;
+            border-color: #CBD5E1;
+            color: #94A3B8;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .mock-btn.active-text {
+            background-color: transparent;
+            border-color: transparent;
+            color: var(--text-muted);
+            text-decoration: underline;
+        }
+
+        .btn-style-selector-modal {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-lg);
+            position: absolute;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            width: 200px;
+        }
+
+        .style-option {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .style-option:hover {
+            background-color: var(--somaiya-red-light);
+            color: var(--somaiya-red);
+        }
+
+        /* Level 3: Prevent Dangerous Actions */
+        .danger-panel {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .config-controls {
+            text-align: left;
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .checkbox-container input {
+            accent-color: var(--somaiya-red);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .live-delete-screen {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #FAFAFA;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .live-delete-screen.deleted {
+            background-color: var(--danger-light);
+            border-color: var(--danger-color);
+        }
+
+        .warning-text-block {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .confirm-input-field {
+            margin-top: 12px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 80%;
+            text-align: center;
+            font-family: inherit;
+            display: none;
+        }
+
+        .confirm-input-field:focus {
+            outline: none;
+            border-color: var(--somaiya-red);
+        }
+
+        .action-button-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-delete-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-delete-action:disabled {
+            background-color: #CBD5E1;
+            color: #94A3B8;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel-action {
+            background-color: var(--white);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            display: none;
+            transition: var(--transition);
+        }
+
+        .btn-cancel-action:hover {
+            background-color: var(--light-bg);
+        }
+
+        .undo-toast {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            background-color: var(--text-dark);
+            color: var(--white);
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.3s ease;
+        }
+
+        .undo-toast button {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .undo-toast button:hover {
+            background-color: var(--somaiya-red-hover);
+        }
+
+        /* Level 4: Command Placement Challenge */
+        .placement-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .layout-wireframe {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--white);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 250px;
+        }
+
+        .wireframe-top-bar {
+            border: 1px dashed var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .wireframe-middle-body {
+            display: flex;
+            gap: 16px;
+            flex-grow: 1;
+        }
+
+        .wireframe-table-area {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            flex-grow: 1;
+            padding: 12px;
+            background-color: #FCFCFD;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mock-row-item {
+            border: 1px solid var(--border-color);
+            background-color: var(--white);
+            border-radius: 6px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wireframe-row-menu-dropzone {
+            border: 1px dashed var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+            border-radius: 6px;
+            padding: 6px 12px;
+            min-height: 40px;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wireframe-contextual-menu-dropzone {
+            border: 1px dashed var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+            border-radius: 6px;
+            padding: 6px 12px;
+            min-height: 40px;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: auto;
+        }
+
+        .wireframe-bottom-form-area {
+            border: 1px dashed var(--somaiya-red);
+            background-color: var(--somaiya-red-light);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .placement-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-height: 60px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Level 5: Real UI Case Builder */
+        .case-builder-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .flow-dropzones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            padding: 16px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .flow-step-box {
+            background-color: var(--light-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            width: 110px;
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .flow-step-box.filled {
+            border-style: solid;
+            border-color: var(--somaiya-red);
+            background-color: var(--white);
+        }
+
+        .flow-step-number {
+            position: absolute;
+            top: 4px;
+            left: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .flow-connector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .run-flow-interactive-sandbox {
+            border: 1px solid var(--border-color);
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .flow-stage-ui {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Feedback and educational panel */
+        .feedback-panel {
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-panel.success {
+            background-color: var(--success-light);
+            border: 1px solid var(--success-color);
+            color: #065F46;
+            display: block;
+        }
+
+        .feedback-panel.error {
+            background-color: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: #991B1B;
+            display: block;
+        }
+
+        .educational-explanation {
+            margin-top: 16px;
+            background-color: var(--somaiya-red-light);
+            border-left: 4px solid var(--somaiya-red);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #7A1C1C;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--somaiya-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--somaiya-red-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            color: var(--somaiya-red);
+            border: 1px solid var(--somaiya-red);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background-color: var(--somaiya-red-light);
+        }
+
+        .btn-outline:disabled {
+            background-color: #F3F4F6;
+            color: #9CA3AF;
+            border-color: #E5E7EB;
+            cursor: not-allowed;
+        }
+
+        /* Modal Overlay for Hint */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--somaiya-red);
+            animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h4 {
+            font-size: 1.15rem;
+            color: var(--somaiya-red);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        /* Final Screen Styling */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .celebrate-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .final-screen h3 {
+            font-size: 1.8rem;
+            color: var(--somaiya-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .final-screen p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-box">UI</div>
+                <div class="logo-title">
+                    <h1>College UI Design Laboratory</h1>
+                    <p>Module 4: Interface Design for Data Handling</p>
+                </div>
+            </div>
+            <div class="subtopic-badge">
+                4.1 Patterns for Actions & Commands
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Left column: Educational guidance and progress -->
+        <div class="info-card">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Simulation Progress</span>
+                    <span id="level-indicator-text">Level 1 of 5</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-card" id="instruction-panel">
+                <!-- Dynamically populated by JS -->
+                <h2 id="level-title">Level 1: Identify Commands</h2>
+                <p id="level-desc">Show a messy dashboard with buttons. Classify them into correct categories to
+                    establish a foundation for clean interface commands.</p>
+                <button class="btn-hint" onclick="showHintModal()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle;">
+                        <path
+                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                    </svg>
+                    Need a Hint?
+                </button>
+            </div>
+        </div>
+
+        <!-- Right column: Interactive Sandbox -->
+        <div class="sandbox">
+            <div class="sandbox-header">
+                <h3 id="sandbox-title">Messy Dashboard Button Pile</h3>
+                <p id="sandbox-desc">Drag the commands below into their correct button priority categories.</p>
+            </div>
+
+            <div class="sandbox-body" id="sandbox-body">
+                <!-- Level 1 UI will load here -->
+            </div>
+
+            <!-- Feedback Messages -->
+            <div class="feedback-panel" id="feedback-panel">
+                <strong id="feedback-title">Feedback Title</strong>
+                <p id="feedback-text">Feedback text body explaining correct or incorrect choices.</p>
+            </div>
+
+            <div class="educational-explanation" id="educational-explanation">
+                <strong>💡 UI Design Principle:</strong>
+                <span id="educational-explanation-text">Educational explanation text goes here...</span>
+            </div>
+
+            <!-- Level Controls -->
+            <div class="controls-row">
+                <button class="btn-outline" id="btn-prev-level" onclick="goToPrevLevel()">← Prev Level</button>
+                <button class="btn-outline" id="btn-restart" onclick="restartSimulation()">Reset Level</button>
+                <button class="btn-action" id="btn-submit-action" onclick="validateAction()">Submit Response</button>
+                <button class="btn-outline" id="btn-next-level" onclick="goToNextLevel()">Next Level →</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hint Modal -->
+    <div class="modal-overlay" id="hint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>💡 Lecture Slide Reference</h4>
+                <button class="modal-close" onclick="closeHintModal()">&times;</button>
+            </div>
+            <p id="hint-text" style="font-size: 0.95rem; color: var(--text-dark);"></p>
+        </div>
+    </div>
+
+    <script>
+        // State Tracker
+        const state = {
+            currentLevel: 1,
+            maxLevels: 5,
+            draggedElementId: null,
+            levelAttempts: 0,
+            // Style parameters for Level 2
+            level2Selections: {
+                'Confirm': '',
+                'Download': '',
+                'Delete Account': '',
+                'Apply Promo': '',
+                'Cancel': ''
+            },
+            // Dangerous setup for Level 3
+            level3Config: {
+                warning: false,
+                confirmInput: false,
+                cancelBtn: false,
+                undoToast: false
+            },
+            // Placement map for Level 4
+            level4Placement: {
+                'top-bar': [],
+                'bottom-bar': [],
+                'row-menu': [],
+                'context-menu': []
+            },
+            // Level 5 Flow Placement
+            level5Flow: [null, null, null, null, null],
+            level5Stages: {
+                'Draft': 0,
+                'Preview': 1,
+                'Publish': 2,
+                'Confirm': 3,
+                'Undo/Archive': 4
+            }
+        };
+
+        // Educational Text Database
+        const levelData = {
+            1: {
+                title: "Level 1: Identify Commands",
+                desc: "A messy dashboard loads all commands as generic labels. Users get confused about what does what. Sort these 7 actions into their behavioral categories.",
+                sandboxTitle: "Command Classification Board",
+                sandboxDesc: "Categorize: Save, Delete, Export, Share, Cancel, Undo, Submit into Primary, Secondary, Destructive, or Supportive categories.",
+                hint: "Primary triggers the main screen outcome. Destructive deletes data. Supportive cancels or reverts actions. Secondary actions are useful secondary options like exports or shares.",
+                explanation: "Properly classifying commands ensures you can format them visually. Grouping commands by behavioral consequence is the critical first step before choosing button colors, shapes, and positions."
+            },
+            2: {
+                title: "Level 2: Fix Button Hierarchy",
+                desc: "All commands on this form have the exact same design. This creates choice fatigue and increases formatting errors. Style each button according to its hierarchy.",
+                sandboxTitle: "Button Priority Hierarchy Adjuster",
+                sandboxDesc: "Click each grey button below and assign it the correct visual styling based on its command role.",
+                hint: "Confirm completes the main action (Primary red). Delete Account is high-risk and dangerous (Danger). Download is helpful but secondary (Secondary outline). Cancel drops changes (Text button). Apply Promo requires valid code, so keep it disabled at first.",
+                explanation: "Visual hierarchy controls user attention. Solid primary actions guide users forward, secondary outlines offer auxiliary paths, danger alerts warn of risk, and text buttons stay low-key to avoid visual clutter."
+            },
+            3: {
+                title: "Level 3: Prevent Dangerous Actions",
+                desc: "A raw delete action with no safety nets leads to catastrophic data loss. Prevent errors by building a robust destructive action safety pattern.",
+                sandboxTitle: "Safeguard Design Canvas",
+                sandboxDesc: "Check the design patterns below to build a bulletproof interface safety system for deleting a portfolio, then execute the deletion.",
+                hint: "For destructive actions, enable all safety controls: warning text, typed confirmation, cancel alternative, and a temporary undo recovery option.",
+                explanation: "Destructive operations require a friction layer. Combining warning statements, explicit typing, explicit cancels, and undo/recovery capabilities protects users from slips and accidents."
+            },
+            4: {
+                title: "Level 4: Command Placement Challenge",
+                desc: "Commands are scattered all over the page. Drag commands to their standard spatial regions based on established mental models.",
+                sandboxTitle: "Spatial Action Allocation",
+                sandboxDesc: "Drag each command from the pool into its correct container within the dashboard wireframe layout.",
+                hint: "Top Action Bar handles global context (Add student). Bottom Action Bar hosts form submits. Row action represents item-level adjustments (Delete record). Right-click or mouse selection uses context menus.",
+                explanation: "Standard placement reduces search times. Consistent patterns (like global at top, form actions at bottom-right, item actions in-row) align with native cognitive scanning patterns."
+            },
+            5: {
+                title: "Level 5: Real UI Case Builder",
+                desc: "Combine everything. Build a complete command publishing flow for releasing exam grades so faculty can review, execute, and recover safely.",
+                sandboxTitle: "Action Publishing Pipeline",
+                sandboxDesc: "Arrange the stages into the correct sequential order from first step to final status option, then run the simulation.",
+                hint: "The correct sequence is: Draft (write grades safely) -> Preview (review accuracy) -> Publish (action trigger) -> Confirm (safety prompt) -> Undo/Archive (error recovery).",
+                explanation: "Comprehensive task chains buffer operations using safe states (drafts), validations (previews), explicit friction prompts (confirmations), and safety exits (undo/archives)."
+            }
+        };
+
+        // Initialize Page
+        window.onload = function () {
+            loadLevel(1);
+        };
+
+        // Load level specific structures
+        function loadLevel(levelNum) {
+            state.currentLevel = levelNum;
+            state.levelAttempts = 0;
+
+            // Reset UI Elements
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+            document.getElementById('btn-submit-action').classList.remove('hidden');
+            document.getElementById('btn-submit-action').disabled = false;
+
+            // Progress Bar
+            const progressPercentage = (levelNum / state.maxLevels) * 100;
+            document.getElementById('progress-bar-fill').style.width = progressPercentage + '%';
+            document.getElementById('level-indicator-text').innerText = `Level ${levelNum} of 5`;
+
+            // Load Texts
+            document.getElementById('level-title').innerText = levelData[levelNum].title;
+            document.getElementById('level-desc').innerText = levelData[levelNum].desc;
+            document.getElementById('sandbox-title').innerText = levelData[levelNum].sandboxTitle;
+            document.getElementById('sandbox-desc').innerText = levelData[levelNum].sandboxDesc;
+
+            // Set Navigation states
+            document.getElementById('btn-prev-level').disabled = (levelNum === 1);
+            document.getElementById('btn-next-level').disabled = (levelNum === state.maxLevels);
+
+            // Render Level specific content
+            const sandboxBody = document.getElementById('sandbox-body');
+            sandboxBody.innerHTML = '';
+
+            if (levelNum === 1) {
+                renderLevel1(sandboxBody);
+            } else if (levelNum === 2) {
+                renderLevel2(sandboxBody);
+            } else if (levelNum === 3) {
+                renderLevel3(sandboxBody);
+            } else if (levelNum === 4) {
+                renderLevel4(sandboxBody);
+            } else if (levelNum === 5) {
+                renderLevel5(sandboxBody);
+            }
+        }
+
+        // Modal Helpers
+        function showHintModal() {
+            const modal = document.getElementById('hint-modal');
+            const text = document.getElementById('hint-text');
+            text.innerText = levelData[state.currentLevel].hint;
+            modal.style.display = 'flex';
+        }
+
+        function closeHintModal() {
+            document.getElementById('hint-modal').style.display = 'none';
+        }
+
+        // Close modal if clicked outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('hint-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+
+            // Hide style menu selector if clicked elsewhere
+            const selectorMenu = document.getElementById('btn-style-selector-menu');
+            if (selectorMenu && !event.target.classList.contains('mock-btn') && !event.target.closest('#btn-style-selector-menu')) {
+                selectorMenu.style.display = 'none';
+            }
+        }
+
+        /* LEVEL 1: IDENTIFY COMMANDS IMPLEMENTATION */
+        function renderLevel1(container) {
+            const commands = ['Submit', 'Delete', 'Export', 'Share', 'Cancel', 'Undo', 'Save'];
+            const shuffled = commands.sort(() => 0.5 - Math.random());
+
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'level-grid';
+
+            const poolDiv = document.createElement('div');
+            poolDiv.className = 'command-pool';
+            poolDiv.id = 'command-pool';
+            poolDiv.innerText = '';
+
+            shuffled.forEach(cmd => {
+                const btn = document.createElement('div');
+                btn.className = 'draggable-command';
+                btn.draggable = true;
+                btn.id = `cmd-${cmd.toLowerCase()}`;
+                btn.innerText = cmd;
+                btn.addEventListener('dragstart', dragStart);
+                poolDiv.appendChild(btn);
+            });
+
+            const binsGrid = document.createElement('div');
+            binsGrid.className = 'category-bins-grid';
+
+            const categories = ['Primary', 'Secondary', 'Destructive', 'Supportive'];
+            categories.forEach(cat => {
+                const bin = document.createElement('div');
+                bin.className = 'bin';
+                bin.id = `bin-${cat.toLowerCase()}`;
+                bin.addEventListener('dragover', dragOver);
+                bin.addEventListener('dragleave', dragLeave);
+                bin.addEventListener('drop', drop);
+
+                const title = document.createElement('div');
+                title.className = 'bin-title';
+                title.innerText = `${cat} Action`;
+
+                const items = document.createElement('div');
+                items.className = 'bin-items';
+                items.id = `bin-items-${cat.toLowerCase()}`;
+
+                bin.appendChild(title);
+                bin.appendChild(items);
+                binsGrid.appendChild(bin);
+            });
+
+            gridDiv.appendChild(poolDiv);
+            gridDiv.appendChild(binsGrid);
+            container.appendChild(gridDiv);
+        }
+
+        // Drag and Drop Logic
+        function dragStart(e) {
+            state.draggedElementId = e.target.id;
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function dragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const bin = e.currentTarget;
+            bin.classList.remove('drag-over');
+
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(draggedId);
+
+            if (draggedElement) {
+                const itemsContainer = bin.querySelector('.bin-items');
+                itemsContainer.appendChild(draggedElement);
+            }
+        }
+
+        function validateLevel1() {
+            const bins = {
+                primary: ['cmd-submit'],
+                destructive: ['cmd-delete'],
+                secondary: ['cmd-export', 'cmd-share'],
+                supportive: ['cmd-cancel', 'cmd-undo', 'cmd-save']
+            };
+
+            let correct = true;
+            let errorMessages = [];
+
+            Object.keys(bins).forEach(binName => {
+                const container = document.getElementById(`bin-items-${binName}`);
+                const children = Array.from(container.children).map(c => c.id);
+                const expected = bins[binName];
+
+                expected.forEach(item => {
+                    if (!children.includes(item)) {
+                        correct = false;
+                        const cleanName = item.replace('cmd-', '').toUpperCase();
+                        errorMessages.push(`"${cleanName}" is not categorized correctly.`);
+                    }
+                });
+
+                children.forEach(child => {
+                    if (!expected.includes(child)) {
+                        correct = false;
+                        const cleanName = child.replace('cmd-', '').toUpperCase();
+                        errorMessages.push(`"${cleanName}" should not be in the ${binName.toUpperCase()} container.`);
+                    }
+                });
+            });
+
+            const pool = document.getElementById('command-pool');
+            if (pool.children.length > 0) {
+                correct = false;
+                errorMessages.push("Please categorize all commands before submitting.");
+            }
+
+            showFeedback(correct, correct
+                ? "Excellent! You categorized the commands accurately! Primary controls key operations, destructive deletes, secondary details auxiliary tasks, and supportive provides escape paths."
+                : `Sorting Error: ${errorMessages[0] || "Check command categories."}`);
+
+            return correct;
+        }
+
+        /* LEVEL 2: FIX BUTTON HIERARCHY */
+        let activeBtnToStyle = null;
+
+        function renderLevel2(container) {
+            state.level2Selections = {
+                'Confirm': '',
+                'Download': '',
+                'Delete Account': '',
+                'Apply Promo': '',
+                'Cancel': ''
+            };
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'level-grid';
+
+            const formDiv = document.createElement('div');
+            formDiv.className = 'bad-form-simulation';
+
+            const headerMock = document.createElement('div');
+            headerMock.className = 'form-header-mock';
+            headerMock.innerText = 'Scholarship Application Panel';
+            formDiv.appendChild(headerMock);
+
+            const fields = [
+                { label: 'Full Student Name', val: 'Rahul Sharma' },
+                { label: 'College Roll ID', val: 'COLLEGE-2026-9812' }
+            ];
+
+            fields.forEach(f => {
+                const row = document.createElement('div');
+                row.className = 'form-row';
+                row.innerHTML = `<label>${f.label}</label><input type="text" value="${f.val}" disabled>`;
+                formDiv.appendChild(row);
+            });
+
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'form-button-container-mock';
+            btnContainer.id = 'hierarchy-buttons-row';
+
+            const mockButtons = ['Delete Account', 'Download', 'Apply Promo', 'Cancel', 'Confirm'];
+            mockButtons.forEach(btnName => {
+                const btnEl = document.createElement('button');
+                btnEl.className = 'mock-btn';
+                btnEl.id = `mock-btn-${btnName.replace(/\s+/g, '-').toLowerCase()}`;
+                btnEl.innerText = btnName;
+                btnEl.onclick = (e) => {
+                    e.stopPropagation();
+                    openStyleSelector(e.target, btnName);
+                };
+                btnContainer.appendChild(btnEl);
+            });
+
+            formDiv.appendChild(btnContainer);
+
+            const selectorMenu = document.createElement('div');
+            selectorMenu.className = 'btn-style-selector-modal';
+            selectorMenu.id = 'btn-style-selector-menu';
+
+            const styles = [
+                { class: 'active-primary', label: 'Primary Red Button' },
+                { class: 'active-secondary', label: 'Secondary Outline Button' },
+                { class: 'active-danger', label: 'Danger Button' },
+                { class: 'active-disabled', label: 'Disabled Button' },
+                { class: 'active-text', label: 'Text Button' }
+            ];
+
+            styles.forEach(style => {
+                const opt = document.createElement('div');
+                opt.className = 'style-option';
+                opt.innerText = style.label;
+                opt.onclick = () => {
+                    applyStyleToMockButton(style.class);
+                };
+                selectorMenu.appendChild(opt);
+            });
+
+            wrapper.appendChild(formDiv);
+            wrapper.appendChild(selectorMenu);
+            container.appendChild(wrapper);
+        }
+
+        function openStyleSelector(btnEl, btnName) {
+            activeBtnToStyle = { el: btnEl, name: btnName };
+            const menu = document.getElementById('btn-style-selector-menu');
+            const rect = btnEl.getBoundingClientRect();
+            const parentRect = btnEl.offsetParent.getBoundingClientRect();
+
+            menu.style.top = (rect.bottom - parentRect.top + 8) + 'px';
+            menu.style.left = (rect.left - parentRect.left) + 'px';
+            menu.style.display = 'flex';
+        }
+
+        function applyStyleToMockButton(styleClass) {
+            if (!activeBtnToStyle) return;
+
+            const btn = activeBtnToStyle.el;
+            const name = activeBtnToStyle.name;
+
+            btn.classList.remove('active-primary', 'active-secondary', 'active-danger', 'active-disabled', 'active-text');
+            btn.classList.add(styleClass);
+            state.level2Selections[name] = styleClass;
+
+            document.getElementById('btn-style-selector-menu').style.display = 'none';
+            activeBtnToStyle = null;
+        }
+
+        function validateLevel2() {
+            const correctMapping = {
+                'Confirm': 'active-primary',
+                'Download': 'active-secondary',
+                'Delete Account': 'active-danger',
+                'Apply Promo': 'active-disabled',
+                'Cancel': 'active-text'
+            };
+
+            let correct = true;
+            let errorMessages = [];
+
+            Object.keys(correctMapping).forEach(btnName => {
+                const selectedStyle = state.level2Selections[btnName];
+                const expectedStyle = correctMapping[btnName];
+
+                if (selectedStyle !== expectedStyle) {
+                    correct = false;
+                    errorMessages.push(`Button "${btnName}" does not have correct priority style.`);
+                }
+            });
+
+            showFeedback(correct, correct
+                ? "Perfect Layout! Confirm is Primary Red guiding submission, Download is secondary outline, Cancel is minimal text style, Delete is red-bordered Danger, and Promo is Disabled. Visual priority is restored."
+                : `Hierarchy Error: ${errorMessages[0] || "Check button assignments."}`);
+
+            return correct;
+        }
+
+        /* LEVEL 3: PREVENT DANGEROUS ACTIONS */
+        let countdownVal = 5;
+        let countdownTimer = null;
+
+        function renderLevel3(container) {
+            state.level3Config = { warning: false, confirmInput: false, cancelBtn: false, undoToast: false };
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'level-grid';
+
+            const configPanel = document.createElement('div');
+            configPanel.className = 'config-controls';
+            configPanel.innerHTML = `
+            <strong>🛠️ Enable Friction Safety Guards:</strong>
+            <label class="checkbox-container">
+                <input type="checkbox" id="chk-warning" onchange="toggleL3Safety('warning')">
+                Display Warning Text (Highlights what database content will be deleted)
+            </label>
+            <label class="checkbox-container">
+                <input type="checkbox" id="chk-confirm" onchange="toggleL3Safety('confirmInput')">
+                Confirmation Input Field (Requires user to type "DELETE")
+            </label>
+            <label class="checkbox-container">
+                <input type="checkbox" id="chk-cancel" onchange="toggleL3Safety('cancelBtn')">
+                Include Alternative Cancel Action (Provides safe path out)
+            </label>
+            <label class="checkbox-container">
+                <input type="checkbox" id="chk-undo" onchange="toggleL3Safety('undoToast')">
+                Undo Recovery Notification (Allows temporary recovery after execution)
+            </label>
+        `;
+            wrapper.appendChild(configPanel);
+
+            const deleteScreen = document.createElement('div');
+            deleteScreen.className = 'danger-panel';
+            deleteScreen.innerHTML = `
+            <div class="live-delete-screen" id="l3-delete-canvas">
+                <span id="l3-status-icon" style="font-size:2.5rem; margin-bottom:12px;">📁</span>
+                <h4 id="l3-canvas-title" style="font-weight:600; margin-bottom:8px;">Portfolio Project: "Module4_Mockups.fig"</h4>
+                
+                <div class="warning-text-block" id="l3-warning-block">
+                    ⚠️ Warning: This operation deletes the file permanently from servers. This cannot be undone by default configuration.
+                </div>
+                
+                <input type="text" class="confirm-input-field" id="l3-confirm-input" placeholder="Type DELETE to authorize" oninput="checkL3ConfirmText()">
+                
+                <div class="action-button-row">
+                    <button class="btn-cancel-action" id="l3-btn-cancel" onclick="triggerL3Cancel()">Cancel</button>
+                    <button class="btn-delete-action" id="l3-btn-delete" onclick="triggerL3Delete()">Delete Portfolio</button>
+                </div>
+
+                <div class="undo-toast" id="l3-undo-toast">
+                    <span>File Deleted. Recover? (<span id="undo-count">5</span>s)</span>
+                    <button onclick="restoreL3Portfolio()">Undo Action</button>
+                </div>
+            </div>
+        `;
+
+            wrapper.appendChild(deleteScreen);
+            container.appendChild(wrapper);
+
+            checkL3ConfirmText();
+        }
+
+        function toggleL3Safety(type) {
+            state.level3Config[type] = document.getElementById(`chk-${type === 'confirmInput' ? 'confirm' : (type === 'undoToast' ? 'undo' : (type === 'cancelBtn' ? 'cancel' : 'warning'))}`).checked;
+
+            document.getElementById('l3-warning-block').style.display = state.level3Config.warning ? 'block' : 'none';
+            document.getElementById('l3-confirm-input').style.display = state.level3Config.confirmInput ? 'block' : 'none';
+            document.getElementById('l3-btn-cancel').style.display = state.level3Config.cancelBtn ? 'block' : 'none';
+
+            checkL3ConfirmText();
+        }
+
+        function checkL3ConfirmText() {
+            const deleteBtn = document.getElementById('l3-btn-delete');
+            if (state.level3Config.confirmInput) {
+                const inputVal = document.getElementById('l3-confirm-input').value;
+                deleteBtn.disabled = (inputVal !== 'DELETE');
+            } else {
+                deleteBtn.disabled = false;
+            }
+        }
+
+        function triggerL3Cancel() {
+            alert("Operation cancelled. Portfolio remains safe.");
+            resetL3Canvas();
+        }
+
+        function resetL3Canvas() {
+            clearInterval(countdownTimer);
+            const canvas = document.getElementById('l3-delete-canvas');
+            canvas.classList.remove('deleted');
+            document.getElementById('l3-status-icon').innerText = '📁';
+            document.getElementById('l3-canvas-title').innerText = 'Portfolio Project: "Module4_Mockups.fig"';
+            document.getElementById('l3-undo-toast').style.display = 'none';
+            if (state.level3Config.confirmInput) {
+                document.getElementById('l3-confirm-input').value = '';
+                document.getElementById('l3-confirm-input').disabled = false;
+            }
+            document.getElementById('l3-btn-delete').style.display = 'inline-block';
+            document.getElementById('l3-btn-cancel').style.display = state.level3Config.cancelBtn ? 'inline-block' : 'none';
+            checkL3ConfirmText();
+        }
+
+        function triggerL3Delete() {
+            const config = state.level3Config;
+            const canvas = document.getElementById('l3-delete-canvas');
+
+            document.getElementById('l3-btn-delete').style.display = 'none';
+            document.getElementById('l3-btn-cancel').style.display = 'none';
+            document.getElementById('l3-confirm-input').disabled = true;
+
+            canvas.classList.add('deleted');
+            document.getElementById('l3-status-icon').innerText = '🗑️';
+            document.getElementById('l3-canvas-title').innerText = 'File deleted from directory.';
+
+            if (config.undoToast) {
+                const toast = document.getElementById('l3-undo-toast');
+                toast.style.display = 'flex';
+                countdownVal = 5;
+                document.getElementById('undo-count').innerText = countdownVal;
+
+                clearInterval(countdownTimer);
+                countdownTimer = setInterval(() => {
+                    countdownVal--;
+                    document.getElementById('undo-count').innerText = countdownVal;
+                    if (countdownVal <= 0) {
+                        clearInterval(countdownTimer);
+                        toast.style.display = 'none';
+                        document.getElementById('l3-canvas-title').innerText = 'Portfolio permanently deleted.';
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('l3-canvas-title').innerText = 'Portfolio permanently deleted.';
+            }
+        }
+
+        function restoreL3Portfolio() {
+            clearInterval(countdownTimer);
+            resetL3Canvas();
+            document.getElementById('l3-canvas-title').innerText = 'File Restored Successfully!';
+            document.getElementById('l3-status-icon').innerText = '✅';
+        }
+
+        function validateLevel3() {
+            const config = state.level3Config;
+            const allGuardsEnabled = (config.warning && config.confirmInput && config.cancelBtn && config.undoToast);
+
+            showFeedback(allGuardsEnabled, allGuardsEnabled
+                ? "Excellent! You built a robust friction defense: Warned of data loss, required typed intent, provided alternative escape path, and enabled undo recovery for post-delete safety."
+                : "Safety Failure: You didn't configure a complete friction pattern. Make sure warning text, confirm prompt, cancel action, and undo notifications are all enabled to protect user data.");
+
+            return allGuardsEnabled;
+        }
+
+        /* LEVEL 4: COMMAND PLACEMENT */
+        function renderLevel4(container) {
+            state.level4Placement = {
+                'top-bar': [],
+                'bottom-bar': [],
+                'row-menu': [],
+                'context-menu': []
+            };
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'placement-layout';
+
+            const wireframe = document.createElement('div');
+            wireframe.className = 'layout-wireframe';
+
+            const topBar = document.createElement('div');
+            topBar.className = 'wireframe-top-bar';
+            topBar.id = 'zone-top-bar';
+            topBar.innerHTML = `<span style="font-size:0.8rem; font-weight:700; color:var(--somaiya-red);">Global Toolbar:</span>`;
+            topBar.addEventListener('dragover', dragOver);
+            topBar.addEventListener('dragleave', dragLeave);
+            topBar.addEventListener('drop', dropPlacement);
+
+            const middleBody = document.createElement('div');
+            middleBody.className = 'wireframe-middle-body';
+
+            const tableArea = document.createElement('div');
+            tableArea.className = 'wireframe-table-area';
+            tableArea.innerHTML = `
+            <div class="mock-row-item">
+                <span>1. Amit Patel (IT Section A)</span>
+                <div class="wireframe-row-menu-dropzone" id="zone-row-menu">
+                    <span style="font-size:0.75rem; color:var(--somaiya-red); font-style:italic;">Row Actions:</span>
+                </div>
+            </div>
+            <div class="mock-row-item">
+                <span style="text-decoration: underline; color: blue;">amit.patel@college.edu</span>
+                <div class="wireframe-contextual-menu-dropzone" id="zone-context-menu">
+                    <span style="font-size:0.75rem; color:var(--somaiya-red); font-style:italic;">Contextual Menu:</span>
+                </div>
+            </div>
+        `;
+            middleBody.appendChild(tableArea);
+
+            const bottomBar = document.createElement('div');
+            bottomBar.className = 'wireframe-bottom-form-area';
+            bottomBar.id = 'zone-bottom-bar';
+            bottomBar.innerHTML = `<span style="font-size:0.8rem; font-weight:700; color:var(--somaiya-red); margin-right:auto;">Form Actions:</span>`;
+            bottomBar.addEventListener('dragover', dragOver);
+            bottomBar.addEventListener('dragleave', dragLeave);
+            bottomBar.addEventListener('drop', dropPlacement);
+
+            setTimeout(() => {
+                const rowZone = document.getElementById('zone-row-menu');
+                rowZone.addEventListener('dragover', dragOver);
+                rowZone.addEventListener('dragleave', dragLeave);
+                rowZone.addEventListener('drop', dropPlacement);
+
+                const contextZone = document.getElementById('zone-context-menu');
+                contextZone.addEventListener('dragover', dragOver);
+                contextZone.addEventListener('dragleave', dragLeave);
+                contextZone.addEventListener('drop', dropPlacement);
+            }, 50);
+
+            wireframe.appendChild(topBar);
+            wireframe.appendChild(middleBody);
+            wireframe.appendChild(bottomBar);
+
+            const pool = document.createElement('div');
+            pool.className = 'placement-pool';
+            pool.id = 'placement-pool';
+
+            const placementCommands = [
+                { id: 'place-add', text: '➕ Add New Student' },
+                { id: 'place-save', text: '💾 Save Profile Details' },
+                { id: 'place-delete', text: '🗑️ Delete Record' },
+                { id: 'place-copy', text: '📋 Copy email ID' }
+            ];
+
+            placementCommands.forEach(cmd => {
+                const btn = document.createElement('div');
+                btn.className = 'draggable-command';
+                btn.draggable = true;
+                btn.id = cmd.id;
+                btn.innerText = cmd.text;
+                btn.addEventListener('dragstart', dragStart);
+                pool.appendChild(btn);
+            });
+
+            wrapper.appendChild(wireframe);
+            wrapper.appendChild(pool);
+            container.appendChild(wrapper);
+        }
+
+        function dropPlacement(e) {
+            e.preventDefault();
+            const zone = e.currentTarget;
+            zone.classList.remove('drag-over');
+
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(draggedId);
+
+            if (draggedElement) {
+                zone.appendChild(draggedElement);
+                const zoneId = zone.id.replace('zone-', '');
+
+                Object.keys(state.level4Placement).forEach(k => {
+                    state.level4Placement[k] = state.level4Placement[k].filter(id => id !== draggedId);
+                });
+
+                if (zoneId in state.level4Placement) {
+                    state.level4Placement[zoneId].push(draggedId);
+                }
+            }
+        }
+
+        function validateLevel4() {
+            const correctPlacements = {
+                'top-bar': 'place-add',
+                'bottom-bar': 'place-save',
+                'row-menu': 'place-delete',
+                'context-menu': 'place-copy'
+            };
+
+            let correct = true;
+            let errors = [];
+
+            Object.keys(correctPlacements).forEach(zone => {
+                const expectedId = correctPlacements[zone];
+                const actualList = state.level4Placement[zone];
+
+                if (!actualList.includes(expectedId)) {
+                    correct = false;
+                    errors.push(`Action is missing from ${zone.toUpperCase().replace('-', ' ')} zone.`);
+                }
+            });
+
+            showFeedback(correct, correct
+                ? "Excellent! Global command placed at top, page-level form save action at bottom, item delete in row menu, and item details (copy email) in contextual selection menu."
+                : `Placement Error: ${errors[0] || "Check command locations."}`);
+
+            return correct;
+        }
+
+        /* LEVEL 5: REAL UI CASE BUILDER */
+        function renderLevel5(container) {
+            state.level5Flow = [null, null, null, null, null];
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'case-builder-grid';
+
+            const dropzoneContainer = document.createElement('div');
+            dropzoneContainer.className = 'flow-dropzones';
+
+            for (let i = 0; i < 5; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'flow-step-box';
+                slot.id = `flow-slot-${i}`;
+                slot.addEventListener('dragover', dragOver);
+                slot.addEventListener('dragleave', dragLeave);
+                slot.addEventListener('drop', dropFlowSlot);
+
+                const num = document.createElement('span');
+                num.className = 'flow-step-number';
+                num.innerText = `Step ${i + 1}`;
+                slot.appendChild(num);
+
+                dropzoneContainer.appendChild(slot);
+
+                if (i < 4) {
+                    const conn = document.createElement('div');
+                    conn.className = 'flow-connector';
+                    conn.innerText = '➔';
+                    dropzoneContainer.appendChild(conn);
+                }
+            }
+
+            const pool = document.createElement('div');
+            pool.className = 'command-pool';
+            pool.id = 'flow-pool';
+
+            const stages = ['Publish', 'Confirm', 'Draft', 'Undo/Archive', 'Preview'];
+            stages.sort(() => 0.5 - Math.random()).forEach(stage => {
+                const btn = document.createElement('div');
+                btn.className = 'draggable-command';
+                btn.draggable = true;
+                btn.id = `flow-item-${stage.toLowerCase().replace('/', '-')}`;
+                btn.innerText = stage;
+                btn.addEventListener('dragstart', dragStart);
+                pool.appendChild(btn);
+            });
+
+            const liveCanvas = document.createElement('div');
+            liveCanvas.className = 'run-flow-interactive-sandbox';
+            liveCanvas.id = 'l5-live-canvas';
+            liveCanvas.innerHTML = `
+            <div style="color:var(--text-muted); font-size:0.9rem;">
+                Arrange stages in order above, then submit. A live simulator will test your pipeline.
+            </div>
+        `;
+
+            wrapper.appendChild(dropzoneContainer);
+            wrapper.appendChild(pool);
+            wrapper.appendChild(liveCanvas);
+            container.appendChild(wrapper);
+        }
+
+        function dropFlowSlot(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove('drag-over');
+
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(draggedId);
+
+            if (draggedElement) {
+                const currentItem = slot.querySelector('.draggable-command');
+                if (currentItem) {
+                    document.getElementById('flow-pool').appendChild(currentItem);
+                }
+
+                slot.appendChild(draggedElement);
+                slot.classList.add('filled');
+
+                const slotIndex = parseInt(slot.id.replace('flow-slot-', ''));
+                state.level5Flow[slotIndex] = draggedElement.innerText;
+            }
+        }
+
+        function validateLevel5() {
+            const correctSequence = ['Draft', 'Preview', 'Publish', 'Confirm', 'Undo/Archive'];
+            let correct = true;
+            let errorMessage = '';
+
+            for (let i = 0; i < 5; i++) {
+                if (state.level5Flow[i] !== correctSequence[i]) {
+                    correct = false;
+                    errorMessage = `Step ${i + 1} is incorrect. Currently placed: "${state.level5Flow[i] || 'Empty'}".`;
+                    break;
+                }
+            }
+
+            if (correct) {
+                runLevel5Simulation();
+            } else {
+                showFeedback(false, `Publish Pipeline Error: ${errorMessage} Pipeline must protect faculty and student grades.`);
+            }
+
+            return correct;
+        }
+
+        function runLevel5Simulation() {
+            const canvas = document.getElementById('l5-live-canvas');
+            canvas.innerHTML = '';
+
+            const steps = [
+                {
+                    title: "📝 Stage 1: Draft Mode",
+                    desc: "Faculty types and edits marks offline safely. Scores are not visible to students yet.",
+                    action: "Generate grades sheet draft"
+                },
+                {
+                    title: "👁️ Stage 2: Preview Summary",
+                    desc: "System compiles average score (78%) and checks for grade boundary anomalies.",
+                    action: "Check visual grade distribution"
+                },
+                {
+                    title: "🚀 Stage 3: Publish Button clicked",
+                    desc: "Faculty hits the primary release command to initialize student notification dispatch.",
+                    action: "Execute grade publish action"
+                },
+                {
+                    title: "⚠️ Stage 4: Critical Action Confirmation",
+                    desc: "Friction modal: 'Are you sure you want to release grades to 120 enrolled students?'",
+                    action: "Confirm release"
+                },
+                {
+                    title: "↩️ Stage 5: Post-Action Safety Net",
+                    desc: "Dispatch banner displays: 'Grades released! Send email alerts.' Undo or Archive operations active.",
+                    action: "Restore draft (Undo)"
+                }
+            ];
+
+            let idx = 0;
+            function renderStep() {
+                if (idx >= steps.length) {
+                    canvas.innerHTML = `
+                    <div style="animation: fadeIn 0.4s ease; color:var(--success-color); font-weight:700;">
+                        🏆 Case Complete! Grade publication flow successfully checked and safe.
+                    </div>
+                `;
+                    showFeedback(true, "Superb! The entire pipeline represents a professional UX design pattern: Draft prevents early leaks, Preview catches mistakes, Publish requests action, Confirm blocks slips, and Undo allows quick rescue.");
+                    return;
+                }
+
+                const step = steps[idx];
+                canvas.innerHTML = `
+                <div class="flow-stage-ui">
+                    <strong style="color:var(--somaiya-red); font-size:1.1rem;">${step.title}</strong>
+                    <p style="font-size:0.9rem; color:var(--text-dark);">${step.desc}</p>
+                    <button class="btn-action" id="l5-simulator-btn">${step.action}</button>
+                </div>
+            `;
+
+                document.getElementById('l5-simulator-btn').onclick = () => {
+                    idx++;
+                    renderStep();
+                };
+            }
+
+            renderStep();
+        }
+
+        /* GENERAL CONTROLS AND FEEDBACK PANEL */
+        function showFeedback(success, text) {
+            const panel = document.getElementById('feedback-panel');
+            const title = document.getElementById('feedback-title');
+            const desc = document.getElementById('feedback-text');
+            const submitBtn = document.getElementById('btn-submit-action');
+
+            panel.className = success ? 'feedback-panel success' : 'feedback-panel error';
+            title.innerText = success ? '✅ Verification Passed!' : '❌ Verification Failed';
+            desc.innerText = text;
+            panel.style.display = 'block';
+
+            if (success) {
+                submitBtn.disabled = true;
+                const eduPanel = document.getElementById('educational-explanation');
+                const eduText = document.getElementById('educational-explanation-text');
+                eduText.innerText = levelData[state.currentLevel].explanation;
+                eduPanel.style.display = 'block';
+            }
+        }
+
+        function validateAction() {
+            if (state.currentLevel === 1) {
+                validateLevel1();
+            } else if (state.currentLevel === 2) {
+                validateLevel2();
+            } else if (state.currentLevel === 3) {
+                validateLevel3();
+            } else if (state.currentLevel === 4) {
+                validateLevel4();
+            } else if (state.currentLevel === 5) {
+                validateLevel5();
+            }
+        }
+
+        function goToNextLevel() {
+            if (state.currentLevel < state.maxLevels) {
+                loadLevel(state.currentLevel + 1);
+            } else {
+                renderFinalCompletionScreen();
+            }
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
+        }
+
+        function renderFinalCompletionScreen() {
+            document.getElementById('btn-submit-action').classList.add('hidden');
+            document.getElementById('feedback-panel').style.display = 'none';
+            document.getElementById('educational-explanation').style.display = 'none';
+
+            const sandbox = document.getElementById('sandbox-body');
+            sandbox.innerHTML = `
+            <div class="final-screen">
+                <span class="celebrate-icon">🏆</span>
+                <h3>Module 4.1 Completed!</h3>
+                <p>Congratulations! You have mastered the patterns for Actions and Commands in UI Design. You successfully navigated button priorities, command placements, dangerous interactions safety buffers, and multi-step transaction flows.</p>
+                <div style="margin-top: 24px;">
+                    <button class="btn-action" onclick="restartSimulation()">Restart Lab Simulation</button>
+                </div>
+            </div>
+        `;
+            document.getElementById('sandbox-title').innerText = "Lab Course Verification Clear";
+            document.getElementById('sandbox-desc').innerText = "All levels completed successfully.";
+        }
+
+        function restartSimulation() {
+            loadLevel(1);
+        }
+    </script>
+</body>
+
+</html>
